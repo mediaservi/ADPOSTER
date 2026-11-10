@@ -58,7 +58,7 @@ body.rot-180 #escena { transform: rotate(180deg); }
 .aviso.on { display: block; }
 
 /* panel del display: se abre con OK del mando, un toque o un clic */
-.panel { --u: calc(var(--u0) * 1.38); position: absolute; inset: 0; z-index: 40; display: none; flex-direction: column; gap: calc(var(--u) * 1.6); padding: calc(var(--u) * 4) calc(var(--u) * 4.5); box-sizing: border-box; overflow-y: auto; background: linear-gradient(180deg, rgba(34, 34, 37, .97), rgba(16, 16, 18, .98)); font-size: calc(var(--u) * 2.5); }
+.panel { --u: calc(var(--u0) * 1.3); position: absolute; inset: 0; z-index: 40; display: none; flex-direction: column; gap: calc(var(--u) * 1.6); padding: calc(var(--u) * 4) calc(var(--u) * 4.5); box-sizing: border-box; overflow-y: auto; background: linear-gradient(180deg, rgba(34, 34, 37, .97), rgba(16, 16, 18, .98)); font-size: calc(var(--u) * 2.5); }
 .con-panel .panel { display: flex; }
 .panel .p-cab { display: flex; align-items: center; justify-content: space-between; gap: calc(var(--u) * 2); padding-bottom: calc(var(--u) * 2); border-bottom: 1px solid #000; box-shadow: 0 1px 0 rgba(255, 255, 255, .07); }
 .panel .p-cab img { height: calc(var(--u) * 7); }

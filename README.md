@@ -2,7 +2,7 @@
 
 **Cartelería digital profesional, fácil y que arranca sola.** ADPOSTER convierte cualquier pantalla en vertical en un cartel digital: pósteres que nunca se repiten, anuncios intercalados, fundidos, horarios y un gestor con vista previa en vivo. Es un apartado de [AVHUB](https://avhub.mediaservi.com/), *tools for AV people*, de [mediaservi.com](https://mediaservi.com).
 
-**Versión actual: v0.3** (beta, en pruebas)
+**Versión actual: v0.4** (beta, en pruebas)
 
 ## Cómo funciona
 
@@ -45,7 +45,11 @@ Para publicar los ajustes del gestor: **Guardar playlists.json** y subir ese arc
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v0.3)
+## Cambios de la versión actual (v0.4)
+
+- **Línea de crédito común.** El pie del gestor y el del panel del display llevan la misma línea que el resto de apps de AVHUB, con el icono nuevo; se cambia desde AVHUB ADMIN.
+
+Sigue de la v0.3:
 
 - **CINE con su cartelera de verdad:** 264 pósteres de cine en `msp-pelis`, ya en WebP para FHD, con los ajustes de la versión anterior (12 segundos por póster y un anuncio cada 4 a 6).
 - **KLUB al día:** se añaden las 48 imágenes que faltaban respecto a la versión anterior (3 anuncios y 45 pósteres de gaming, música y colección), con sus mismas carpetas y ajustes.
@@ -74,4 +78,4 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v0.3 2026 es un proyecto hecho con 𑣲 by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v0.4 2026 es un proyecto hecho con 𑣲 by [mediaservi.com](https://mediaservi.com)*

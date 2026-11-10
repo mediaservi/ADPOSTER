@@ -5,7 +5,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '0.3';
+  const VERSION = '0.4';
   const SC = document.currentScript, Q = new URLSearchParams(location.search);
   const BASE = new URL(SC.dataset.base || '../', location.href).href;
   const ID = (SC.dataset.playlist || Q.get('l') || 'demo').toLowerCase().replace(/[^a-z0-9_-]/g, '');
@@ -115,7 +115,7 @@
       <h3>${T('Carpetas de contenido')}</h3><div class="lista">${con.map(c => chk(c, 'contenido')).join('')}</div>
       <h3>${T('Carpetas de anuncios')}</h3><div class="lista">${ads.map(c => chk(c, 'anuncios')).join('')}</div>
       <div class="acc"><button class="pri" data-a="ok">${T('Aceptar y reproducir')}</button><button data-a="reset">${T('Restablecer')}</button><button data-a="cerrar">${T('Cerrar')}</button></div>
-      <div class="firma">${T('Estos ajustes se guardan solo en este display.')}<br>ADPOSTER v${VERSION} ${new Date().getFullYear()} ${T('es un proyecto hecho con')} <i class="ic-footer"></i> by mediaservi.com</div>`; }
+      <div class="firma">${T('Estos ajustes se guardan solo en este display.')}<br>${window.AVCREDITO ? window.AVCREDITO.html('ADPOSTER', 'v' + VERSION, LANG, { sinEnlaces: true }) : 'ADPOSTER v' + VERSION + ' ' + new Date().getFullYear() + ' ' + T('es un proyecto hecho con') + ' by mediaservi.com'}</div>`; }
   function abre() { if (PREV || !cfg) return; borr = { segundos: cfg.segundos, fundido: { tipo: cfg.fundido.tipo, segundos: cfg.fundido.segundos }, contenido: cfg.contenido.slice(), anuncios: cfg.anuncios.slice() }; pinta(); document.body.classList.add('con-panel'); tPanel = Date.now(); const b = $('.panel .pri'); b && b.focus(); }
   function cierra() { document.body.classList.remove('con-panel'); }
   function accion(t) { const a = t.dataset.a, foco = sel => { pinta(); const e = $(sel); e && e.focus(); }; tPanel = Date.now();

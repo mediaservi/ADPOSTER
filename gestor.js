@@ -3,7 +3,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '0.3', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'];
+  const VERSION = '0.4', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'];
   const DEF = { nombre: '', fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7], fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true,
     horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '' };
   const $ = s => document.querySelector(s), copia = o => JSON.parse(JSON.stringify(o));
@@ -60,7 +60,8 @@
       <div class="nota">${T('Para publicar: guarda el archivo y súbelo a la raíz de la web. Los displays lo recogen solos en menos de 5 minutos.')}</div>`;
     if (foco) { const e = foco[2] ? document.getElementById(foco[2]) : [...document.querySelectorAll('#zona-b [data-a="' + foco[0] + '"]')].find(x => (x.dataset.v || '') === (foco[1] || '')); e && e.focus(); } }
   function pintaFijo() { document.documentElement.lang = lang; $('#btn-idioma').textContent = lang.toUpperCase(); $('#zona-a').setAttribute('aria-label', T('Contenido')); $('#zona-b').setAttribute('aria-label', T('Reproducción'));
-    $('#pie').innerHTML = `ADPOSTER v${VERSION} ${new Date().getFullYear()} ${T('es un proyecto hecho con')} <i class="ic-footer" aria-hidden="true"></i> by <a href="https://mediaservi.com" target="_blank" rel="noopener">mediaservi.com</a>`; }
+    $('#pie').innerHTML = window.AVCREDITO ? window.AVCREDITO.html('ADPOSTER', 'v' + VERSION, lang) : `ADPOSTER v${VERSION} ${new Date().getFullYear()} ${T('es un proyecto hecho con')} by <a href="https://mediaservi.com" target="_blank" rel="noopener">mediaservi.com</a>`; }
+  if (window.AVCREDITO) window.AVCREDITO.alCambiar(() => { if (B) pintaFijo(); });   // la línea de crédito es la común de AVHUB: se edita en AVHUB ADMIN
 
   /* ---------- acciones ---------- */
   const lim = (v, a, b) => Math.min(b, Math.max(a, v)), alterna = (l, v) => { const i = l.indexOf(v); i < 0 ? l.push(v) : l.splice(i, 1); };
