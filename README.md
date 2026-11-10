@@ -2,7 +2,7 @@
 
 **Cartelería digital profesional, fácil y que arranca sola.** ADPOSTER convierte cualquier pantalla en vertical en un cartel digital: pósteres que nunca se repiten, anuncios intercalados, fundidos, horarios y un gestor con vista previa en vivo. Es un apartado de [AVHUB](https://avhub.mediaservi.com/), *tools for AV people*, de [mediaservi.com](https://mediaservi.com).
 
-**Versión actual: v0.1** (beta, en pruebas)
+**Versión actual: v0.2** (beta, en pruebas)
 
 ## Cómo funciona
 
@@ -16,6 +16,7 @@
 - **Nunca repite.** Baraja cada carpeta y no vuelve a enseñar un póster hasta agotar el mazo, ni siquiera después de apagar y encender.
 - **Anuncios intercalados** a pantalla completa, uno cada tantos pósteres (entre un mínimo y un máximo, al azar).
 - **Transiciones:** fundido, zoom, desliza, cortina o corte, con duración ajustable. Acercamiento lento y destello al entrar, opcionales.
+- **Zoom hasta llenar:** cada póster empieza encajado y va creciendo hasta rebosar justo su marco.
 - **Horarios:** la playlist se enciende y se apaga sola por horas y días de la semana, también en tramos que pasan de medianoche.
 - **Redirección:** una playlist puede enviar el display a cualquier otra URL.
 - **Contenido nuevo sin tocar el display:** cada cinco minutos mira si hay imágenes o ajustes nuevos y los aplica.
@@ -42,7 +43,12 @@ Para publicar los ajustes del gestor: **Guardar playlists.json** y subir ese arc
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v0.1)
+## Cambios de la versión actual (v0.2)
+
+- **Zoom hasta llenar.** Efecto nuevo: al entrar cada póster, se amplía poco a poco desde su tamaño encajado hasta rebosar justo el marco. Se activa con la tecla «Llenar» del gestor y viene encendido en CINE y KLUB.
+- El movimiento de cada póster arranca con él y se mantiene mientras se funde con el siguiente, sin saltos.
+
+Sigue de la v0.1:
 
 - Primera versión: reproductor, las playlists de demostración CINE y KLUB, gestor con vista previa en vivo y preparación automática de imágenes.
 - Sustituye, mejorado, al reproductor de pósteres anterior: ya no necesita funciones de servidor, así que funciona en cualquier alojamiento estático.
@@ -59,4 +65,4 @@ En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o 
 
 ---
 
-*ADPOSTER v0.1 2026 es un proyecto hecho con 𑣲 by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v0.2 2026 es un proyecto hecho con 𑣲 by [mediaservi.com](https://mediaservi.com)*

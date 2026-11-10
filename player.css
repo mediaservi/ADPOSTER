@@ -41,8 +41,15 @@ body.rot-270 #escena { transform: rotate(-90deg); }
 /* vida: un acercamiento muy lento y un destello al entrar */
 @keyframes ap-respira { from { transform: scale(1); } to { transform: scale(1.035); } }
 @keyframes ap-destello { 0% { transform: translateX(-130%) skewX(-18deg); } 100% { transform: translateX(330%) skewX(-18deg); } }
-.mov .capa.on .hoja img { animation: ap-respira var(--dur, 8s) linear both; transform-origin: 50% 60%; }
-.brillo .capa.on .hoja::after { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 40%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .2) 45%, rgba(255, 255, 255, .34) 50%, rgba(255, 255, 255, .2) 55%, transparent); animation: ap-destello 1.5s var(--t, 2.5s) ease-in-out both; pointer-events: none; }
+@keyframes ap-llena { from { transform: scale(1); } to { transform: scale(var(--k, 1.04)); } }
+.mov .hoja.anim img { animation: ap-respira var(--dur, 8s) linear both; transform-origin: 50% 60%; }
+/* zoom hasta llenar: el póster crece desde su tamaño encajado hasta rebosar justo el marco */
+.llena .marco { overflow: hidden; }
+.llena .hoja { box-shadow: none; border-radius: 0; transform-origin: 50% 100%; will-change: transform; }
+.llena .capa.centro .hoja { transform-origin: 50% 50%; }
+.llena .hoja.anim { animation: ap-llena var(--dur, 8s) cubic-bezier(.33, 0, .3, 1) both; }
+.llena .hoja.anim img { animation: none; }
+.brillo .hoja.anim::after { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 40%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .2) 45%, rgba(255, 255, 255, .34) 50%, rgba(255, 255, 255, .2) 55%, transparent); animation: ap-destello 1.5s var(--t, 2.5s) ease-in-out both; pointer-events: none; }
 
 .apagado { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; transition: opacity 2s ease; z-index: 20; }
 .apagado.on { opacity: 1; }

@@ -27,6 +27,7 @@
         "segundos": 2.5
       },
       "movimiento": true,
+      "llenar": true,
       "brillo": true,
       "horario": {
         "activo": false,
@@ -70,6 +71,7 @@
         "segundos": 2.5
       },
       "movimiento": true,
+      "llenar": true,
       "brillo": true,
       "horario": {
         "activo": false,

@@ -5,14 +5,14 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '0.1';
+  const VERSION = '0.2';
   const SC = document.currentScript, Q = new URLSearchParams(location.search);
   const BASE = new URL(SC.dataset.base || '../', location.href).href;
   const ID = (SC.dataset.playlist || Q.get('l') || 'demo').toLowerCase().replace(/[^a-z0-9_-]/g, '');
   const PREV = Q.has('prev');                                              // vista previa dentro del gestor
   const K = 'adposter:' + ID + ':';
   const DEF = { nombre: ID.toUpperCase(), fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7],
-    fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, brillo: true, horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '' };
+    fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true, horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '' };
   const TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'];
 
   /* ---------- idioma (es · en · ca) ---------- */
@@ -58,7 +58,7 @@
     pool = { feed: junta(cfg.contenido), ads: junta(cfg.anuncios) };
     const st = escena.style; st.setProperty('--cab', num(cfg.cabecera, 18, 0, 60) + '%'); st.setProperty('--pie', num(cfg.pie, 4.5, 0, 40) + '%'); st.setProperty('--lado', num(cfg.lado, 5, 0, 30) + '%');
     st.setProperty('--t', (cfg.fundido.tipo === 'corte' ? 0 : cfg.fundido.segundos) + 's'); st.setProperty('--dur', (cfg.segundos + cfg.fundido.segundos) + 's');
-    escena.className = 't-' + cfg.fundido.tipo + (cfg.movimiento ? ' mov' : '') + (cfg.brillo ? ' brillo' : ''); CAPAS.feed.forEach(c => c.classList.toggle('centro', cfg.alinea === 'centro'));
+    escena.className = 't-' + cfg.fundido.tipo + (cfg.movimiento ? ' mov' : '') + (cfg.llenar ? ' llena' : '') + (cfg.brillo ? ' brillo' : ''); CAPAS.feed.forEach(c => c.classList.toggle('centro', cfg.alinea === 'centro'));
     const f = $('.fondo'), fs = car.fondos || [], fa = cfg.fondo && fs.find(x => x.replace(/\.[a-z0-9]+$/i, '') === cfg.fondo);
     if (fa) { const u = url('fondos/' + fa); if (f.dataset.u !== u) { const i = new Image(); i.onload = () => { f.style.backgroundImage = 'url("' + u + '")'; f.dataset.u = u; f.classList.add('on'); }; i.src = u; } } else { f.classList.remove('on'); f.dataset.u = ''; }
     document.title = 'ADPOSTER · ' + cfg.nombre; cambio = true;
@@ -82,11 +82,11 @@
   function precarga(u) { return new Promise(res => { const i = new Image(); let fin = false; const ok = v => { if (!fin) { fin = true; res(v); } }; const t = setTimeout(() => ok(false), 12000);
     i.onload = () => { clearTimeout(t); (i.decode ? i.decode().catch(() => {}) : Promise.resolve()).then(() => ok(i)); }; i.onerror = () => { clearTimeout(t); ok(false); }; i.src = u; }); }
   /* cada póster ocupa todo lo que cabe en su marco, sea cual sea su tamaño original */
-  function encaja(capa) { const h = capa.querySelector('.hoja'); if (!h || !h.dataset.r) return; const m = $('.marco'), r = +h.dataset.r, w = Math.min(m.clientWidth, m.clientHeight * r); h.style.width = w + 'px'; h.style.height = w / r + 'px'; }
+  function encaja(capa) { const h = capa.querySelector('.hoja'); if (!h || !h.dataset.r) return; const m = $('.marco'), r = +h.dataset.r, w = Math.min(m.clientWidth, m.clientHeight * r); h.style.width = w + 'px'; h.style.height = w / r + 'px'; h.style.setProperty('--k', (Math.max(m.clientWidth / w, m.clientHeight / (w / r)) * 1.015).toFixed(4)); }
   addEventListener('resize', () => CAPAS.feed.forEach(encaja));
   async function paso(tipo) {
     const f = saca(tipo); if (!f) return false; const u = url(f), pre = await precarga(u); if (!pre) { await espera(400); return false; }
-    const capas = CAPAS[tipo], n = turno[tipo] % 2, entra = capas[n], sale = capas[1 - n], img = entra.querySelector('img'); img.src = u; turno[tipo]++; if (tipo === 'feed' && pre.naturalWidth) { entra.querySelector('.hoja').dataset.r = pre.naturalWidth / pre.naturalHeight; encaja(entra); }
+    const capas = CAPAS[tipo], n = turno[tipo] % 2, entra = capas[n], sale = capas[1 - n], img = entra.querySelector('img'); img.src = u; turno[tipo]++; if (tipo === 'feed' && pre.naturalWidth) { const hj = entra.querySelector('.hoja'); hj.dataset.r = pre.naturalWidth / pre.naturalHeight; encaja(entra); hj.classList.remove('anim'); void hj.offsetWidth; hj.classList.add('anim'); }   // el movimiento arranca con cada póster y se mantiene mientras se va
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
     sale.classList.add('sale'); sale.classList.remove('on'); entra.classList.remove('sale'); entra.classList.add('on'); const tf = cfg.fundido.tipo === 'corte' ? 0 : cfg.fundido.segundos * 1000;
     if (tipo === 'feed') { setTimeout(() => CAPAS.ads.forEach(c => c.classList.remove('on', 'sale')), tf ? 60 : 0); }
