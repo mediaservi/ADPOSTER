@@ -1,0 +1,74 @@
+/* ADPOSTER · reproductor de cartelería para displays FHD en vertical · GPL-3.0 · mediaservi.com */
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 400; font-display: swap; src: url(assets/fonts/inter-latin-400-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 700 900; font-display: swap; src: url(assets/fonts/inter-latin-800-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Share Tech Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url(assets/fonts/share-tech-mono-latin-400-normal.woff2) format('woff2'); }
+html, body { margin: 0; width: 100%; height: 100%; background: #000; overflow: hidden; color: #f2f4f7; font-family: Inter, system-ui, Arial, sans-serif; -webkit-user-select: none; user-select: none; }
+body.ap { display: flex; align-items: center; justify-content: center; cursor: none; }
+body.ap.raton, body.ap.con-panel { cursor: default; }
+
+/* el escenario siempre es 9:16; si la pantalla da la imagen apaisada, ?rot=90 o ?rot=270 lo gira */
+#escena { --u0: min(1vw, calc(100vh * 9 / 1600)); --u: var(--u0); position: relative; width: calc(var(--u) * 100); aspect-ratio: 9 / 16; overflow: hidden; background: #000; flex: none; contain: strict; }
+body.rot #escena { --u0: min(1vh, calc(100vw * 9 / 1600)); }
+body.rot-90 #escena { transform: rotate(90deg); }
+body.rot-270 #escena { transform: rotate(-90deg); }
+
+.fondo { position: absolute; inset: 0; background: #000 center / 100% 100% no-repeat; opacity: 0; transition: opacity 1.5s ease; }
+.fondo.on { opacity: 1; }
+.marco { position: absolute; top: var(--cab, 18%); bottom: var(--pie, 4.5%); left: var(--lado, 5%); right: var(--lado, 5%); }
+.capa, .anuncio { position: absolute; inset: 0; display: flex; justify-content: center; opacity: 0; pointer-events: none; will-change: opacity, transform; transition: opacity var(--t, 2.5s) ease-in-out, transform var(--t, 2.5s) cubic-bezier(.22, .8, .3, 1), clip-path var(--t, 2.5s) cubic-bezier(.6, 0, .2, 1); }
+.capa { align-items: flex-end; }
+.capa.centro { align-items: center; }
+.anuncio { align-items: center; background: #000; z-index: 5; }
+.capa.on, .anuncio.on { opacity: 1; }
+.capa img, .anuncio img { display: block; max-width: 100%; max-height: 100%; object-fit: contain; }
+.capa .hoja img { width: 100%; height: 100%; max-width: none; max-height: none; }
+.capa .hoja { position: relative; display: flex; max-width: 100%; max-height: 100%; overflow: hidden; border-radius: calc(var(--u) * .5); box-shadow: 0 calc(var(--u) * 1.2) calc(var(--u) * 3.4) rgba(0, 0, 0, .62), 0 0 0 1px rgba(255, 255, 255, .06); }
+.anuncio img { width: 100%; height: 100%; }
+
+/* tipos de transición */
+.t-zoom .capa, .t-zoom .anuncio { transform: scale(1.06); }
+.t-zoom .on { transform: none; }
+.t-desliza .capa, .t-desliza .anuncio { transform: translateX(7%); }
+.t-desliza .on { transform: none; }
+.t-desliza .sale { transform: translateX(-7%); }
+.t-cortina .capa, .t-cortina .anuncio { opacity: 1; clip-path: inset(0 0 100% 0); z-index: 1; }
+.t-cortina .anuncio { z-index: 5; }
+.t-cortina .on { clip-path: inset(0); z-index: 2; }
+.t-cortina .anuncio.on { z-index: 6; }
+.t-cortina .sale { clip-path: inset(0); z-index: 1; }
+.t-corte .capa, .t-corte .anuncio { transition: none; }
+
+/* vida: un acercamiento muy lento y un destello al entrar */
+@keyframes ap-respira { from { transform: scale(1); } to { transform: scale(1.035); } }
+@keyframes ap-destello { 0% { transform: translateX(-130%) skewX(-18deg); } 100% { transform: translateX(330%) skewX(-18deg); } }
+.mov .capa.on .hoja img { animation: ap-respira var(--dur, 8s) linear both; transform-origin: 50% 60%; }
+.brillo .capa.on .hoja::after { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 40%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .2) 45%, rgba(255, 255, 255, .34) 50%, rgba(255, 255, 255, .2) 55%, transparent); animation: ap-destello 1.5s var(--t, 2.5s) ease-in-out both; pointer-events: none; }
+
+.apagado { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; transition: opacity 2s ease; z-index: 20; }
+.apagado.on { opacity: 1; }
+.aviso { position: absolute; left: 6%; right: 6%; bottom: 6%; z-index: 30; display: none; padding: calc(var(--u) * 2.2) calc(var(--u) * 3); border-radius: calc(var(--u) * 1.6); background: rgba(12, 12, 14, .88); border: 1px solid rgba(255, 176, 0, .5); color: #ffb000; font: 400 calc(var(--u) * 2.6) / 1.35 'Share Tech Mono', monospace; text-align: center; letter-spacing: .04em; }
+.aviso.on { display: block; }
+
+/* panel del display: se abre con OK del mando, un toque o un clic */
+.panel { --u: calc(var(--u0) * 1.38); position: absolute; inset: 0; z-index: 40; display: none; flex-direction: column; gap: calc(var(--u) * 1.6); padding: calc(var(--u) * 4) calc(var(--u) * 4.5); box-sizing: border-box; overflow-y: auto; background: linear-gradient(180deg, rgba(34, 34, 37, .97), rgba(16, 16, 18, .98)); font-size: calc(var(--u) * 2.5); }
+.con-panel .panel { display: flex; }
+.panel .p-cab { display: flex; align-items: center; justify-content: space-between; gap: calc(var(--u) * 2); padding-bottom: calc(var(--u) * 2); border-bottom: 1px solid #000; box-shadow: 0 1px 0 rgba(255, 255, 255, .07); }
+.panel .p-cab img { height: calc(var(--u) * 7); }
+.panel .p-cab b { font: 400 calc(var(--u) * 2.6) 'Share Tech Mono', monospace; color: #ffb000; letter-spacing: .14em; text-transform: uppercase; }
+.panel h3 { margin: calc(var(--u) * 1.2) 0 0; font: 400 calc(var(--u) * 2) 'Share Tech Mono', monospace; letter-spacing: .16em; text-transform: uppercase; color: #9aa0aa; text-shadow: 0 -1px 0 #000; }
+.panel .fila { display: flex; align-items: center; gap: calc(var(--u) * 1.6); }
+.panel .lcd { flex: 1; text-align: center; padding: calc(var(--u) * 1.4); border-radius: calc(var(--u) * 1); background: #0b0a06; box-shadow: inset 0 2px 8px #000, 0 1px 0 rgba(255, 255, 255, .08); color: #ffb000; font: 400 calc(var(--u) * 4.2) 'Share Tech Mono', monospace; text-shadow: 0 0 calc(var(--u) * 1.2) rgba(255, 176, 0, .55); }
+.panel button, .panel label { font: 700 calc(var(--u) * 2.5) Inter, Arial, sans-serif; color: #e9ebee; border: 1px solid #0a0a0b; border-radius: calc(var(--u) * 1.1); background: linear-gradient(180deg, #4a4a50, #2c2c30); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16), 0 2px 4px rgba(0, 0, 0, .5); padding: calc(var(--u) * 1.7) calc(var(--u) * 2.2); cursor: pointer; }
+.panel button.rd { width: calc(var(--u) * 9); flex: none; font-size: calc(var(--u) * 3.4); padding: calc(var(--u) * 1.1) 0; }
+.panel label { display: flex; align-items: center; gap: calc(var(--u) * 1.8); font-weight: 400; }
+.panel label i { flex: none; width: calc(var(--u) * 2.2); height: calc(var(--u) * 2.2); border-radius: 50%; background: #1a1206; box-shadow: inset 0 1px 3px #000; }
+.panel label.on i { background: #ffb000; box-shadow: 0 0 calc(var(--u) * 1.4) rgba(255, 176, 0, .8), inset 0 1px 0 rgba(255, 255, 255, .5); }
+.panel label small { margin-left: auto; color: #9aa0aa; font: 400 calc(var(--u) * 2) 'Share Tech Mono', monospace; }
+.panel label.on { color: #fff; }
+.panel .lista { display: grid; gap: calc(var(--u) * 1); }
+.panel .pri { background: linear-gradient(180deg, #ffc23d, #e69a00); color: #1a1205; border-color: #5a3d00; text-transform: uppercase; letter-spacing: .06em; }
+.panel .acc { display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--u) * 1.4); margin-top: auto; padding-top: calc(var(--u) * 2); }
+.panel .acc .pri { grid-column: 1 / -1; }
+.panel button:focus-visible, .panel label:focus-visible, .panel button:focus, .panel label:focus { outline: calc(var(--u) * .6) solid #ffb000; outline-offset: calc(var(--u) * .3); }
+.panel .firma { text-align: center; color: #7d828c; font: 400 calc(var(--u) * 1.7) 'Share Tech Mono', monospace; letter-spacing: .06em; }
+.panel .firma a { color: inherit; }

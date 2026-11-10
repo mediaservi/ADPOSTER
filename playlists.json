@@ -1,0 +1,91 @@
+{
+  "recarga": 1,
+  "playlists": {
+    "cine": {
+      "nombre": "CINE",
+      "fondo": "cine",
+      "cabecera": 24,
+      "pie": 4.5,
+      "lado": 5,
+      "alinea": "abajo",
+      "contenido": [
+        "msp-collector",
+        "msp-music"
+      ],
+      "anuncios": [
+        "ads-theater",
+        "ads-event"
+      ],
+      "segundos": 8,
+      "segundosAnuncio": 8,
+      "anunciosCada": [
+        4,
+        7
+      ],
+      "fundido": {
+        "tipo": "fundido",
+        "segundos": 2.5
+      },
+      "movimiento": true,
+      "brillo": true,
+      "horario": {
+        "activo": false,
+        "desde": "09:00",
+        "hasta": "23:00",
+        "dias": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      "redirige": ""
+    },
+    "klub": {
+      "nombre": "KLUB",
+      "fondo": "klub",
+      "cabecera": 18,
+      "pie": 4.5,
+      "lado": 5,
+      "alinea": "abajo",
+      "contenido": [
+        "msp-gaming",
+        "msp-music"
+      ],
+      "anuncios": [
+        "ads-klub",
+        "ads-event"
+      ],
+      "segundos": 8,
+      "segundosAnuncio": 8,
+      "anunciosCada": [
+        4,
+        7
+      ],
+      "fundido": {
+        "tipo": "fundido",
+        "segundos": 2.5
+      },
+      "movimiento": true,
+      "brillo": true,
+      "horario": {
+        "activo": false,
+        "desde": "09:00",
+        "hasta": "23:00",
+        "dias": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      "redirige": ""
+    }
+  }
+}
