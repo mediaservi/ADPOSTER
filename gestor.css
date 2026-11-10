@@ -44,7 +44,7 @@ img { display: block; }
 .lcd { flex: 1; min-width: 0; min-height: var(--alto); display: flex; align-items: center; justify-content: center; gap: .5em; padding: 0 10px; border-radius: 7px; background: #0b0a06; box-shadow: inset 0 2px 8px #000, 0 1px 0 rgba(255, 255, 255, .08); color: var(--ambar); font: 400 1.25em 'Share Tech Mono', monospace; text-shadow: 0 0 8px rgba(255, 176, 0, .5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lcd small { font-size: .7em; color: #b98a2a; letter-spacing: .1em; text-transform: uppercase; }
 .lcd.url { flex: none; justify-content: flex-start; font-size: 1em; }
-.rej.ancha { grid-template-columns: repeat(auto-fit, minmax(158px, 1fr)); }
+.rej.ancha { grid-template-columns: repeat(auto-fit, minmax(184px, 1fr)); }
 .rej.media { grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); }
 input.campo { flex: 1; min-width: 0; min-height: var(--alto); padding: 0 10px; border: 1px solid var(--linea); border-radius: 7px; background: #0b0a06; box-shadow: inset 0 2px 8px #000; color: var(--ambar); font: 400 1.05em 'Share Tech Mono', monospace; }
 input.campo::placeholder { color: #6d5a2c; }

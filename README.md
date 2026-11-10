@@ -2,13 +2,15 @@
 
 **Cartelería digital profesional, fácil y que arranca sola.** ADPOSTER convierte cualquier pantalla en vertical en un cartel digital: pósteres que nunca se repiten, anuncios intercalados, fundidos, horarios y un gestor con vista previa en vivo. Es un apartado de [AVHUB](https://avhub.mediaservi.com/), *tools for AV people*, de [mediaservi.com](https://mediaservi.com).
 
-**Versión actual: v0.2** (beta, en pruebas)
+**Versión actual: v0.3** (beta, en pruebas)
 
 ## Cómo funciona
 
 1. Cada **playlist** tiene su dirección: `adposter.mediaservi.com/cine`, `adposter.mediaservi.com/klub` o `adposter.mediaservi.com/p/?l=nombre`.
 2. Esa dirección se pone como **página de inicio del kiosco** (por ejemplo, la app Kiosk en un Xiaomi Smart TV Stick 4K conectado al HDMI del display).
 3. Al dar corriente al display, **arranca solo** en unos segundos y no hay que tocar nada más.
+
+Si el display está girado, se añade el giro a la dirección: `…/cine/?rot=90` (derecha), `?rot=180` (boca abajo) o `?rot=270` (izquierda). También valen las direcciones cortas de siempre: `…/cine/v`, `…/cine/i` y `…/cine/V`. Y cualquier playlist nueva tiene la suya: `adposter.mediaservi.com/mi-bar`.
 
 ## Funciones
 
@@ -43,7 +45,14 @@ Para publicar los ajustes del gestor: **Guardar playlists.json** y subir ese arc
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v0.2)
+## Cambios de la versión actual (v0.3)
+
+- **CINE con su cartelera de verdad:** 264 pósteres de cine en `msp-pelis`, ya en WebP para FHD, con los ajustes de la versión anterior (12 segundos por póster y un anuncio cada 4 a 6).
+- **KLUB al día:** se añaden las 48 imágenes que faltaban respecto a la versión anterior (3 anuncios y 45 pósteres de gaming, música y colección), con sus mismas carpetas y ajustes.
+- **Giro del display:** además de 90° y 270°, ahora también 180°. El gestor lo añade a la URL del kiosco con un toque.
+- **Direcciones cortas:** `…/cine/v`, `/i` y `/V` siguen girando el display como antes, y `…/nombre` abre la playlist con ese nombre.
+
+Sigue de la v0.2:
 
 - **Zoom hasta llenar.** Efecto nuevo: al entrar cada póster, se amplía poco a poco desde su tamaño encajado hasta rebosar justo el marco. Se activa con la tecla «Llenar» del gestor y viene encendido en CINE y KLUB.
 - El movimiento de cada póster arranca con él y se mantiene mientras se funde con el siguiente, sin saltos.
@@ -65,4 +74,4 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v0.2 2026 es un proyecto hecho con 𑣲 by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v0.3 2026 es un proyecto hecho con 𑣲 by [mediaservi.com](https://mediaservi.com)*

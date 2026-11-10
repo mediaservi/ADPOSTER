@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<!-- ADPOSTER · direcciones cortas: …/mi-playlist abre esa playlist, y …/cine/v, /i o /V giran el display como en la versión anterior (90°, 180° y 270°). GPL-3.0 · mediaservi.com -->
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>ADPOSTER</title>
+<style>html,body{margin:0;height:100%;background:#000;color:#ffb000;font:16px/1.4 monospace;display:flex;align-items:center;justify-content:center;text-align:center}a{color:inherit}</style></head>
+<body><p id="m"></p><script>
+(function () {
+  var raiz = /github\.io$/.test(location.hostname) ? '/' + location.pathname.split('/')[1] + '/' : '/';
+  var p = location.pathname.slice(raiz.length).replace(/\/+$/, '').split('/').filter(Boolean);
+  var GIRO = { v: 90, i: 180, V: 270 }, id = (p[0] || '').toLowerCase().replace(/[^a-z0-9_-]/g, ''), g = p.length === 2 ? GIRO[p[1]] : 0;
+  if (id && id !== 'p' && p.length <= 2 && (p.length === 1 || g)) { location.replace(raiz + (id === 'cine' || id === 'klub' ? id + '/' + (g ? '?rot=' + g : '') : 'p/?l=' + id + (g ? '&rot=' + g : ''))); return; }
+  document.getElementById('m').innerHTML = 'ADPOSTER · no existe esta dirección<br><a href="' + raiz + '">ir al gestor</a>';
+})();
+</script></body></html>

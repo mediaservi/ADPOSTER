@@ -9,18 +9,16 @@
       "lado": 5,
       "alinea": "abajo",
       "contenido": [
-        "msp-collector",
-        "msp-music"
+        "msp-pelis"
       ],
       "anuncios": [
-        "ads-theater",
-        "ads-event"
+        "ads-theater"
       ],
-      "segundos": 8,
-      "segundosAnuncio": 8,
+      "segundos": 12,
+      "segundosAnuncio": 12,
       "anunciosCada": [
         4,
-        7
+        6
       ],
       "fundido": {
         "tipo": "fundido",
@@ -54,17 +52,17 @@
       "alinea": "abajo",
       "contenido": [
         "msp-gaming",
-        "msp-music"
+        "msp-music",
+        "msp-collector"
       ],
       "anuncios": [
-        "ads-klub",
-        "ads-event"
+        "ads-klub"
       ],
-      "segundos": 8,
-      "segundosAnuncio": 8,
+      "segundos": 12,
+      "segundosAnuncio": 12,
       "anunciosCada": [
         4,
-        7
+        6
       ],
       "fundido": {
         "tipo": "fundido",

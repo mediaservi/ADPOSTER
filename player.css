@@ -11,6 +11,7 @@ body.ap.raton, body.ap.con-panel { cursor: default; }
 body.rot #escena { --u0: min(1vh, calc(100vw * 9 / 1600)); }
 body.rot-90 #escena { transform: rotate(90deg); }
 body.rot-270 #escena { transform: rotate(-90deg); }
+body.rot-180 #escena { transform: rotate(180deg); }
 
 .fondo { position: absolute; inset: 0; background: #000 center / 100% 100% no-repeat; opacity: 0; transition: opacity 1.5s ease; }
 .fondo.on { opacity: 1; }

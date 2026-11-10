@@ -3,7 +3,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '0.2', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'];
+  const VERSION = '0.3', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'];
   const DEF = { nombre: '', fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7], fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true,
     horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '' };
   const $ = s => document.querySelector(s), copia = o => JSON.parse(JSON.stringify(o));
@@ -12,7 +12,7 @@
   /* ---------- idioma ---------- */
   const IDI = ['es', 'en', 'ca']; let lang = lee('lang') || (IDI.includes((navigator.language || '').slice(0, 2)) ? navigator.language.slice(0, 2) : 'es');
   const TX = { 'Playlist': ['Playlist', 'Playlist'], 'Nueva': ['New', 'Nova'], 'nombre de la nueva': ['name of the new one', 'nom de la nova'], 'Borrar': ['Delete', 'Esborra'], 'Fondo': ['Background', 'Fons'], 'sin fondo': ['no background', 'sense fons'],
-    'Carpetas de contenido': ['Content folders', 'Carpetes de contingut'], 'Carpetas de anuncios': ['Ad folders', "Carpetes d'anuncis"], 'URL para el kiosco': ['URL for the kiosk', 'URL per al quiosc'], 'Copiar': ['Copy', 'Copia'], 'Copiada': ['Copied', 'Copiada'], 'Abrir': ['Open', 'Obre'],
+    'Carpetas de contenido': ['Content folders', 'Carpetes de contingut'], 'Carpetas de anuncios': ['Ad folders', "Carpetes d'anuncis"], 'URL para el kiosco': ['URL for the kiosk', 'URL per al quiosc'], 'Giro del display': ['Display rotation', 'Gir del display'], 'Copiar': ['Copy', 'Copia'], 'Copiada': ['Copied', 'Copiada'], 'Abrir': ['Open', 'Obre'],
     'Duración': ['Duration', 'Durada'], 'póster': ['poster', 'pòster'], 'anuncio': ['ad', 'anunci'], 'Transición': ['Transition', 'Transició'], 'fundido': ['fade', 'fosa'], 'zoom': ['zoom', 'zoom'], 'desliza': ['slide', 'llisca'], 'cortina': ['wipe', 'cortina'], 'corte': ['cut', 'tall'],
     'Un anuncio cada': ['One ad every', 'Un anunci cada'], 'mín': ['min', 'mín'], 'máx': ['max', 'màx'], 'pósteres': ['posters', 'pòsters'], 'Efectos y encaje': ['Effects and fit', 'Efectes i encaix'], 'Movimiento': ['Motion', 'Moviment'], 'Llenar': ['Fill', 'Omple'], 'Brillo': ['Shine', 'Brillantor'], 'Abajo': ['Bottom', 'A baix'], 'Centro': ['Centre', 'Centre'],
     'cabecera': ['header', 'capçalera'], 'Horario': ['Schedule', 'Horari'], 'En horario': ['Scheduled', 'En horari'], 'Redirección': ['Redirect', 'Redirecció'], 'https://… (vacío: reproduce la playlist)': ['https://… (empty: plays the playlist)', 'https://… (buit: reprodueix la playlist)'],
@@ -28,7 +28,9 @@
   const completa = p => { const c = Object.assign({}, copia(DEF), p || {}); c.fundido = Object.assign({}, DEF.fundido, (p || {}).fundido); c.horario = Object.assign({}, copia(DEF.horario), (p || {}).horario); return c; };
   const sucio = () => JSON.stringify(B.playlists) !== JSON.stringify(PUB.playlists);
   function base() { const d = new URL('./', location.href).href; return /githack|localhost|127\.0\.0\.1/.test(location.host) ? 'https://adposter.mediaservi.com/' : d; }
-  const urlKiosco = id => base() + (CON_CARPETA.includes(id) ? id : 'p/?l=' + id);
+  let giro = 0;   // giro del display: va en la URL del kiosco, porque es cosa de cada aparato
+  const cola = id => (CON_CARPETA.includes(id) ? id + (giro ? '/?rot=' + giro : '') : 'p/?l=' + id + (giro ? '&rot=' + giro : ''));
+  const urlKiosco = id => base() + cola(id);
   function cambia(f) { f(P()); guarda('gestor', B); envia(); pintaB(); pintaA(); estado(); }
   function envia() { const fr = $('#previa'); if (listo && fr.contentWindow) fr.contentWindow.postMessage({ adposter: 'cfg', id: sel, cfg: P() }, '*'); }
   function previa() { listo = false; $('#previa').src = 'p/?l=' + encodeURIComponent(sel) + '&prev=1&lang=' + lang; }
@@ -44,7 +46,7 @@
       <h2>${T('Fondo')}</h2><div class="rej media">${fs.map(f => tecla('fondo', f, f, p.fondo === f)).join('')}${tecla('fondo', '', T('sin fondo'), !p.fondo)}</div>
       <h2>${T('Carpetas de contenido')}</h2><div class="rej ancha">${cs.filter(c => !esAds(c)).map(c => tecla('contenido', c, c, p.contenido.includes(c), n(c))).join('')}</div>
       <h2>${T('Carpetas de anuncios')}</h2><div class="rej ancha">${cs.filter(esAds).map(c => tecla('anuncios', c, c, p.anuncios.includes(c), n(c))).join('')}</div>
-      <h2 style="margin-top:auto">${T('URL para el kiosco')}</h2><div class="lcd url" id="url">${esc(urlKiosco(sel))}</div><div class="fila"><button type="button" class="tecla" data-a="copia">${T('Copiar')}</button><a class="tecla" href="${CON_CARPETA.includes(sel) ? sel + '/' : 'p/?l=' + sel}" target="_blank" rel="noopener">${T('Abrir')}</a></div>`;
+      <h2 style="margin-top:auto">${T('URL para el kiosco')}</h2><div class="fila giro">${[0, 90, 180, 270].map(g => `<button type="button" class="tecla${giro === g ? ' on' : ''}" data-a="giro" data-v="${g}" aria-pressed="${giro === g}" aria-label="${T('Giro del display')} ${g}°"><i class="led"></i><span>${g}°</span></button>`).join('')}</div><div class="lcd url" id="url">${esc(urlKiosco(sel))}</div><div class="fila"><button type="button" class="tecla" data-a="copia">${T('Copiar')}</button><a class="tecla" href="${cola(sel).replace(/^(cine|klub)$/, '$1/')}" target="_blank" rel="noopener">${T('Abrir')}</a></div>`;
     if (foco && foco[0]) { const e = [...document.querySelectorAll('#zona-a [data-a="' + foco[0] + '"]')].find(x => (x.dataset.v || '') === (foco[1] || '')); e && e.focus(); } }
   function pintaB() { const p = P(), h = p.horario, D = ['L', 'M', 'X', 'J', 'V', 'S', 'D'], foco = document.activeElement && document.activeElement.dataset ? [document.activeElement.dataset.a, document.activeElement.dataset.v, document.activeElement.id] : null;
     $('#zona-b').innerHTML = `<h2>${T('Duración')}</h2>${paso('segundos', `${p.segundos} s <small>${T('póster')}</small>`)}${paso('segundosAnuncio', `${p.segundosAnuncio} s <small>${T('anuncio')}</small>`)}
@@ -72,6 +74,7 @@
     amin(v) { cambia(p => { p.anunciosCada[0] = lim(p.anunciosCada[0] + +v, 1, 30); if (p.anunciosCada[1] < p.anunciosCada[0]) p.anunciosCada[1] = p.anunciosCada[0]; }); }, amax(v) { cambia(p => { p.anunciosCada[1] = lim(p.anunciosCada[1] + +v, 1, 30); if (p.anunciosCada[0] > p.anunciosCada[1]) p.anunciosCada[0] = p.anunciosCada[1]; }); },
     movimiento() { cambia(p => { p.movimiento = !p.movimiento; }); }, llenar() { cambia(p => { p.llenar = !p.llenar; }); }, brillo() { cambia(p => { p.brillo = !p.brillo; }); }, alinea() { cambia(p => { p.alinea = p.alinea === 'centro' ? 'abajo' : 'centro'; }); }, cabecera(v) { cambia(p => { p.cabecera = lim(p.cabecera + +v, 0, 50); }); },
     hact() { cambia(p => { p.horario.activo = !p.horario.activo; }); }, dia(v) { cambia(p => { alterna(p.horario.dias, +v); p.horario.dias.sort(); }); },
+    giro(v) { giro = +v; pintaA(); },
     copia() { const u = urlKiosco(sel), b = document.querySelector('[data-a="copia"]'), ok = () => { b.textContent = T('Copiada'); setTimeout(() => { b.textContent = T('Copiar'); }, 1500); }; (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(ok, () => { const r = document.createRange(); r.selectNodeContents($('#url')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); try { document.execCommand('copy'); ok(); } catch (e) {} }); },
     guarda() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ recarga: PUB.recarga === undefined ? 1 : PUB.recarga, playlists: B.playlists }, null, 2) + '\n'], { type: 'application/json' })); a.download = 'playlists.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); },
     importa() { $('#archivo').click(); },
