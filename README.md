@@ -2,7 +2,7 @@
 
 **Cartelería digital sencilla pero potente, que arranca sola.** Pensada para autónomos y negocios muy pequeños que no tienen medios para un sistema de cartelería profesional. ADPOSTER convierte cualquier pantalla en vertical en un cartel digital: pósteres que nunca se repiten, anuncios intercalados, fundidos, horarios y un gestor con vista previa en vivo. Es un apartado de [AVHUB](https://avhub.mediaservi.com/), *tools for AV people*, de [mediaservi.com](https://mediaservi.com).
 
-**Versión actual: v0.7** (beta, en pruebas)
+**Versión actual: v0.8** (beta, en pruebas)
 
 ## Cómo funciona
 
@@ -45,7 +45,12 @@ Para publicar los ajustes del gestor: **Guardar playlists.json** y subir ese arc
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v0.7)
+## Cambios de la versión actual (v0.8)
+
+- **Solo carteles de muestra propios.** El repositorio público ya no contiene carteles de películas, música ni videojuegos de terceros. Las listas de demostración usan diez carteles y dos anuncios dibujados por código (`tools/muestras.py`), con títulos inventados.
+- **Origen privado.** Un display puede leer sus listas e imágenes de **otra web con la misma estructura** (`playlists.json` + `assets/`), que solo conoce él: se le da una vez con `?origen=https://…` y lo recuerda; `?origen=no` vuelve a las muestras. El gestor también se abre sobre un origen privado con `?origen=…`. Así cada cual mantiene su contenido en su propia nube o repositorio privado y el público solo ve las muestras.
+
+Sigue de la v0.7:
 
 - **Documentación legal completa:** `LEGAL.md`, `DISCLAIMER.md`, `PRIVACY.md` y `COOKIES.md` en el repositorio, enlazados desde el «Aviso legal» de la app. El aviso de la app añade que no es un proyecto técnico ni asesoramiento profesional, que la limitación de responsabilidad no alcanza a lo que la ley no permite excluir, y un apartado de privacidad y contacto.
 
@@ -91,7 +96,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v0.7 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v0.8 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

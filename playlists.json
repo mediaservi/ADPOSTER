@@ -1,5 +1,5 @@
 {
-  "recarga": 1,
+  "recarga": 2,
   "playlists": {
     "cine": {
       "nombre": "CINE",
@@ -9,10 +9,10 @@
       "lado": 5,
       "alinea": "abajo",
       "contenido": [
-        "msp-pelis"
+        "demo-carteles"
       ],
       "anuncios": [
-        "ads-theater"
+        "demo-anuncios"
       ],
       "segundos": 12,
       "segundosAnuncio": 12,
@@ -51,12 +51,10 @@
       "lado": 5,
       "alinea": "abajo",
       "contenido": [
-        "msp-gaming",
-        "msp-music",
-        "msp-collector"
+        "demo-carteles"
       ],
       "anuncios": [
-        "ads-klub"
+        "demo-anuncios"
       ],
       "segundos": 12,
       "segundosAnuncio": 12,

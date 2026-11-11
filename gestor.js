@@ -3,7 +3,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '0.7', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'];
+  const VERSION = '0.8', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'];
   const DEF = { nombre: '', fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7], fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true,
     horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '' };
   const $ = s => document.querySelector(s), copia = o => JSON.parse(JSON.stringify(o));
@@ -33,7 +33,7 @@
   const urlKiosco = id => base() + cola(id);
   function cambia(f) { f(P()); guarda('gestor', B); envia(); pintaB(); pintaA(); estado(); }
   function envia() { const fr = $('#previa'); if (listo && fr.contentWindow) fr.contentWindow.postMessage({ adposter: 'cfg', id: sel, cfg: P() }, '*'); }
-  function previa() { listo = false; $('#previa').src = 'p/?l=' + encodeURIComponent(sel) + '&prev=1&lang=' + lang; }
+  function previa() { listo = false; $('#previa').src = 'p/?l=' + encodeURIComponent(sel) + '&prev=1&lang=' + lang + (ORIG ? '&origen=' + encodeURIComponent(ORIG) : ''); }
   function estado() { const e = $('#estado'), s = sucio(); e.classList.toggle('sucio', s); e.lastElementChild.textContent = T(s ? 'Cambios sin publicar' : 'Publicado'); }
 
   /* ---------- zonas ---------- */
@@ -93,7 +93,9 @@
   addEventListener('message', e => { const d = e.data; if (d && d.adposter === 'listo' && d.id === sel) { listo = true; envia(); } });
 
   /* ---------- arranque ---------- */
-  const trae = u => fetch(u + '?t=' + Date.now(), { cache: 'no-store' }).then(r => { if (!r.ok) throw r.status; return r.json(); });
+  // v0.8 · ?origen=https://… abre el gestor sobre un origen privado (otra web con la misma estructura): lee de allí carpetas y listas, y la vista previa lo usa
+  const ORIG = (() => { const p = new URLSearchParams(location.search).get('origen') || ''; return /^(https:\/\/|http:\/\/(localhost|127\.0\.0\.1)[:\/])[^\s"'<>]+$/.test(p) ? p.replace(/\/*$/, '/') : ''; })();
+  const trae = u => fetch(ORIG + u + '?t=' + Date.now(), { cache: 'no-store' }).then(r => { if (!r.ok) throw r.status; return r.json(); });
   Promise.all([trae('assets/manifest.json').catch(() => ({ carpetas: {} })), trae('playlists.json').catch(() => ({ recarga: 1, playlists: {} }))]).then(([m, l]) => {
     MAN = m; PUB = { recarga: l.recarga, playlists: {} }; Object.keys(l.playlists || {}).forEach(k => { PUB.playlists[k] = completa(l.playlists[k]); });
     const b = lee('gestor'); B = b && b.playlists && Object.keys(b.playlists).length ? { playlists: {} } : copia({ playlists: PUB.playlists }); if (b && b.playlists) Object.keys(b.playlists).forEach(k => { B.playlists[k] = completa(b.playlists[k]); });
