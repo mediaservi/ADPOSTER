@@ -3,7 +3,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '0.4', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'];
+  const VERSION = '0.5', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'];
   const DEF = { nombre: '', fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7], fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true,
     horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '' };
   const $ = s => document.querySelector(s), copia = o => JSON.parse(JSON.stringify(o));
@@ -62,6 +62,9 @@
   function pintaFijo() { document.documentElement.lang = lang; $('#btn-idioma').textContent = lang.toUpperCase(); $('#zona-a').setAttribute('aria-label', T('Contenido')); $('#zona-b').setAttribute('aria-label', T('Reproducción'));
     $('#pie').innerHTML = window.AVCREDITO ? window.AVCREDITO.html('ADPOSTER', 'v' + VERSION, lang) : `ADPOSTER v${VERSION} ${new Date().getFullYear()} ${T('es un proyecto hecho con')} by <a href="https://mediaservi.com" target="_blank" rel="noopener">mediaservi.com</a>`; }
   if (window.AVCREDITO) window.AVCREDITO.alCambiar(() => { if (B) pintaFijo(); });   // la línea de crédito es la común de AVHUB: se edita en AVHUB ADMIN
+  // v0.5 · seta de aviso de fallos, común a toda la familia (fallo.js): en la barra, del mismo tamaño que la tecla de idioma
+  if (window.AVFALLO) { const bi = $('#btn-idioma'); if (bi) { const bf = window.AVFALLO.boton({ app: 'ADPOSTER', version: 'v' + VERSION, idioma: () => lang }); bf.id = 'btn-fallo'; bi.before(bf);
+    const talla = () => { const h = bi.offsetHeight; if (h) bf.style.setProperty('--avf', h + 'px'); }; talla(); addEventListener('resize', talla); setTimeout(talla, 800); } }
 
   /* ---------- acciones ---------- */
   const lim = (v, a, b) => Math.min(b, Math.max(a, v)), alterna = (l, v) => { const i = l.indexOf(v); i < 0 ? l.push(v) : l.splice(i, 1); };
