@@ -314,3 +314,17 @@ button.bf { cursor: pointer; } button.bf:hover, button.bf:focus-visible { border
 @media (max-width: 900px) and (orientation: landscape) { .barra .zm { display: none; } .mini { padding: 2px; } .mini .mm { width: 20px; } .mini.hor .mm { width: 46px; } .mini .mn { font-size: 9px; } .tira { gap: 4px; } }
 .barra .par { flex: none; display: flex; gap: 6px; }   /* deshacer y rehacer van siempre juntos */
 .barra .par .rd { flex: none; width: var(--alto); padding: 0; font-size: 1.25em; }
+
+/* v1.4 · acceso privado: candado discreto en el pie y su ventana */
+.pie { position: relative; }
+.cand { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 1.7em; height: 1.7em; max-height: 100%; padding: .22em; border: 0; border-radius: 6px; background: none; color: #8d929c; opacity: .28; cursor: pointer; }
+.cand svg { display: block; width: 100%; height: 100%; }
+.cand:hover, .cand:focus-visible { opacity: .8; outline: none; box-shadow: 0 0 0 2px #ffc23d; }
+.cand.on { opacity: 1; color: #ffc23d; filter: drop-shadow(0 0 5px #ffb000aa); }
+dialog.adm { width: min(440px, calc(100vw - 24px)); max-height: calc(100vh - 24px); overflow: auto; padding: 0; border: 1px solid var(--linea); border-radius: 12px; background: #1d1d20; color: inherit; box-shadow: 0 20px 60px #000c; }
+dialog.adm::backdrop { background: #000a; }
+.adm-c { display: flex; flex-direction: column; gap: 8px; padding: 16px; }
+.adm-c h2 { margin: 0 0 2px; }
+.adm-c input.campo { flex: none; width: 100%; }
+.adm-c .fila { margin-top: 4px; }
+.adm-c .fila .tecla { flex: 1; }
