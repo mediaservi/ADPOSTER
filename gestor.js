@@ -1,4 +1,4 @@
-/* ADPOSTER · gestor de listas y displays (v1.2).
+/* ADPOSTER · gestor de listas y displays (v1.3).
    Cuatro ventanas: DISPLAYS y LISTAS, fijas a la izquierda; el LIENZO en el centro, con la vista previa en vivo, zoom y guías que se arrastran;
    y a la derecha las pestañas CONTENIDO · DISEÑO · TIEMPOS · DIRECTO · PUBLICAR.
    Los cambios de las listas se quedan en este navegador como borrador hasta que se publican (subiendo playlists.json a la web).
@@ -6,10 +6,11 @@
    v1.1 · una lista puede ser de CARTELES (carpetas que rotan, como hasta ahora) o una COMPOSICIÓN de escenas que se editan en el lienzo (editor.js),
    con galería de plantillas, biblioteca de archivos y calendario. Este archivo expone window.ADG para esos módulos.
    v1.2 · instalable y con uso sin conexión: botón «Instalar» (instalar.js) junto a la seta y service worker (sw.js).
+   v1.3 · editor de composiciones: selección múltiple, alinear y repartir (editor.js).
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.2', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS_C = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'], TABS_E = ['piezas', 'escena', 'tiempos', 'directo', 'publicar'];
+  const VERSION = '1.3', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS_C = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'], TABS_E = ['piezas', 'escena', 'tiempos', 'directo', 'publicar'];
   const DEF = { nombre: '', fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7], fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true,
     horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '', formato: 'vertical', qr: { activo: false, modo: 'url', url: '', texto: '', pos: 'bd' }, cinta: { activo: false, texto: '', rss: '' }, publico: false, modo: 'carteles', escenas: [], orden: 'azar', secuencia: [], archivos: {} };
   const ESCM = p => !!p && p.modo === 'escenas', tabsDe = p => ESCM(p) ? TABS_E : TABS_C, X = () => window.ADG.ext || {};

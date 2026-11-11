@@ -1,15 +1,20 @@
-/* ADPOSTER · editor de composiciones (v1.1). Se apoya en el gestor (window.ADG) y en el motor de escenas (window.ADESCENA).
+/* ADPOSTER · editor de composiciones (v1.3). Se apoya en el gestor (window.ADG) y en el motor de escenas (window.ADESCENA).
    · Lienzo: cada pieza de la escena se selecciona, se mueve, se escala y se gira con el ratón o el dedo; imán a bordes, centros y otras piezas;
      teclado (flechas, Supr, Ctrl+D, Ctrl+C/V, Ctrl+Z/Y); deshacer y rehacer; «Probar» la pone en el reproductor de verdad.
    · Pestaña PIEZAS: añadir piezas, propiedades de la seleccionada y capas.   · Pestaña ESCENA: fondo, duración, temporada y transición.
    · Tira de escenas bajo el lienzo.   · Galería de plantillas (plantillas.js).
+   · v1.3 · selección múltiple: Mayús/Ctrl + clic (o la tecla «Elegir varias» en pantallas táctiles), marco arrastrando en un hueco y Ctrl+A;
+     las piezas elegidas se mueven, duplican, borran y ordenan juntas, y se alinean y reparten entre sí. Con una sola pieza, se alinea en el lienzo.
    La biblioteca de archivos y el calendario están en gestion.js.
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
   const G = window.ADG, A = window.ADESCENA, PL = window.ADPLANT; if (!G || !A || !PL) return;
   const { T, TX, $, esc, tecla, campo, reset, lim, copia } = G, P = () => G.P();
-  Object.assign(TX, { 'Carteles': ['Posters', 'Cartells'], 'Composición': ['Composition', 'Composició'], 'escenas': ['scenes', 'escenes'], 'piezas': ['pieces', 'peces'], 'Piezas': ['Pieces', 'Peces'], 'Escena': ['Scene', 'Escena'], 'Biblioteca': ['Library', 'Biblioteca'], 'Calendario': ['Calendar', 'Calendari'],
+  Object.assign(TX, { 'Selección': ['Selection', 'Selecció'], 'Alinear': ['Align', 'Alinea'], 'Alinear en el lienzo': ['Align on the canvas', 'Alinea al llenç'], 'Repartir': ['Distribute', 'Reparteix'], 'Elegir varias': ['Pick several', 'Tria-ne diverses'], 'Centro horizontal': ['Horizontal centre', 'Centre horitzontal'], 'Centro vertical': ['Vertical centre', 'Centre vertical'],
+    'Repartir en horizontal': ['Distribute horizontally', 'Reparteix en horitzontal'], 'Repartir en vertical': ['Distribute vertically', 'Reparteix en vertical'], 'Hacen falta tres piezas o más para repartir.': ['You need three or more pieces to distribute.', 'Calen tres peces o més per repartir.'],
+    'Mayús + clic añade o quita piezas. Arrastra en un hueco del lienzo para elegir varias con un marco.': ['Shift + click adds or removes pieces. Drag on an empty spot of the canvas to pick several with a frame.', 'Maj + clic afegeix o treu peces. Arrossega en un buit del llenç per triar-ne diverses amb un marc.'], 'Borde izquierdo': ['Left edge', 'Vora esquerra'], 'Borde derecho': ['Right edge', 'Vora dreta'], 'Borde de arriba': ['Top edge', 'Vora de dalt'], 'Borde de abajo': ['Bottom edge', 'Vora de baix'],
+    'Carteles': ['Posters', 'Cartells'], 'Composición': ['Composition', 'Composició'], 'escenas': ['scenes', 'escenes'], 'piezas': ['pieces', 'peces'], 'Piezas': ['Pieces', 'Peces'], 'Escena': ['Scene', 'Escena'], 'Biblioteca': ['Library', 'Biblioteca'], 'Calendario': ['Calendar', 'Calendari'],
     'Programar por fechas': ['Schedule by date', 'Programa per dates'], 'Qué lista sale cada día y a cada hora, en todos los displays o solo en un grupo.': ['Which list plays each day and hour, on every display or just one group.', 'Quina llista surt cada dia i a cada hora, a tots els displays o només en un grup.'],
     'Imán': ['Snap', 'Imant'], 'Deshacer': ['Undo', 'Desfés'], 'Rehacer': ['Redo', 'Refés'], 'Probar': ['Play', 'Prova'], 'Editar': ['Edit', 'Edita'], 'Añadir pieza': ['Add a piece', 'Afegeix una peça'],
     'Texto': ['Text', 'Text'], 'Imagen': ['Image', 'Imatge'], 'Vídeo': ['Video', 'Vídeo'], 'Zona': ['Zone', 'Zona'], 'Forma': ['Shape', 'Forma'], 'Reloj': ['Clock', 'Rellotge'], 'Fecha': ['Date', 'Data'], 'El tiempo': ['Weather', 'El temps'], 'Noticias': ['News', 'Notícies'], 'QR': ['QR', 'QR'], 'Web': ['Web', 'Web'],
@@ -33,8 +38,16 @@
 
   /* ---------- estado ---------- */
   let iE = 0, selId = '', mont = null, iman = G.lee('g-iman') !== false, probando = false, porta = null;
+  /* v1.3 · selección múltiple: selId es la pieza principal y selMas, las demás. selMas solo vale mientras la principal siga siendo selMasP: así, cualquier cambio directo de selId deja la selección en una sola pieza */
+  let selMas = [], selMasP = '', varias = false, modK = false;
   const minis = { firma: '', m: [] }, HIST = {};
   const ES = () => P().escenas, E = () => ES()[iE], PZ = () => (E() ? E().piezas.find(z => z.id === selId) : null), hor = () => P().formato === 'horizontal';
+  const IDS = () => (selId ? [selId].concat(selMasP === selId ? selMas : []) : []), SEL = () => { const e = E(), ids = IDS(); return e ? e.piezas.filter(z => ids.includes(z.id)) : []; };
+  const ponSel = ids => { ids = ids.filter((x, i) => x && ids.indexOf(x) === i); selId = ids[0] || ''; selMas = ids.slice(1); selMasP = selId; };
+  function alterna(id) { const ids = IDS(), i = ids.indexOf(id); i < 0 ? ids.push(id) : ids.splice(i, 1); ponSel(ids); capa(); if (selId && G.tab !== 'piezas') G.ACC.tab('piezas'); else if (G.tab === 'piezas') G.pintaT(); }
+  /* la caja que ocupa de verdad una pieza (si está girada, la que la envuelve) y la de un grupo, en % del lienzo */
+  const caja = (z, R) => { if (!z.r) return { x: z.x, y: z.y, w: z.w, h: z.h }; R = R && R.width ? R : $('#ed-esc').getBoundingClientRect(); const a = z.r * Math.PI / 180, W = z.w * (R.width || 100) / 100, H = z.h * (R.height || 100) / 100, bw = (Math.abs(W * Math.cos(a)) + Math.abs(H * Math.sin(a))) / (R.width || 100) * 100, bh = (Math.abs(W * Math.sin(a)) + Math.abs(H * Math.cos(a))) / (R.height || 100) * 100; return { x: z.x + z.w / 2 - bw / 2, y: z.y + z.h / 2 - bh / 2, w: bw, h: bh }; };
+  const cajaDe = (L, R) => { const B = L.map(z => caja(z, R)), x0 = Math.min(...B.map(b => b.x)), y0 = Math.min(...B.map(b => b.y)); return { x: x0, y: y0, w: Math.max(...B.map(b => b.x + b.w)) - x0, h: Math.max(...B.map(b => b.y + b.h)) - y0 }; };
   const urlDe = s => { s = String(s || ''); if (s.indexOf('m:') === 0) return G.B.medios[s.slice(2)] || ''; if (/^https:\/\//i.test(s)) return s; return G.urlAsset(s); };
   const ctx = o => Object.assign({ vivo: false, red: true, edita: true, lang: G.lang, man: G.MAN, url: urlDe }, o);
   const red = (v, n) => { const k = Math.pow(10, n == null ? 2 : n); return Math.round(v * k) / k; };
@@ -59,24 +72,37 @@
     if (!mont) mont = A.monta($('#ed-esc'), E(), ctx()); else mont.pon(E()); capa(); }
   function remonta() { if (mont) { mont.destruye(); mont = null; } minis.firma = ''; render(); tira(); }
   /* la caja de selección, con sus ocho asas y la de girar */
-  function capa(lineas) { const c = $('#ed-capa'), z = PZ(); let b = c.querySelector('.sel'); c.querySelectorAll('.guia').forEach(g => g.remove());
+  function capa(lineas, marco) { const c = $('#ed-capa'), z = PZ(), S = SEL(); let b = c.querySelector('.sel'); c.querySelectorAll('.guia, .selm, .selg, .marco').forEach(g => g.remove());
+    const pon = (d, q) => { const t = d.style; t.left = q.x + '%'; t.top = q.y + '%'; t.width = q.w + '%'; t.height = q.h + '%'; if (q.r) t.transform = 'rotate(' + q.r + 'deg)'; c.appendChild(d); return d; };
+    if (marco && !probando) pon(el('div', 'marco'), marco);
+    if (S.length > 1 && !probando) { b && b.remove(); S.forEach(q => pon(el('div', 'selm' + (q.bloq ? ' bloq' : '')), q)); const g = pon(el('div', 'selg'), cajaDe(S)), n = el('b'); n.textContent = porta && porta.modo === 'mueve' ? red(cajaDe(S).x, 1) + ' · ' + red(cajaDe(S).y, 1) : '× ' + S.length; g.appendChild(n);
+      (lineas || []).forEach(l => { const gg = el('div', 'guia ' + (l[0] === 'x' ? 'v' : 'h')); gg.style[l[0] === 'x' ? 'left' : 'top'] = l[1] + '%'; c.appendChild(gg); }); return; }
     if (!z || probando) { b && b.remove(); return; }
     if (!b) { b = el('div', 'sel'); b.innerHTML = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'].map(h => '<i data-h="' + h + '"></i>').join('') + '<i data-h="rot"></i><b></b>'; c.appendChild(b); }
     const s = b.style; s.left = z.x + '%'; s.top = z.y + '%'; s.width = z.w + '%'; s.height = z.h + '%'; s.transform = z.r ? 'rotate(' + z.r + 'deg)' : ''; b.classList.toggle('bloq', !!z.bloq); b.lastChild.textContent = porta ? (porta.modo === 'rot' ? Math.round(z.r || 0) + '°' : porta.modo === 'mueve' ? red(z.x, 1) + ' · ' + red(z.y, 1) : red(z.w, 1) + ' × ' + red(z.h, 1)) : '';
     (lineas || []).forEach(l => { const g = el('div', 'guia ' + (l[0] === 'x' ? 'v' : 'h')); g.style[l[0] === 'x' ? 'left' : 'top'] = l[1] + '%'; c.appendChild(g); }); }
-  function elige(id, sinTab) { selId = id || ''; capa(); if (id && G.tab !== 'piezas' && !sinTab) G.ACC.tab('piezas'); else if (G.tab === 'piezas') G.pintaT(); }
+  function elige(id, sinTab) { selId = id || ''; selMas = []; selMasP = selId; capa(); if (id && G.tab !== 'piezas' && !sinTab) G.ACC.tab('piezas'); else if (G.tab === 'piezas') G.pintaT(); }
 
   /* ---------- arrastrar: mover, escalar y girar ---------- */
   const ed = $('#ed');
-  ed.addEventListener('pointerdown', e => { if (probando || e.button || !G.ESCM(P())) return; const R = $('#ed-esc').getBoundingClientRect(), h = e.target.closest && e.target.closest('[data-h]'); let z = PZ(), modo = '';
-    if (h && z && !z.bloq) modo = h.dataset.h;
+  ed.addEventListener('pointerdown', e => { if (probando || e.button || !G.ESCM(P())) return; const R = $('#ed-esc').getBoundingClientRect(), h = e.target.closest && e.target.closest('[data-h]'), mod = e.shiftKey || e.ctrlKey || e.metaKey || varias; let z = PZ(), modo = '', grupo = null;
+    if (h && z && !z.bloq && SEL().length < 2) modo = h.dataset.h;
     else { const bajo = document.elementsFromPoint(e.clientX, e.clientY).find(x => x.classList && x.classList.contains('pz') && $('#ed-esc').contains(x)), zz = bajo && E().piezas.find(q => q.id === bajo.dataset.id);
-      if (!zz) { if (selId) elige(''); return; } if (zz.id !== selId) elige(zz.id); z = zz; if (z.bloq) return; modo = 'mueve'; }
-    e.preventDefault(); try { ed.setPointerCapture(e.pointerId); } catch (x) {} porta = { modo, x0: e.clientX, y0: e.clientY, R, ini: copia(z), movido: false, id: e.pointerId }; });
-  ed.addEventListener('pointermove', e => { if (!porta || e.pointerId !== porta.id) return; const z = PZ(); if (!z) return; const { R, ini, modo } = porta, dx = e.clientX - porta.x0, dy = e.clientY - porta.y0;
+      if (!zz) { e.preventDefault(); try { ed.setPointerCapture(e.pointerId); } catch (x) {} porta = { modo: 'marco', x0: e.clientX, y0: e.clientY, R, base: mod ? IDS() : [], mod, movido: false, id: e.pointerId }; return; }   /* en un hueco: marco de selección (y, si no se arrastra, se suelta la selección) */
+      if (mod) { alterna(zz.id); return; }
+      if (SEL().length > 1 && IDS().includes(zz.id)) { grupo = SEL().filter(q => !q.bloq); if (!grupo.length) return; z = zz; modo = 'mueve'; }
+      else { if (zz.id !== selId || SEL().length > 1) elige(zz.id); z = zz; if (z.bloq) return; modo = 'mueve'; } }
+    e.preventDefault(); try { ed.setPointerCapture(e.pointerId); } catch (x) {} porta = { modo, x0: e.clientX, y0: e.clientY, R, ini: copia(z), inis: grupo && grupo.map(q => ({ id: q.id, x: q.x, y: q.y })), caja0: grupo && cajaDe(grupo, R), movido: false, id: e.pointerId }; });
+  ed.addEventListener('pointermove', e => { if (!porta || e.pointerId !== porta.id) return; const { R, ini, modo } = porta, dx = e.clientX - porta.x0, dy = e.clientY - porta.y0;
+    if (modo === 'marco') { if (!porta.movido) { if (Math.abs(dx) + Math.abs(dy) < 4) return; porta.movido = true; ed.classList.add('arrastra'); }
+      const m = { x: (Math.min(porta.x0, e.clientX) - R.left) / R.width * 100, y: (Math.min(porta.y0, e.clientY) - R.top) / R.height * 100, w: Math.abs(dx) / R.width * 100, h: Math.abs(dy) / R.height * 100 };
+      const dentro = E().piezas.filter(q => { if (q.oculta) return false; const c = caja(q, R); return c.x < m.x + m.w && c.x + c.w > m.x && c.y < m.y + m.h && c.y + c.h > m.y; }).map(q => q.id);
+      ponSel(porta.base.concat(dentro)); capa(null, m); return; }
+    const z = PZ(); if (!z) return;
     if (!porta.movido) { if (Math.abs(dx) + Math.abs(dy) < 3) return; porta.movido = true; antes(); ed.classList.add('arrastra'); }
     let lineas = [];
-    if (modo === 'mueve') { z.x = ini.x + dx / R.width * 100; z.y = ini.y + dy / R.height * 100; if (iman && !e.altKey) lineas = pega(z, R); z.x = red(z.x); z.y = red(z.y); }
+    if (modo === 'mueve' && porta.inis) { const c0 = porta.caja0, g = { id: '', x: c0.x + dx / R.width * 100, y: c0.y + dy / R.height * 100, w: c0.w, h: c0.h }; if (iman && !e.altKey) lineas = pega(g, R, IDS()); const ax = g.x - c0.x, ay = g.y - c0.y; porta.inis.forEach(o => { const q = E().piezas.find(x => x.id === o.id); if (q) { q.x = red(o.x + ax); q.y = red(o.y + ay); } }); }
+    else if (modo === 'mueve') { z.x = ini.x + dx / R.width * 100; z.y = ini.y + dy / R.height * 100; if (iman && !e.altKey) lineas = pega(z, R); z.x = red(z.x); z.y = red(z.y); }
     else if (modo === 'rot') { const cx = R.left + (ini.x + ini.w / 2) / 100 * R.width, cy = R.top + (ini.y + ini.h / 2) / 100 * R.height; let a = Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI + 90; if (a > 180) a -= 360; if (iman || e.shiftKey) { const q = Math.round(a / 15) * 15; if (e.shiftKey || Math.abs(a - q) < 4) a = q; } z.r = Math.round(a) || 0; }
     else { const hx = modo.indexOf('e') >= 0 ? 1 : modo.indexOf('w') >= 0 ? -1 : 0, hy = modo.indexOf('s') >= 0 ? 1 : modo.indexOf('n') >= 0 ? -1 : 0, a = (ini.r || 0) * Math.PI / 180, co = Math.cos(a), si = Math.sin(a);
       const W = ini.w / 100 * R.width, H = ini.h / 100 * R.height, lx = dx * co + dy * si, ly = -dx * si + dy * co; let nw = Math.max(8, W + hx * lx), nh = Math.max(8, H + hy * ly);
@@ -85,11 +111,13 @@
       const cx = (ini.x + ini.w / 2) / 100 * R.width + (hx * (nw - W) / 2) * co - (hy * (nh - H) / 2) * si, cy = (ini.y + ini.h / 2) / 100 * R.height + (hx * (nw - W) / 2) * si + (hy * (nh - H) / 2) * co;
       z.w = red(nw / R.width * 100); z.h = red(nh / R.height * 100); z.x = red((cx - nw / 2) / R.width * 100); z.y = red((cy - nh / 2) / R.height * 100); }
     mont && mont.pon(E()); capa(lineas); });
-  const suelta = e => { if (!porta || (e && e.pointerId !== porta.id)) return; const m = porta.movido; porta = null; ed.classList.remove('arrastra'); capa(); if (m) hecho(); };
+  const suelta = e => { if (!porta || (e && e.pointerId !== porta.id)) return; const m = porta.movido, marco = porta.modo === 'marco', mod = porta.mod; porta = null; ed.classList.remove('arrastra');
+    if (marco) { if (!m && !mod && selId) { elige(''); return; } capa(); if (m) { if (selId && G.tab !== 'piezas') G.ACC.tab('piezas'); else if (G.tab === 'piezas') G.pintaT(); } return; }
+    capa(); if (m) hecho(); };
   ed.addEventListener('pointerup', suelta); ed.addEventListener('pointercancel', suelta);
   ed.addEventListener('dblclick', () => { const z = PZ(); if (z && z.t === 'texto') { const t = $('#pz-tx'); if (t) { t.focus(); t.select(); } } });
   /* imán: los bordes y el centro de la pieza se pegan a los del lienzo y a los de las demás piezas */
-  function pega(z, R) { const ux = 6 / R.width * 100, uy = 6 / R.height * 100, otras = E().piezas.filter(o => o.id !== z.id && !o.oculta && !o.r), L = [];
+  function pega(z, R, fuera) { const ux = 6 / R.width * 100, uy = 6 / R.height * 100, otras = E().piezas.filter(o => o.id !== z.id && !(fuera || []).includes(o.id) && !o.oculta && !o.r), L = [];
     const eje = (k, t, u, d) => { const dian = [0, 50, 100].concat(otras.flatMap(o => [o[k], o[k] + o[t] / 2, o[k] + o[t]])), mios = [z[k], z[k] + z[t] / 2, z[k] + z[t]]; let mejor = null; mios.forEach(m => dian.forEach(c => { const dd = c - m; if (Math.abs(dd) <= u && (!mejor || Math.abs(dd) < Math.abs(mejor[0]))) mejor = [dd, c]; }));
       if (mejor) { z[k] += mejor[0]; L.push([d, mejor[1]]); } else z[k] = Math.round(z[k] * 2) / 2; };
     eje('x', 'w', ux, 'x'); eje('y', 'h', uy, 'y'); return L; }
@@ -98,11 +126,14 @@
   document.addEventListener('keydown', e => { if (!G.ESCM(P()) || probando || !$('#modal').hidden) return; const t = e.target, enCampo = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable), ctrl = e.ctrlKey || e.metaKey, k = e.key.toLowerCase();
     if (ctrl && k === 'z' && !enCampo) { e.preventDefault(); e.shiftKey ? vuelve('r', 'u') : vuelve('u', 'r'); return; } if (ctrl && k === 'y' && !enCampo) { e.preventDefault(); vuelve('r', 'u'); return; }
     if (enCampo) return; const z = PZ();
-    if (ctrl && k === 'v' && porta2) { e.preventDefault(); antes(); const n = copia(porta2); n.id = A.id(); n.x = red(n.x + 3); n.y = red(n.y + 3); porta2 = copia(n); E().piezas.push(n); selId = n.id; hecho(); return; }
+    if (ctrl && k === 'a') { e.preventDefault(); ACC.pzTodas(); return; }
+    if (ctrl && k === 'v' && porta2) { e.preventDefault(); antes(); const ns = porta2.map(q => { const n = copia(q); n.id = A.id(); n.x = red(n.x + 3); n.y = red(n.y + 3); return n; }); porta2 = ns.map(copia); ns.forEach(n => E().piezas.push(n)); ponSel(ns.map(n => n.id)); hecho(); return; }
     if (!z) return;
-    if (k === 'escape') { elige(''); return; } if (ctrl && k === 'c') { porta2 = copia(z); return; } if (ctrl && k === 'd') { e.preventDefault(); ACC.pzDup(); return; }
+    if (k === 'escape') { elige(''); return; } if (ctrl && k === 'c') { porta2 = SEL().map(copia); return; } if (ctrl && k === 'd') { e.preventDefault(); ACC.pzDup(); return; }
     if (k === 'delete' || k === 'backspace') { e.preventDefault(); ACC.pzBorra(); return; }
-    const F = { arrowleft: ['x', -1], arrowright: ['x', 1], arrowup: ['y', -1], arrowdown: ['y', 1] }[k]; if (F && !z.bloq) { e.preventDefault(); if (!e.repeat) antes(); z[F[0]] = red(z[F[0]] + F[1] * (e.shiftKey ? 2.5 : .5)); hecho(true); if (G.tab === 'piezas') geoPinta(); } });
+    const F = { arrowleft: ['x', -1], arrowright: ['x', 1], arrowup: ['y', -1], arrowdown: ['y', 1] }[k], mov = SEL().filter(q => !q.bloq); if (F && mov.length) { e.preventDefault(); if (!e.repeat) antes(); mov.forEach(q => { q[F[0]] = red(q[F[0]] + F[1] * (e.shiftKey ? 2.5 : .5)); }); hecho(true); capa(); if (G.tab === 'piezas') geoPinta(); } });
+  /* con qué tecla se pulsó: Mayús o Ctrl sobre una capa de la lista añade o quita esa pieza de la selección */
+  document.addEventListener('pointerdown', e => { modK = e.shiftKey || e.ctrlKey || e.metaKey; }, true); document.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') modK = e.shiftKey || e.ctrlKey || e.metaKey; }, true);
   /* soltar una imagen del ordenador sobre el lienzo la añade como pieza */
   $('#lienzo').addEventListener('dragover', e => { if (G.ESCM(P()) && e.dataTransfer && [...e.dataTransfer.types].includes('Files')) { e.preventDefault(); $('#lienzo').classList.add('sobre-img'); } });
   $('#lienzo').addEventListener('dragleave', () => $('#lienzo').classList.remove('sobre-img'));
@@ -156,14 +187,21 @@
   };
   G.PINTA.piezas = p => { asegura(); const z = PZ(), ps = E().piezas;
     let h = `<h2>${T('Añadir pieza')}</h2><div class="rej nuevas">${A.TIPOS.map(t => `<button type="button" class="tecla" data-a="pzNueva" data-v="${t}"><b class="ic">${ICO[t]}</b><span>${T(NOM[t])}</span></button>`).join('')}</div>`;
-    if (z) h += `<h2>${T(NOM[z.t])}<b class="cuenta">${ps.indexOf(z) + 1}/${ps.length}</b></h2>${PROPIO[z.t](z)}
+    const S = SEL(), ids = IDS(), svg = d => `<svg viewBox="0 0 20 20" aria-hidden="true">${d}</svg>`, R1 = 'fill="currentColor" stroke="none"', LN = 'stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"';
+    const AL = [['izq', 'Borde izquierdo', `<path ${LN} d="M3 2v16"/><rect ${R1} x="5" y="4.5" width="11" height="4" rx=".8"/><rect ${R1} x="5" y="11.500" width="6.500" height="4" rx=".8"/>`], ['cx', 'Centro horizontal', `<path ${LN} d="M10 2v16"/><rect ${R1} x="4" y="4.500" width="12" height="4" rx=".8"/><rect ${R1} x="6.500" y="11.500" width="7" height="4" rx=".8"/>`], ['der', 'Borde derecho', `<path ${LN} d="M17 2v16"/><rect ${R1} x="4" y="4.500" width="11" height="4" rx=".8"/><rect ${R1} x="8.500" y="11.500" width="6.500" height="4" rx=".8"/>`],
+      ['arr', 'Borde de arriba', `<path ${LN} d="M2 3h16"/><rect ${R1} x="4.500" y="5" width="4" height="11" rx=".8"/><rect ${R1} x="11.500" y="5" width="4" height="6.500" rx=".8"/>`], ['cy', 'Centro vertical', `<path ${LN} d="M2 10h16"/><rect ${R1} x="4.500" y="4" width="4" height="12" rx=".8"/><rect ${R1} x="11.500" y="6.500" width="4" height="7" rx=".8"/>`], ['aba', 'Borde de abajo', `<path ${LN} d="M2 17h16"/><rect ${R1} x="4.500" y="4" width="4" height="11" rx=".8"/><rect ${R1} x="11.500" y="8.500" width="4" height="6.500" rx=".8"/>`]];
+    const alinea = () => `<div class="fila ali">${AL.map((a, i) => (i === 3 ? '<i class="sep"></i>' : '') + `<button type="button" class="tecla" data-a="pzAli" data-v="${a[0]}" aria-label="${T(a[1])}" title="${T(a[1])}">${svg(a[2])}</button>`).join('')}</div>`;
+    if (S.length > 1) h += `<h2>${T('Selección')}<b class="cuenta">${S.length} ${T('piezas')}</b></h2><h2>${T('Alinear')}</h2>${alinea()}
+      <h2>${T('Repartir')}</h2><div class="fila ali"><button type="button" class="tecla" data-a="pzRep" data-v="h" aria-label="${T('Repartir en horizontal')}" title="${T('Repartir en horizontal')}"${S.length > 2 ? '' : ' disabled'}>${svg(`<path ${LN} d="M2.500 2v16M17.500 2v16"/><rect ${R1} x="5" y="5" width="3.200" height="10" rx=".8"/><rect ${R1} x="11.800" y="5" width="3.200" height="10" rx=".8"/>`)}</button><button type="button" class="tecla" data-a="pzRep" data-v="v" aria-label="${T('Repartir en vertical')}" title="${T('Repartir en vertical')}"${S.length > 2 ? '' : ' disabled'}>${svg(`<path ${LN} d="M2 2.500h16M2 17.500h16"/><rect ${R1} x="5" y="5" width="10" height="3.200" rx=".8"/><rect ${R1} x="5" y="11.800" width="10" height="3.200" rx=".8"/>`)}</button></div>${S.length > 2 ? '' : `<div class="nota">${T('Hacen falta tres piezas o más para repartir.')}</div>`}
+      <div class="rej dos"><button type="button" class="tecla" data-a="pzDup">${T('Duplicar')}</button><button type="button" class="tecla reset" data-a="pzBorra">${T('Borrar')}</button><button type="button" class="tecla" data-a="pzOrden" data-v="1">${T('Al frente')}</button><button type="button" class="tecla" data-a="pzOrden" data-v="-1">${T('Al fondo')}</button></div>`;
+    else if (z) h += `<h2>${T(NOM[z.t])}<b class="cuenta">${ps.indexOf(z) + 1}/${ps.length}</b></h2>${PROPIO[z.t](z)}
       <h2>${T('Caja')}</h2>${z.t === 'forma' || z.t === 'qr' ? '' : colores('pzT', 'fondo', z.fondo || '', 'sin fondo', 'data-pz')}<div class="fila">${st2('pzPaso', 'radio', red(z.radio || 0, 1) + ' <small>' + T('esquinas') + '</small>', .5)}</div><div class="fila">${st2('pzPaso', 'borde', red(z.borde || 0, 1) + ' <small>' + T('borde') + '</small>', .1)}${alt('sombra', T('Sombra'), z.sombra)}</div>${z.borde ? colores('pzT', 'bcol', z.bcol || '#ffffff', '', 'data-pz') : ''}
       <div class="fila">${st2('pzPaso', 'o', Math.round((z.o == null ? 1 : z.o) * 100) + ' % <small>' + T('opacidad') + '</small>', .05)}</div><div class="fila">${st2('pzPaso', 'r', (z.r || 0) + '° <small>' + T('giro') + '</small>', 5)}</div>
-      <h2>${T('Posición y tamaño')}</h2>${geoHtml(z)}
+      <h2>${T('Posición y tamaño')}</h2>${geoHtml(z)}<h2>${T('Alinear en el lienzo')}</h2>${alinea()}
       <h2>${T('Entrada')}</h2><div class="rej tres">${['', 'aparece', 'sube', 'baja', 'izquierda', 'derecha', 'zoom'].map(a => op('pzT', 'an', a, T(a || 'ninguna'), (z.an || '') === a)).join('')}</div>${z.an ? st('pzPaso', 'ret', red(z.ret || 0, 1) + ' s <small>' + T('retardo') + '</small>', .1) : ''}
       <div class="rej dos"><button type="button" class="tecla" data-a="pzDup">${T('Duplicar')}</button><button type="button" class="tecla reset" data-a="pzBorra">${T('Borrar')}</button><button type="button" class="tecla" data-a="pzOrden" data-v="1">${T('Al frente')}</button><button type="button" class="tecla" data-a="pzOrden" data-v="-1">${T('Al fondo')}</button></div>`;
     else h += `<div class="nota">${T('Toca una pieza en el lienzo para cambiarla, o añade una nueva.')}</div>`;
-    h += `<h2>${T('Capas')}<b class="cuenta">${ps.length}</b></h2><div class="capas">${ps.slice().reverse().map(q => `<div class="capa-f${q.id === selId ? ' on' : ''}"><button type="button" class="tecla nom${q.id === selId ? ' on' : ''}" data-a="pzSel" data-v="${q.id}" aria-pressed="${q.id === selId}"><b class="ic">${ICO[q.t]}</b><span>${esc(nombrePz(q))}</span></button><button type="button" class="tecla rd${q.bloq ? ' on' : ''}" data-a="pzBloq" data-v="${q.id}" aria-pressed="${!!q.bloq}" aria-label="${T('Bloquear')}" title="${T('Bloquear')}">🔒</button><button type="button" class="tecla rd${q.oculta ? ' on' : ''}" data-a="pzOculta" data-v="${q.id}" aria-pressed="${!!q.oculta}" aria-label="${T('Ocultar')}" title="${T('Ocultar')}">◌</button></div>`).join('')}</div>${reset('piezas')}`;
+    h += `<h2>${T('Capas')}<b class="cuenta">${ps.length}</b></h2><div class="fila">${tecla('pzVarias', '', T('Elegir varias'), varias)}<button type="button" class="tecla" data-a="pzTodas" style="flex:none">${T('Todas')}</button></div><div class="nota">${T('Mayús + clic añade o quita piezas. Arrastra en un hueco del lienzo para elegir varias con un marco.')}</div><div class="capas">${ps.slice().reverse().map(q => `<div class="capa-f${ids.includes(q.id) ? ' on' : ''}"><button type="button" class="tecla nom${ids.includes(q.id) ? ' on' : ''}" data-a="pzSel" data-v="${q.id}" aria-pressed="${ids.includes(q.id)}"><b class="ic">${ICO[q.t]}</b><span>${esc(nombrePz(q))}</span></button><button type="button" class="tecla rd${q.bloq ? ' on' : ''}" data-a="pzBloq" data-v="${q.id}" aria-pressed="${!!q.bloq}" aria-label="${T('Bloquear')}" title="${T('Bloquear')}">🔒</button><button type="button" class="tecla rd${q.oculta ? ' on' : ''}" data-a="pzOculta" data-v="${q.id}" aria-pressed="${!!q.oculta}" aria-label="${T('Ocultar')}" title="${T('Ocultar')}">◌</button></div>`).join('')}</div>${reset('piezas')}`;
     return h; };
   G.PINTA.escena = p => { asegura(); const e = E(), f = e.fondo || (e.fondo = { t: 'color', c: '#15151b' }), ft = ['deg', 'malla', 'img'].includes(f.t) ? f.t : 'color', TIP = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'];
     return `<h2>${T('Escena')}<b class="cuenta">${iE + 1}/${ES().length}</b></h2>${campo('es-n', e.n || '', T('nombre de la escena'), ' maxlength="40" data-es="n"')}${st('escPaso', 'seg', (e.seg || 12) + ' s <small>' + T('Duración') + '</small>', 1)}
@@ -183,10 +221,18 @@
   const ACC = {
     modo(v) { const p = P(), a = v === 'escenas' ? 'escenas' : 'carteles'; if (p.modo === a) return; const vacia = a === 'escenas' && !(p.escenas || []).length; if (probando) ACC.probar(); G.cambia(q => { q.modo = a; }); iE = 0; selId = ''; remonta(); G.previa(); G.pintaT(); if (vacia) ACC.plant('sustituye'); },
     pzNueva(t) { if (!A.TIPOS.includes(t)) return; antes(); const n = A.nueva(t, hor()); if (t === 'zona') { const c = G.carpetas().filter(x => !G.esAds(x)); n.carp = c.length ? [c[0]] : []; } E().piezas.push(n); selId = n.id; hecho(); if (t === 'texto') setTimeout(() => { const x = $('#pz-tx'); if (x) { x.focus(); x.select(); } }, 30); },
-    pzSel(id) { elige(id === selId ? '' : id); },
-    pzBorra() { const z = PZ(); if (!z) return; antes(); E().piezas.splice(E().piezas.indexOf(z), 1); selId = ''; hecho(); G.pintaL(); },
-    pzDup() { const z = PZ(); if (!z) return; antes(); const n = copia(z); n.id = A.id(); n.x = red(n.x + 3); n.y = red(n.y + 3); E().piezas.splice(E().piezas.indexOf(z) + 1, 0, n); selId = n.id; hecho(); G.pintaL(); },
-    pzOrden(v) { const z = PZ(), ps = E().piezas; if (!z) return; antes(); ps.splice(ps.indexOf(z), 1); +v > 0 ? ps.push(z) : ps.unshift(z); hecho(); },
+    pzSel(id) { if (modK || varias) alterna(id); else elige(id === selId && SEL().length < 2 ? '' : id); },
+    pzVarias() { varias = !varias; G.pintaT(); },
+    pzTodas() { if (!E()) return; ponSel(E().piezas.filter(q => !q.oculta).map(q => q.id)); capa(); if (G.tab !== 'piezas') G.ACC.tab('piezas'); else G.pintaT(); },
+    pzBorra() { const S = SEL(); if (!S.length) return; antes(); S.forEach(z => E().piezas.splice(E().piezas.indexOf(z), 1)); selId = ''; hecho(); G.pintaL(); },
+    pzDup() { const S = SEL(), ps = E().piezas; if (!S.length) return; antes(); const ns = S.map(z => { const n = copia(z); n.id = A.id(); n.x = red(n.x + 3); n.y = red(n.y + 3); return n; }); if (S.length === 1) ps.splice(ps.indexOf(S[0]) + 1, 0, ns[0]); else ns.forEach(n => ps.push(n)); ponSel(ns.map(n => n.id)); hecho(); G.pintaL(); },
+    pzOrden(v) { const S = SEL(), ps = E().piezas; if (!S.length) return; antes(); S.forEach(z => ps.splice(ps.indexOf(z), 1)); +v > 0 ? S.forEach(z => ps.push(z)) : S.slice().reverse().forEach(z => ps.unshift(z)); hecho(); },
+    /* alinear: varias piezas, entre sí (a la caja que las envuelve); una sola, en el lienzo. Las bloqueadas cuentan para la caja pero no se mueven */
+    pzAli(v) { const S = SEL(); if (!S.length) return; const R = $('#ed-esc').getBoundingClientRect(), ref = S.length > 1 ? cajaDe(S, R) : { x: 0, y: 0, w: 100, h: 100 }; antes();
+      S.forEach(z => { if (z.bloq) return; const b = caja(z, R); if (v === 'izq') z.x += ref.x - b.x; else if (v === 'cx') z.x += ref.x + ref.w / 2 - (b.x + b.w / 2); else if (v === 'der') z.x += ref.x + ref.w - (b.x + b.w); else if (v === 'arr') z.y += ref.y - b.y; else if (v === 'cy') z.y += ref.y + ref.h / 2 - (b.y + b.h / 2); else if (v === 'aba') z.y += ref.y + ref.h - (b.y + b.h); z.x = red(z.x); z.y = red(z.y); }); hecho(); },
+    /* repartir: la primera y la última se quedan donde están y las de en medio se colocan con el mismo hueco entre todas */
+    pzRep(v) { const S = SEL(); if (S.length < 3) return; const k = v === 'v' ? 'y' : 'x', t = v === 'v' ? 'h' : 'w', R = $('#ed-esc').getBoundingClientRect(), L = S.map(z => ({ z, b: caja(z, R) })).sort((a, b) => (a.b[k] + a.b[t] / 2) - (b.b[k] + b.b[t] / 2)), u = L[L.length - 1];
+      const ini = L[0].b[k], hueco = (u.b[k] + u.b[t] - ini - L.reduce((n, o) => n + o.b[t], 0)) / (L.length - 1); antes(); let p = ini; L.forEach(o => { if (!o.z.bloq) o.z[k] = red(o.z[k] + p - o.b[k]); p += o.b[t] + hueco; }); hecho(); },
     pzBloq(id) { const z = E().piezas.find(q => q.id === id); if (!z) return; antes(); z.bloq ? delete z.bloq : z.bloq = true; hecho(); },
     pzOculta(id) { const z = E().piezas.find(q => q.id === id); if (!z) return; antes(); z.oculta ? delete z.oculta : z.oculta = true; hecho(); },
     pzT(v) { const z = PZ(); if (!z) return; const [k, x] = parte(v); antes(); pone(z, k, x); hecho(); },

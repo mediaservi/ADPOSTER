@@ -175,6 +175,14 @@ body.arr-carpeta .suelta { display: flex; }
 .ed-capa .sel b { position: absolute; left: 50%; top: calc(100% + 10px); transform: translateX(-50%); padding: 1px 7px; border-radius: 5px; background: #0b0a06; border: 1px solid rgba(255, 176, 0, .7); color: var(--ambar); font: 400 10px/1.5 'Share Tech Mono', monospace; white-space: nowrap; }
 .ed-capa .sel b:empty { display: none; }
 .ed-capa .sel.bloq { outline-style: dashed; } .ed-capa .sel.bloq i { display: none; }
+/* v1.3 · selección múltiple: contorno de cada pieza elegida, caja del grupo y marco de selección */
+.ed-capa .selm { position: absolute; box-sizing: border-box; outline: 2px solid var(--ambar); box-shadow: 0 0 0 1px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(0, 0, 0, .45); }
+.ed-capa .selm.bloq { outline-style: dashed; }
+.ed-capa .selg { position: absolute; box-sizing: border-box; outline: 1px dashed #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, .55); }
+.ed-capa .selg b { position: absolute; left: 50%; top: calc(100% + 10px); transform: translateX(-50%); padding: 1px 7px; border-radius: 5px; background: #0b0a06; border: 1px solid rgba(255, 176, 0, .7); color: var(--ambar); font: 400 10px/1.5 'Share Tech Mono', monospace; white-space: nowrap; }
+.ed-capa .marco { position: absolute; box-sizing: border-box; border: 1px dashed #fff; background: rgba(255, 176, 0, .16); box-shadow: 0 0 0 1px rgba(0, 0, 0, .5); }
+.fila.ali .tecla svg { width: 1.15em; height: 1.15em; display: block; margin: auto; }
+.fila.ali .tecla:disabled { opacity: .4; }
 .ed-capa .guia { position: absolute; background: #ff2bd1; box-shadow: 0 0 3px #ff2bd1; }
 .ed-capa .guia.v { top: 0; bottom: 0; width: 1px; } .ed-capa .guia.h { left: 0; right: 0; height: 1px; }
 .ed.arrastra .pz { cursor: grabbing; }

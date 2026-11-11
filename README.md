@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.2**
+**Versión actual: v1.3**
 
 ## Cómo funciona
 
@@ -33,6 +33,7 @@ En tablet y móvil las ventanas se apilan, con el lienzo arriba; en móvil apais
 
 - **Escenas compuestas pieza a pieza.** Una lista puede ser una serie de escenas, cada una un lienzo con piezas colocadas libremente: **texto** (19 tipos de letra, con ajuste automático a la caja para que nunca se corte), **imagen**, **vídeo**, **zona** (una carpeta que va pasando dentro de un recuadro), **forma**, **reloj** (digital o analógico), **fecha**, **el tiempo** (con previsión), **noticias** de un RSS (cinta, lista o de una en una), **código QR** y **página web**.
 - **Editor en el lienzo:** mover, escalar y girar; imán a bordes, centros y otras piezas; capas con bloqueo y ocultar; duplicar, copiar y pegar; teclado (flechas, Supr, Ctrl+D, Ctrl+Z/Y); deshacer y rehacer; caja con fondo, esquinas, borde, sombra y opacidad; animación de entrada de cada pieza.
+- **Selección múltiple, alinear y repartir** (nuevo en v1.3): varias piezas se eligen con Mayús o Ctrl + clic (en el lienzo o en la lista de capas), arrastrando un marco en un hueco del lienzo, con Ctrl+A o, en pantallas táctiles, con la tecla «Elegir varias». Las elegidas se mueven, duplican, copian, borran y ordenan juntas; se **alinean** entre sí por cualquiera de sus bordes o centros y se **reparten** con el mismo hueco (tres o más). Con una sola pieza elegida, los mismos botones la alinean en el lienzo.
 - **Galería de plantillas:** 34 puntos de partida propios, cada uno en vertical y en horizontal, por categorías (hostelería, comercio, eventos, empresa, información, QR y redes, fotos y carteles). Se añaden como escena nueva o sustituyen la actual, y luego se retocan.
 - **Fondos:** color, degradado, malla de color o imagen, con oscurecido y trama.
 - **Escenas de temporada:** una escena puede salir solo entre dos fechas.
@@ -113,7 +114,15 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.2)
+## Cambios de la versión actual (v1.3)
+
+- **Selección múltiple** en el editor de composiciones: Mayús o Ctrl + clic añade o quita piezas (en el lienzo y en la lista de capas); arrastrar en un hueco del lienzo dibuja un marco que elige todo lo que toca; Ctrl+A las elige todas y Escape las suelta. En pantallas táctiles, la tecla «Elegir varias» hace lo mismo sin teclado.
+- **En grupo:** las piezas elegidas se mueven juntas (arrastrando o con las flechas, con imán a los bordes del grupo), y se duplican, copian, pegan, borran y pasan al frente o al fondo a la vez. Las bloqueadas no se mueven.
+- **Alinear:** borde izquierdo, centro horizontal, borde derecho, arriba, centro vertical y abajo. Con varias piezas, entre sí; con una sola, en el lienzo. Las piezas giradas se alinean por la caja que las envuelve.
+- **Repartir** en horizontal o en vertical, con el mismo hueco entre todas (tres piezas o más): la primera y la última no se mueven.
+- Todo entra en deshacer y rehacer. No cambia nada más del aspecto ni del funcionamiento.
+
+### Sigue de la v1.2
 
 - **Instalable:** botón «Instalar» en la cabecera del gestor, con su icono propio; ADPOSTER se abre como una aplicación más.
 - **Sin conexión:** el gestor y los displays guardan una copia de la app, de las listas y de las imágenes de sus carpetas (hasta 600 por pantalla), y siguen funcionando con ella si no hay internet. Con conexión se carga siempre lo último.
@@ -207,7 +216,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.2 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.3 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 
