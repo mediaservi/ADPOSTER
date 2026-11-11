@@ -8,7 +8,7 @@
 
 ## Almacenamiento local
 
-La aplicación guarda en tu navegador (almacenamiento local) lo necesario para funcionar como tú la dejaste: idioma, ajustes, últimas opciones elegidas y, si lo escribiste, tu correo para los avisos de fallo. Esa información **no sale de tu dispositivo** y puedes borrarla cuando quieras desde los ajustes del navegador (borrar los datos del sitio). Al ser estrictamente necesaria para el servicio que tú pides, no requiere un aviso de consentimiento.
+La aplicación guarda en tu navegador (almacenamiento local) lo necesario para funcionar como tú la dejaste: idioma, ajustes, últimas opciones elegidas, el código, nombre y grupo de cada display y el canal del directo y, si lo escribiste, tu correo para los avisos de fallo. Esa información **no sale de tu dispositivo** y puedes borrarla cuando quieras desde los ajustes del navegador (borrar los datos del sitio). Al ser estrictamente necesaria para el servicio que tú pides, no requiere un aviso de consentimiento.
 
 ## Cookies de terceros
 

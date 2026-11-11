@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<!--
+  ADPOSTER · ELIGE — la página del público. Se llega escaneando el código QR que enseña un display.
+  Muestra las listas que el dueño ha marcado como «elegibles por el público» y, al tocar una, ese display la pone.
+  El QR lleva solo el canal del público (derivado del canal de la instalación, no al revés) y el código del display:
+  desde aquí no se pueden mandar avisos, ni apagar, ni ninguna otra orden. No se guarda ni se pide ningún dato.
+  Licencia GPL-3.0 · mediaservi.com
+-->
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ADPOSTER · Elige</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#232325">
+  <link rel="icon" href="../assets/logos/adposter-icono.svg" type="image/svg+xml">
+  <style>
+    @font-face { font-family: 'Inter'; font-weight: 400; font-display: swap; src: url(../assets/fonts/inter-latin-400-normal.woff2) format('woff2'); }
+    @font-face { font-family: 'Inter'; font-weight: 700 900; font-display: swap; src: url(../assets/fonts/inter-latin-800-normal.woff2) format('woff2'); }
+    @font-face { font-family: 'Share Tech Mono'; font-weight: 400; font-display: swap; src: url(../assets/fonts/share-tech-mono-latin-400-normal.woff2) format('woff2'); }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: #121213; color: #e9ebee; font: 400 16px/1.35 Inter, system-ui, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { min-height: 100dvh; display: flex; flex-direction: column; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; background: linear-gradient(180deg, #303034, #1d1d20); border-bottom: 1px solid #0a0a0b; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .09); }
+    header img { height: 34px; width: auto; display: block; }
+    main { flex: 1; width: 100%; max-width: 620px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    h1 { margin: 0; font: 400 13px 'Share Tech Mono', monospace; letter-spacing: .18em; text-transform: uppercase; color: #9aa0aa; }
+    .lcd { padding: 12px 14px; border-radius: 9px; background: #0b0a06; box-shadow: inset 0 2px 8px #000, 0 1px 0 rgba(255, 255, 255, .08); color: #ffb000; font: 400 19px/1.25 'Share Tech Mono', monospace; text-shadow: 0 0 8px rgba(255, 176, 0, .5); overflow-wrap: anywhere; display: flex; align-items: center; gap: 10px; }
+    .lcd i { flex: none; width: 11px; height: 11px; border-radius: 50%; background: #3a2a08; }
+    .lcd.on i { background: #00ff04; box-shadow: 0 0 8px rgba(0, 255, 4, .8); }
+    .lista { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    button { font: 800 19px/1.2 Inter, Arial, sans-serif; color: #e9ebee; min-height: 68px; padding: 12px 16px; border: 1px solid #0a0a0b; border-radius: 11px; background: linear-gradient(180deg, #4b4b51, #2d2d31); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16), 0 3px 5px rgba(0, 0, 0, .5); cursor: pointer; display: flex; align-items: center; gap: 12px; text-align: left; letter-spacing: .02em; overflow-wrap: anywhere; }
+    button:active { transform: translateY(1px); box-shadow: inset 0 2px 5px rgba(0, 0, 0, .6); }
+    button:focus-visible { outline: 2px solid #ffb000; outline-offset: 2px; }
+    button i { flex: none; width: 13px; height: 13px; border-radius: 50%; background: #1d1407; box-shadow: inset 0 1px 2px #000; }
+    button.on { color: #fff; background: linear-gradient(180deg, #3a3a3f, #232326); box-shadow: inset 0 2px 5px rgba(0, 0, 0, .65); }
+    button.on i { background: #ffb000; box-shadow: 0 0 9px rgba(255, 176, 0, .9), inset 0 1px 0 rgba(255, 255, 255, .5); }
+    button[disabled] { opacity: .55; cursor: default; }
+    .nota { color: #9aa0aa; font-size: 14px; }
+    footer { padding: 9px 12px; text-align: center; color: #8d929c; font-size: 13px; background: #19191b; border-top: 1px solid #0a0a0b; }
+    footer a { color: inherit; }
+  </style>
+</head>
+<body>
+  <header><img src="../assets/logos/adposter-logo.svg" alt="ADPOSTER" width="227" height="60"><span class="nota" id="idi"></span></header>
+  <main>
+    <h1 id="t1"></h1>
+    <div class="lcd" id="disp"><i></i><span></span></div>
+    <h1 id="t2"></h1>
+    <div class="lista" id="lista"></div>
+    <div class="nota" id="nota" role="status" aria-live="polite"></div>
+  </main>
+  <footer id="pie"></footer>
+  <noscript><p style="padding:2rem">ADPOSTER necesita JavaScript activado.</p></noscript>
+  <script src="../credito.js?v=1.0"></script>
+  <script src="../directo.js?v=1.0"></script>
+  <script>
+  (function () {
+    'use strict';
+    var VERSION = '1.0', Q = new URLSearchParams(location.search), C = Q.get('c') || '', D = (Q.get('d') || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 12);
+    var lang = (Q.get('lang') || navigator.language || 'es').slice(0, 2).toLowerCase(); if (['es', 'en', 'ca'].indexOf(lang) < 0) lang = 'es';
+    var TX = { 'Pantalla': ['Screen', 'Pantalla'], 'Elige qué quieres ver': ['Choose what to watch', 'Tria què vols veure'], 'Buscando la pantalla…': ['Looking for the screen…', 'Buscant la pantalla…'],
+      'Esta pantalla no tiene listas para elegir ahora mismo.': ['This screen has no lists to choose from right now.', 'Aquesta pantalla no té llistes per triar ara mateix.'],
+      'Este enlace no es válido. Escanea de nuevo el código de la pantalla.': ['This link is not valid. Scan the code on the screen again.', 'Aquest enllaç no és vàlid. Torna a escanejar el codi de la pantalla.'],
+      'Enviado. La pantalla cambia en unos segundos.': ['Sent. The screen changes in a few seconds.', 'Enviat. La pantalla canvia en uns segons.'], 'Sin conexión: reintentando…': ['Offline: retrying…', 'Sense connexió: reintentant…'],
+      'No encuentro la pantalla. Puede que esté apagada.': ['I cannot find the screen. It may be switched off.', 'No trobo la pantalla. Potser està apagada.'], 'Ahora en pantalla': ['Now showing', 'Ara en pantalla'], 'es un proyecto hecho con': ['is a project made with', 'és un projecte fet amb'] };
+    var T = function (s) { var t = TX[s]; return !t || lang === 'es' ? s : t[lang === 'en' ? 0 : 1]; };
+    var $ = function (i) { return document.getElementById(i); }, menu = null, dir = null, tEnv = 0, visto = false;
+    document.documentElement.lang = lang; $('t1').textContent = T('Pantalla'); $('t2').textContent = T('Elige qué quieres ver');
+    $('pie').innerHTML = window.AVCREDITO ? window.AVCREDITO.html('ADPOSTER', 'v' + VERSION, lang) : 'ADPOSTER v' + VERSION + ' ' + new Date().getFullYear() + ' ' + T('es un proyecto hecho con') + ' by mediaservi.com';
+    if (window.AVCREDITO) window.AVCREDITO.alCambiar(function () { $('pie').innerHTML = window.AVCREDITO.html('ADPOSTER', 'v' + VERSION, lang); });
+    function nota(t) { $('nota').textContent = t || ''; }
+    function pinta() { var d = $('disp'), l = $('lista'); d.classList.toggle('on', !!(dir && dir.up && menu)); d.lastElementChild.textContent = menu ? menu.n : T('Buscando la pantalla…'); l.textContent = '';
+      if (!menu) return; if (!menu.listas || !menu.listas.length) { nota(T('Esta pantalla no tiene listas para elegir ahora mismo.')); return; }
+      menu.listas.forEach(function (x) { var b = document.createElement('button'), i = document.createElement('i'), s = document.createElement('span'); b.type = 'button'; s.textContent = x.n; b.appendChild(i); b.appendChild(s); var on = x.id === menu.l; b.className = on ? 'on' : ''; b.setAttribute('aria-pressed', on); if (on) b.title = T('Ahora en pantalla');
+        b.disabled = Date.now() - tEnv < 8000; b.addEventListener('click', function () { if (on || !dir) return; dir.pub('pide/' + D, { t: 'lista', id: x.id }); tEnv = Date.now(); nota(T('Enviado. La pantalla cambia en unos segundos.')); pinta(); setTimeout(pinta, 8200); }); l.appendChild(b); }); }
+    if (!window.ADDIRECTO || !window.ADDIRECTO.canalOk(C) || !D) { $('disp').lastElementChild.textContent = '—'; nota(T('Este enlace no es válido. Escanea de nuevo el código de la pantalla.')); return; }
+    dir = window.ADDIRECTO.conecta(C, { temas: ['menu/' + D], alMensaje: function (t, m) { if (m && typeof m === 'object') { menu = { n: String(m.n || '').slice(0, 40), l: String(m.l || ''), listas: (Array.isArray(m.listas) ? m.listas : []).slice(0, 24).map(function (x) { return { id: String(x.id || ''), n: String(x.n || x.id || '').slice(0, 40) }; }) }; visto = true; if (Date.now() - tEnv > 8000) nota(''); pinta(); } },
+      alCambiar: function (v) { if (!v) nota(T('Sin conexión: reintentando…')); else if (!visto) nota(''); pinta(); } });
+    pinta(); setTimeout(function () { if (!visto) nota(T('No encuentro la pantalla. Puede que esté apagada.')); }, 12000);
+  })();
+  </script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 {
-  "recarga": 2,
+  "recarga": 3,
   "playlists": {
     "cine": {
       "nombre": "CINE",
@@ -84,6 +84,62 @@
         ]
       },
       "redirige": ""
+    },
+    "apaisado": {
+      "nombre": "APAISADO",
+      "fondo": "demo",
+      "cabecera": 24,
+      "pie": 5,
+      "lado": 4,
+      "alinea": "centro",
+      "contenido": [
+        "demo-carteles"
+      ],
+      "anuncios": [
+        "demo-anuncios"
+      ],
+      "segundos": 10,
+      "segundosAnuncio": 10,
+      "anunciosCada": [
+        4,
+        6
+      ],
+      "fundido": {
+        "tipo": "fundido",
+        "segundos": 2.5
+      },
+      "movimiento": true,
+      "llenar": false,
+      "brillo": true,
+      "horario": {
+        "activo": false,
+        "desde": "09:00",
+        "hasta": "23:00",
+        "dias": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      "redirige": "",
+      "formato": "horizontal",
+      "cinta": {
+        "activo": true,
+        "texto": "ADPOSTER en horizontal: el cartel y el anuncio a la vez · Esta cinta puede llevar un texto fijo, los titulares de un RSS o un mensaje enviado al momento desde el gestor",
+        "rss": ""
+      },
+      "qr": {
+        "activo": true,
+        "modo": "url",
+        "url": "https://adposter.mediaservi.com/",
+        "texto": "Pruébalo",
+        "pos": "bd"
+      },
+      "publico": false
     }
   }
 }

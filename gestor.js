@@ -1,106 +1,245 @@
-/* ADPOSTER · gestor de playlists. Edita los ajustes de cada playlist con vista previa en vivo y guarda playlists.json.
-   Los cambios se quedan en este navegador como borrador hasta que se publican (subiendo playlists.json a la web).
+/* ADPOSTER · gestor de listas y displays (v1.0).
+   Cuatro ventanas: DISPLAYS y LISTAS, fijas a la izquierda; el LIENZO en el centro, con la vista previa en vivo, zoom y guías que se arrastran;
+   y a la derecha las pestañas CONTENIDO · DISEÑO · TIEMPOS · DIRECTO · PUBLICAR.
+   Los cambios de las listas se quedan en este navegador como borrador hasta que se publican (subiendo playlists.json a la web).
+   El directo (directo.js) no necesita publicar nada: habla con los displays al momento a través de un canal que solo conoce la instalación.
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '0.9', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'];
+  const VERSION = '1.0', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'];
   const DEF = { nombre: '', fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7], fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true,
-    horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '' };
+    horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '', formato: 'vertical', qr: { activo: false, modo: 'url', url: '', texto: '', pos: 'bd' }, cinta: { activo: false, texto: '', rss: '' }, publico: false };
+  /* qué ajustes restablece el botón de cada pestaña */
+  const GRUPOS = { contenido: ['fondo', 'contenido', 'anuncios', 'cinta', 'publico'], diseno: ['formato', 'cabecera', 'pie', 'lado', 'alinea', 'movimiento', 'llenar', 'brillo', 'fundido', 'qr'], tiempos: ['segundos', 'segundosAnuncio', 'anunciosCada', 'horario', 'redirige'] };
+  /* plantillas: un punto de partida para el diseño, que luego se retoca */
+  const PLANT = { cartelera: { formato: 'vertical', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', llenar: false, movimiento: true, brillo: true }, completa: { formato: 'vertical', cabecera: 0, pie: 0, lado: 0, alinea: 'centro', llenar: true, movimiento: false, brillo: false },
+    marco: { formato: 'vertical', cabecera: 9, pie: 9, lado: 9, alinea: 'centro', llenar: false, movimiento: true, brillo: true }, apaisado: { formato: 'horizontal', pie: 5, lado: 4, alinea: 'centro', llenar: false, movimiento: true, brillo: true } };
   const $ = s => document.querySelector(s), copia = o => JSON.parse(JSON.stringify(o));
-  const lee = k => { try { return JSON.parse(localStorage.getItem('adposter:' + k)); } catch (e) { return null; } }, guarda = (k, v) => { try { localStorage.setItem('adposter:' + k, JSON.stringify(v)); } catch (e) {} };
+  const lee = k => { try { return JSON.parse(localStorage.getItem('adposter:' + k)); } catch (e) { return null; } }, guarda = (k, v) => { try { v === null ? localStorage.removeItem('adposter:' + k) : localStorage.setItem('adposter:' + k, JSON.stringify(v)); } catch (e) {} };
 
   /* ---------- idioma ---------- */
   const IDI = ['es', 'en', 'ca']; let lang = lee('lang') || (IDI.includes((navigator.language || '').slice(0, 2)) ? navigator.language.slice(0, 2) : 'es');
-  const TX = { 'Playlist': ['Playlist', 'Playlist'], 'Nueva': ['New', 'Nova'], 'nombre de la nueva': ['name of the new one', 'nom de la nova'], 'Borrar': ['Delete', 'Esborra'], 'Fondo': ['Background', 'Fons'], 'sin fondo': ['no background', 'sense fons'],
+  const TX = { 'Listas': ['Lists', 'Llistes'], 'Nueva': ['New', 'Nova'], 'nueva lista': ['new list', 'nova llista'], 'Borrar': ['Delete', 'Esborra'], 'Fondo': ['Background', 'Fons'], 'sin fondo': ['no background', 'sense fons'],
     'Carpetas de contenido': ['Content folders', 'Carpetes de contingut'], 'Carpetas de anuncios': ['Ad folders', "Carpetes d'anuncis"], 'URL para el kiosco': ['URL for the kiosk', 'URL per al quiosc'], 'Giro del display': ['Display rotation', 'Gir del display'], 'Copiar': ['Copy', 'Copia'], 'Copiada': ['Copied', 'Copiada'], 'Abrir': ['Open', 'Obre'],
     'Duración': ['Duration', 'Durada'], 'póster': ['poster', 'pòster'], 'anuncio': ['ad', 'anunci'], 'Transición': ['Transition', 'Transició'], 'fundido': ['fade', 'fosa'], 'zoom': ['zoom', 'zoom'], 'desliza': ['slide', 'llisca'], 'cortina': ['wipe', 'cortina'], 'corte': ['cut', 'tall'],
-    'Un anuncio cada': ['One ad every', 'Un anunci cada'], 'mín': ['min', 'mín'], 'máx': ['max', 'màx'], 'pósteres': ['posters', 'pòsters'], 'Efectos y encaje': ['Effects and fit', 'Efectes i encaix'], 'Movimiento': ['Motion', 'Moviment'], 'Llenar': ['Fill', 'Omple'], 'Brillo': ['Shine', 'Brillantor'], 'Abajo': ['Bottom', 'A baix'], 'Centro': ['Centre', 'Centre'],
-    'cabecera': ['header', 'capçalera'], 'Horario': ['Schedule', 'Horari'], 'En horario': ['Scheduled', 'En horari'], 'Redirección': ['Redirect', 'Redirecció'], 'https://… (vacío: reproduce la playlist)': ['https://… (empty: plays the playlist)', 'https://… (buit: reprodueix la playlist)'],
+    'Un anuncio cada': ['One ad every', 'Un anunci cada'], 'mín': ['min', 'mín'], 'máx': ['max', 'màx'], 'Efectos': ['Effects', 'Efectes'], 'Movimiento': ['Motion', 'Moviment'], 'Llenar': ['Fill', 'Omple'], 'Brillo': ['Shine', 'Brillantor'], 'Abajo': ['Bottom', 'A baix'], 'Centro': ['Centre', 'Centre'],
+    'cabecera': ['header', 'capçalera'], 'pie': ['footer', 'peu'], 'lados': ['sides', 'costats'], 'Horario de encendido': ['Power schedule', "Horari d'encesa"], 'En horario': ['Scheduled', 'En horari'], 'Redirección': ['Redirect', 'Redirecció'], 'https://… (vacío: reproduce la lista)': ['https://… (empty: plays the list)', 'https://… (buit: reprodueix la llista)'],
     'Guardar playlists.json': ['Save playlists.json', 'Desa playlists.json'], 'Importar': ['Import', 'Importa'], 'Restablecer': ['Reset', 'Restableix'],
-    'Para publicar: guarda el archivo y súbelo a la raíz de la web. Los displays lo recogen solos en menos de 5 minutos.': ['To publish: save the file and upload it to the site root. Displays pick it up on their own within 5 minutes.', "Per publicar: desa l'arxiu i puja'l a l'arrel del web. Els displays el recullen sols en menys de 5 minuts."],
-    'Publicado': ['Published', 'Publicat'], 'Cambios sin publicar': ['Unpublished changes', 'Canvis sense publicar'], 'imágenes': ['images', 'imatges'], 'es un proyecto hecho con': ['is a project made with', 'és un projecte fet amb'], 'Contenido': ['Content', 'Contingut'], 'Reproducción': ['Playback', 'Reproducció'],
-    'L': ['M', 'Dl'], 'M': ['T', 'Dt'], 'X': ['W', 'Dc'], 'J': ['T', 'Dj'], 'V': ['F', 'Dv'], 'S': ['S', 'Ds'], 'D': ['S', 'Dg'] };
+    'Para publicar las listas: guarda el archivo y súbelo a la raíz de tu web. Los displays lo recogen solos en menos de 5 minutos. El directo no necesita publicar nada.': ['To publish the lists: save the file and upload it to your site root. Displays pick it up on their own within 5 minutes. Live control needs no publishing.', "Per publicar les llistes: desa l'arxiu i puja'l a l'arrel del teu web. Els displays el recullen sols en menys de 5 minuts. El directe no necessita publicar res."],
+    'Publicado': ['Published', 'Publicat'], 'Cambios sin publicar': ['Unpublished changes', 'Canvis sense publicar'], 'es un proyecto hecho con': ['is a project made with', 'és un projecte fet amb'],
+    'L': ['M', 'Dl'], 'M': ['T', 'Dt'], 'X': ['W', 'Dc'], 'J': ['T', 'Dj'], 'V': ['F', 'Dv'], 'S': ['S', 'Ds'], 'D': ['S', 'Dg'],
+    'Contenido': ['Content', 'Contingut'], 'Diseño': ['Design', 'Disseny'], 'Tiempos': ['Timing', 'Temps'], 'Directo': ['Live', 'Directe'], 'Publicar': ['Publish', 'Publica'], 'Lienzo': ['Canvas', 'Llenç'], 'Ajustes': ['Settings', 'Ajustos'],
+    'Ajustar': ['Fit', 'Ajusta'], 'Guías': ['Guides', 'Guies'], 'Vertical': ['Portrait', 'Vertical'], 'Horizontal': ['Landscape', 'Horitzontal'], 'Formato': ['Format', 'Format'], 'Plantillas': ['Templates', 'Plantilles'], 'Cartelera': ['Billboard', 'Cartellera'], 'Pantalla completa': ['Full screen', 'Pantalla completa'], 'Marco centrado': ['Centred frame', 'Marc centrat'], 'Apaisado': ['Landscape', 'Apaïsat'],
+    'Márgenes': ['Margins', 'Marges'], 'Código QR': ['QR code', 'Codi QR'], 'QR en pantalla': ['QR on screen', 'QR en pantalla'], 'Enlace': ['Link', 'Enllaç'], 'El público elige': ['Audience picks', 'El públic tria'], 'https://… destino del QR': ['https://… QR target', 'https://… destí del QR'], 'texto bajo el QR': ['caption under the QR', 'text sota el QR'],
+    'Lista elegible por el público': ['List the audience can pick', 'Llista que el públic pot triar'], 'Esquina': ['Corner', 'Cantonada'], 'Cinta de texto': ['Text ticker', 'Cinta de text'], 'Cinta': ['Ticker', 'Cinta'], 'texto de la cinta': ['ticker text', 'text de la cinta'], 'RSS: https://… o noticias.xml': ['RSS: https://… or news.xml', 'RSS: https://… o noticies.xml'], 'Participación del público': ['Audience participation', 'Participació del públic'], 'Quien escanee el QR «El público elige» de un display podrá poner en él las listas marcadas así, y nada más.': ['Whoever scans a display’s “Audience picks” QR can put the lists marked this way on it, and nothing else.', 'Qui escanegi el QR «El públic tria» d’un display hi podrà posar les llistes marcades així, i res més.'],
+    'Displays': ['Displays', 'Displays'], 'en línea': ['online', 'en línia'], 'Todos': ['All', 'Tots'], 'grupo': ['group', 'grup'], 'sede': ['site', 'seu'], 'Activar el directo': ['Turn live control on', 'Activa el directe'],
+    'El directo une este gestor con tus displays al momento: ver cómo está cada uno, cambiarle la lista, mandar avisos, apagar… Actívalo y abre en cada display la URL de la pestaña PUBLICAR.': ['Live control links this manager with your displays instantly: see how each one is doing, change its list, send alerts, switch off… Turn it on and open the URL from the PUBLISH tab on each display.', "El directe uneix aquest gestor amb els teus displays a l'instant: veure com està cadascun, canviar-li la llista, enviar avisos, apagar… Activa'l i obre a cada display la URL de la pestanya PUBLICA."],
+    'Aún no hay ningún display en este canal. Abre la URL para el kiosco (pestaña PUBLICAR) en una pantalla y aparecerá aquí.': ['No display on this channel yet. Open the kiosk URL (PUBLISH tab) on a screen and it will show up here.', 'Encara no hi ha cap display en aquest canal. Obre la URL per al quiosc (pestanya PUBLICA) en una pantalla i apareixerà aquí.'],
+    'Repetidor': ['Relay', 'Repetidor'], 'conectado': ['connected', 'connectat'], 'conectando…': ['connecting…', 'connectant…'], 'apagado': ['off', 'apagat'], 'fuera de horario': ['out of schedule', "fora d'horari"], 'sin señal': ['no signal', 'sense senyal'], 'encendido': ['on', 'encès'],
+    'Destino': ['Target', 'Destí'], 'todos los displays': ['all displays', 'tots els displays'], 'Lanzar una lista': ['Launch a list', 'Llança una llista'], 'Aviso a toda pantalla': ['Full-screen alert', 'Avís a tota pantalla'], 'texto del aviso': ['alert text', "text de l'avís"], 'Enviar aviso': ['Send alert', "Envia l'avís"],
+    'Mensaje en la cinta': ['Message on the ticker', 'Missatge a la cinta'], 'mensaje': ['message', 'missatge'], 'Poner': ['Show', 'Posa'], 'Quitar': ['Remove', 'Treu'], 'Encendido': ['Power', 'Encesa'], 'Encender': ['Switch on', 'Encén'], 'Apagar': ['Switch off', 'Apaga'], 'Recargar': ['Reload', 'Recarrega'], 'Identificar': ['Identify', 'Identifica'],
+    'Este display': ['This display', 'Aquest display'], 'nombre': ['name', 'nom'], 'Aplicar': ['Apply', 'Aplica'], 'Olvidar': ['Forget', 'Oblida'], 'Enviado a': ['Sent to', 'Enviat a'], 'Sin directo: se ve solo en el lienzo': ['No live control: shown on the canvas only', 'Sense directe: es veu només al llenç'], 'Sin conexión con el repetidor: se ve solo en el lienzo': ['No relay connection: shown on the canvas only', 'Sense connexió amb el repetidor: es veu només al llenç'],
+    'Canal en directo': ['Live channel', 'Canal en directe'], 'sin canal': ['no channel', 'sense canal'], 'Canal nuevo': ['New channel', 'Canal nou'], 'En archivo': ['In file', "A l'arxiu"],
+    'El canal es la llave del directo: quien lo tenga puede mandar a tus displays. Va dentro de la URL del kiosco. Guárdalo «en el archivo» solo si tu web de listas es privada.': ['The channel is the key to live control: whoever has it can command your displays. It travels inside the kiosk URL. Keep it “in the file” only if your lists site is private.', "El canal és la clau del directe: qui el tingui pot manar als teus displays. Va dins de la URL del quiosc. Desa'l «a l'arxiu» només si el teu web de llistes és privat."],
+    'Origen privado': ['Private source', 'Origen privat'], 'https://… web privada (opcional)': ['https://… private site (optional)', 'https://… web privat (opcional)'], 'archivos': ['files', 'arxius'], 'carpetas': ['folders', 'carpetes'], 'carteles': ['posters', 'cartells'], 'anuncios': ['ads', 'anuncis'],
+    'Suelta aquí para añadirla a la lista': ['Drop here to add it to the list', 'Deixa-la aquí per afegir-la a la llista'], 'En horizontal, el margen de arriba es igual al de abajo y «Llenar» no se aplica.': ['In landscape, the top margin equals the bottom one and “Fill” does not apply.', 'En horitzontal, el marge de dalt és igual al de baix i «Omple» no s’aplica.'],
+    'Arrastra una lista sobre un display para lanzarla.': ['Drag a list onto a display to launch it.', 'Arrossega una llista sobre un display per llançar-la.'] };
   const T = s => { const t = TX[s]; return !t || lang === 'es' ? s : t[lang === 'en' ? 0 : 1]; };
 
   /* ---------- datos ---------- */
-  let MAN = { carpetas: {} }, PUB = { recarga: 1, playlists: {} }, B = null, sel = '', listo = false;
-  const P = () => B.playlists[sel], carpetas = () => Object.keys(MAN.carpetas).filter(c => c !== 'fondos'), esAds = c => /^ads?[-_]/i.test(c);
-  const completa = p => { const c = Object.assign({}, copia(DEF), p || {}); c.fundido = Object.assign({}, DEF.fundido, (p || {}).fundido); c.horario = Object.assign({}, copia(DEF.horario), (p || {}).horario); return c; };
+  let MAN = { carpetas: {} }, PUB = { recarga: 1, playlists: {} }, B = null, sel = '', listo = false, giro = 0;
+  let tab = TABS.includes(lee('g-tab')) ? lee('g-tab') : 'contenido', zoom = 1, guias = lee('g-guias') !== false;
+  let canal = '', enArchivo = false, dir = null, DSP = {}, dest = { k: 'todos', v: '' };
+  const D = { aviso: '', seg: 10, color: 'ambar', cinta: '', n: '', g: '', s: '' };                 // lo que se está escribiendo en la pestaña DIRECTO
+  const P = () => B.playlists[sel], carpetas = () => Object.keys(MAN.carpetas).filter(c => c !== 'fondos'), esAds = c => /^ads?[-_]/i.test(c) || /anuncio/i.test(c);
+  const completa = p => { p = p || {}; const c = Object.assign({}, copia(DEF), p); c.fundido = Object.assign({}, DEF.fundido, p.fundido); c.horario = Object.assign({}, copia(DEF.horario), p.horario); c.qr = Object.assign({}, DEF.qr, p.qr); c.cinta = Object.assign({}, DEF.cinta, p.cinta); if (c.formato !== 'horizontal') c.formato = 'vertical'; return c; };
   const sucio = () => JSON.stringify(B.playlists) !== JSON.stringify(PUB.playlists);
-  function base() { const d = new URL('./', location.href).href; return /githack|localhost|127\.0\.0\.1/.test(location.host) ? 'https://adposter.mediaservi.com/' : d; }
-  let giro = 0;   // giro del display: va en la URL del kiosco, porque es cosa de cada aparato
-  const cola = id => (CON_CARPETA.includes(id) ? id + (giro ? '/?rot=' + giro : '') : 'p/?l=' + id + (giro ? '&rot=' + giro : ''));
+  const slug = s => String(s || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 24);
+  function base() { const d = new URL('./', location.href).href; return /githack/.test(location.host) ? 'https://adposter.mediaservi.com/' : d; }
+  /* la URL del kiosco lleva lo que es de cada aparato: el giro, el canal del directo y, si lo hay, el origen privado */
+  const cola = id => { const q = []; if (!CON_CARPETA.includes(id)) q.push('l=' + id); if (giro) q.push('rot=' + giro); if (canal && !enArchivo) q.push('canal=' + canal); if (ORIG) q.push('origen=' + encodeURIComponent(ORIG)); return (CON_CARPETA.includes(id) ? id + '/' : 'p/') + (q.length ? '?' + q.join('&') : ''); };
   const urlKiosco = id => base() + cola(id);
-  function cambia(f) { f(P()); guarda('gestor', B); envia(); pintaB(); pintaA(); estado(); }
+  let tEnv = 0;
   function envia() { const fr = $('#previa'); if (listo && fr.contentWindow) fr.contentWindow.postMessage({ adposter: 'cfg', id: sel, cfg: P() }, '*'); }
+  const enviaLuego = () => { clearTimeout(tEnv); tEnv = setTimeout(envia, 220); };
+  function cambia(f) { f(P()); guarda('gestor', B); envia(); pintaT(); pintaL(); pintaBarra(); ajusta(); estado(); }
   function previa() { listo = false; $('#previa').src = 'p/?l=' + encodeURIComponent(sel) + '&prev=1&lang=' + lang + (ORIG ? '&origen=' + encodeURIComponent(ORIG) : ''); }
-  function estado() { const e = $('#estado'), s = sucio(); e.classList.toggle('sucio', s); e.lastElementChild.textContent = T(s ? 'Cambios sin publicar' : 'Publicado'); }
+  let tFlash = 0;
+  function estado(msg) { const e = $('#estado'), s = sucio(); if (msg) { clearTimeout(tFlash); e.className = 'estado flash'; e.lastElementChild.textContent = msg; tFlash = setTimeout(() => { tFlash = 0; estado(); }, 2600); return; } if (tFlash) return;
+    e.className = 'estado' + (s ? ' sucio' : ''); e.lastElementChild.textContent = T(s ? 'Cambios sin publicar' : 'Publicado'); }
 
-  /* ---------- zonas ---------- */
+  /* ---------- piezas ---------- */
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const tecla = (a, v, txt, on, extra) => `<button type="button" class="tecla${on ? ' on' : ''}" data-a="${a}" data-v="${esc(v)}" aria-pressed="${!!on}"><i class="led"></i><span>${txt}</span>${extra || ''}</button>`;
+  const tecla = (a, v, txt, on, extra, attr) => `<button type="button" class="tecla${on ? ' on' : ''}" data-a="${a}" data-v="${esc(v)}" aria-pressed="${!!on}"${attr || ''}><i class="led"></i><span>${txt}</span>${extra || ''}</button>`;
   const paso = (a, txt) => `<div class="fila"><button type="button" class="tecla rd" data-a="${a}" data-v="-1" aria-label="−">−</button><div class="lcd">${txt}</div><button type="button" class="tecla rd" data-a="${a}" data-v="1" aria-label="+">+</button></div>`;
-  function pintaA() { const p = P(), fs = (MAN.carpetas.fondos || []).map(f => f.replace(/\.[a-z0-9]+$/i, '')), cs = carpetas(), n = c => `<small>${MAN.carpetas[c].length}</small>`, foco = document.activeElement && document.activeElement.dataset ? [document.activeElement.dataset.a, document.activeElement.dataset.v] : null;
-    $('#zona-a').innerHTML = `<h2>${T('Playlist')}</h2><div class="rej">${Object.keys(B.playlists).map(id => tecla('sel', id, esc(B.playlists[id].nombre || id.toUpperCase()), id === sel)).join('')}</div>
-      <div class="fila"><input class="campo" id="nueva" maxlength="24" placeholder="${T('nombre de la nueva')}" aria-label="${T('nombre de la nueva')}"><button type="button" class="tecla" data-a="nueva" style="flex:none">+ ${T('Nueva')}</button><button type="button" class="tecla reset" data-a="borra" style="flex:none"${Object.keys(B.playlists).length < 2 ? ' disabled' : ''}>${T('Borrar')}</button></div>
-      <h2>${T('Fondo')}</h2><div class="rej media">${fs.map(f => tecla('fondo', f, f, p.fondo === f)).join('')}${tecla('fondo', '', T('sin fondo'), !p.fondo)}</div>
-      <h2>${T('Carpetas de contenido')}</h2><div class="rej ancha">${cs.filter(c => !esAds(c)).map(c => tecla('contenido', c, c, p.contenido.includes(c), n(c))).join('')}</div>
-      <h2>${T('Carpetas de anuncios')}</h2><div class="rej ancha">${cs.filter(esAds).map(c => tecla('anuncios', c, c, p.anuncios.includes(c), n(c))).join('')}</div>
-      <h2 style="margin-top:auto">${T('URL para el kiosco')}</h2><div class="fila giro">${[0, 90, 180, 270].map(g => `<button type="button" class="tecla${giro === g ? ' on' : ''}" data-a="giro" data-v="${g}" aria-pressed="${giro === g}" aria-label="${T('Giro del display')} ${g}°"><i class="led"></i><span>${g}°</span></button>`).join('')}</div><div class="lcd url" id="url">${esc(urlKiosco(sel))}</div><div class="fila"><button type="button" class="tecla" data-a="copia">${T('Copiar')}</button><a class="tecla" href="${cola(sel).replace(/^(cine|klub)$/, '$1/')}" target="_blank" rel="noopener">${T('Abrir')}</a></div>`;
-    if (foco && foco[0]) { const e = [...document.querySelectorAll('#zona-a [data-a="' + foco[0] + '"]')].find(x => (x.dataset.v || '') === (foco[1] || '')); e && e.focus(); } }
-  function pintaB() { const p = P(), h = p.horario, D = ['L', 'M', 'X', 'J', 'V', 'S', 'D'], foco = document.activeElement && document.activeElement.dataset ? [document.activeElement.dataset.a, document.activeElement.dataset.v, document.activeElement.id] : null;
-    $('#zona-b').innerHTML = `<h2>${T('Duración')}</h2>${paso('segundos', `${p.segundos} s <small>${T('póster')}</small>`)}${paso('segundosAnuncio', `${p.segundosAnuncio} s <small>${T('anuncio')}</small>`)}
-      <h2>${T('Transición')}</h2><div class="rej" style="grid-template-columns:repeat(auto-fit,minmax(94px,1fr))">${TIPOS.map(t => tecla('tipo', t, T(t), p.fundido.tipo === t)).join('')}</div>${paso('fseg', `${p.fundido.segundos.toFixed(1)} s`)}
-      <h2>${T('Un anuncio cada')}</h2><div class="fila"><button type="button" class="tecla rd" data-a="amin" data-v="-1">−</button><div class="lcd">${p.anunciosCada[0]} <small>${T('mín')}</small></div><button type="button" class="tecla rd" data-a="amin" data-v="1">+</button><button type="button" class="tecla rd" data-a="amax" data-v="-1">−</button><div class="lcd">${p.anunciosCada[1]} <small>${T('máx')}</small></div><button type="button" class="tecla rd" data-a="amax" data-v="1">+</button></div>
-      <h2>${T('Efectos y encaje')}</h2><div class="fila">${tecla('movimiento', '', T('Movimiento'), p.movimiento)}${tecla('llenar', '', T('Llenar'), p.llenar)}${tecla('brillo', '', T('Brillo'), p.brillo)}</div><div class="fila"><button type="button" class="tecla rd" data-a="cabecera" data-v="-1" aria-label="−">−</button><div class="lcd">${p.cabecera} % <small>${T('cabecera')}</small></div><button type="button" class="tecla rd" data-a="cabecera" data-v="1" aria-label="+">+</button><button type="button" class="tecla on" data-a="alinea" style="flex:none"><i class="led"></i><span>${T(p.alinea === 'centro' ? 'Centro' : 'Abajo')}</span></button></div>
-      <h2>${T('Horario')}</h2><div class="fila">${tecla('hact', '', T('En horario'), h.activo)}<input type="time" class="campo" id="hdesde" value="${esc(h.desde)}" aria-label="desde"><input type="time" class="campo" id="hhasta" value="${esc(h.hasta)}" aria-label="hasta"></div>
-      <div class="fila dias">${D.map((d, i) => `<button type="button" class="tecla${h.dias.includes(i + 1) ? ' on' : ''}" data-a="dia" data-v="${i + 1}" aria-pressed="${h.dias.includes(i + 1)}">${T(d)}</button>`).join('')}</div>
-      <h2>${T('Redirección')}</h2><input class="campo" id="redirige" type="url" inputmode="url" value="${esc(p.redirige || '')}" placeholder="${T('https://… (vacío: reproduce la playlist)')}" aria-label="${T('Redirección')}" style="flex:none">
-      <div class="pie-zona"><button type="button" class="tecla pri" data-a="guarda">${T('Guardar playlists.json')}</button><button type="button" class="tecla" data-a="importa">${T('Importar')}</button><button type="button" class="tecla reset" data-a="reset">${T('Restablecer')}</button></div>
-      <div class="nota">${T('Para publicar: guarda el archivo y súbelo a la raíz de la web. Los displays lo recogen solos en menos de 5 minutos.')}</div>`;
-    if (foco) { const e = foco[2] ? document.getElementById(foco[2]) : [...document.querySelectorAll('#zona-b [data-a="' + foco[0] + '"]')].find(x => (x.dataset.v || '') === (foco[1] || '')); e && e.focus(); } }
-  function pintaFijo() { document.documentElement.lang = lang; $('#btn-idioma').textContent = lang.toUpperCase(); $('#zona-a').setAttribute('aria-label', T('Contenido')); $('#zona-b').setAttribute('aria-label', T('Reproducción'));
+  const medio = (a, txt) => `<button type="button" class="tecla rd" data-a="${a}" data-v="-1" aria-label="−">−</button><div class="lcd">${txt}</div><button type="button" class="tecla rd" data-a="${a}" data-v="1" aria-label="+">+</button>`;
+  const campo = (id, val, ph, attr) => `<input class="campo" id="${id}" value="${esc(val || '')}" placeholder="${esc(ph)}" aria-label="${esc(ph)}" autocomplete="off" spellcheck="false"${attr || ''}>`;
+  const reset = g => `<div class="pie-zona"><button type="button" class="tecla reset" data-a="reset" data-v="${g}">${T('Restablecer')}</button></div>`;
+  /* repinta una ventana sin perder el foco ni el desplazamiento */
+  function pon(sel, html) { const z = $(sel), a = document.activeElement, dentro = a && z.contains(a), k = dentro ? [a.id, a.dataset.a, a.dataset.v, a.selectionStart, a.selectionEnd] : null, st = z.scrollTop; z.innerHTML = html; z.scrollTop = st;
+    if (k) { const e = k[0] ? document.getElementById(k[0]) : [...z.querySelectorAll('[data-a="' + k[1] + '"]')].find(x => (x.dataset.v || '') === (k[2] || '')); if (e) { e.focus({ preventScroll: true }); if (k[0] && k[3] != null && e.setSelectionRange) { try { e.setSelectionRange(k[3], k[4]); } catch (x) {} } } } }
+
+  /* ---------- ventana DISPLAYS: el estado de cada pantalla, en directo ---------- */
+  const enLinea = d => !!d.visto && Date.now() - d.visto < 50000;
+  const ids = () => Object.keys(DSP).sort((a, b) => DSP[a].n.localeCompare(DSP[b].n));
+  const destinos = () => ids().filter(i => dest.k === 'todos' || (dest.k === 'd' ? i === dest.v : DSP[i][dest.k] === dest.v));
+  const temaDest = () => dest.k === 'todos' ? 'orden/todos' : 'orden/' + dest.k + '/' + dest.v;
+  const nombreDest = () => dest.k === 'todos' ? T('todos los displays') : dest.k === 'd' ? (DSP[dest.v] ? DSP[dest.v].n : dest.v) : T(dest.k === 'g' ? 'grupo' : 'sede') + ' ' + dest.v;
+  function pintaD() { const L = ids(), on = L.filter(i => enLinea(DSP[i])).length, gs = [...new Set(L.map(i => DSP[i].g).filter(Boolean))].sort(), ss = [...new Set(L.map(i => DSP[i].s).filter(Boolean))].sort();
+    if ((dest.k === 'd' && !DSP[dest.v]) || (dest.k === 'g' && !gs.includes(dest.v)) || (dest.k === 's' && !ss.includes(dest.v))) dest = { k: 'todos', v: '' };
+    let h = `<h2>${T('Displays')}<b class="cuenta">${canal ? on + '/' + L.length + ' ' + T('en línea') : '—'}</b></h2>`;
+    if (!canal) h += `<div class="nota">${T('El directo une este gestor con tus displays al momento: ver cómo está cada uno, cambiarle la lista, mandar avisos, apagar… Actívalo y abre en cada display la URL de la pestaña PUBLICAR.')}</div><div class="fila"><button type="button" class="tecla pri" data-a="canalNuevo">${T('Activar el directo')}</button></div>`;
+    else { const up = dir && dir.up;
+      h += `<div class="rej env">${tecla('dest', 'todos:', T('Todos'), dest.k === 'todos', `<small>${L.length}</small>`, ' data-suelta="1"')}${gs.map(g => tecla('dest', 'g:' + g, esc(g), dest.k === 'g' && dest.v === g, '<small>G</small>', ' data-suelta="1" title="' + T('grupo') + '"')).join('')}${ss.map(s => tecla('dest', 's:' + s, esc(s), dest.k === 's' && dest.v === s, '<small>S</small>', ' data-suelta="1" title="' + T('sede') + '"')).join('')}</div>`;
+      h += `<div class="dlista">${L.map(i => { const d = DSP[i], lin = enLinea(d), st = !lin ? 'sin señal' : d.off === 2 ? 'apagado' : d.off === 1 ? 'fuera de horario' : 'encendido';
+        return `<button type="button" class="tecla disp${dest.k === 'd' && dest.v === i ? ' on' : ''} e-${!lin ? 'no' : d.off ? 'off' : 'si'}" data-a="dest" data-v="d:${i}" data-suelta="1" aria-pressed="${dest.k === 'd' && dest.v === i}" title="${esc(d.i)}"><i class="led"></i><span class="dn">${esc(d.n)}</span><span class="dd">${esc(d.ln || d.l)} · ${d.f === 'horizontal' ? 'H' : 'V'}${d.g ? ' · ' + esc(d.g) : ''}${d.s ? ' · ' + esc(d.s) : ''} · ${T(st)}</span></button>`; }).join('')}</div>`;
+      if (!L.length) h += `<div class="nota">${T('Aún no hay ningún display en este canal. Abre la URL para el kiosco (pestaña PUBLICAR) en una pantalla y aparecerá aquí.')}</div>`;
+      h += `<div class="rep${up ? ' on' : ''}"><i></i>${T('Repetidor')}: ${T(up ? 'conectado' : 'conectando…')}</div>`; }
+    pon('#zona-disp', h); const l = $('#dest-lcd'); if (l) l.textContent = nombreDest() + (dest.k !== 'd' ? ' (' + destinos().length + ')' : ''); }
+  function enlaza() { if (dir) { dir.cierra(); dir = null; } DSP = {}; if (!window.ADDIRECTO || !window.ADDIRECTO.canalOk(canal)) { canal = ''; pintaD(); return; }
+    dir = window.ADDIRECTO.conecta(canal, { temas: ['estado/+'], alCambiar: () => pintaD(), alMensaje: (t, x, ret) => { const id = (t.split('/')[1] || ''); if (t.indexOf('estado/') !== 0 || !/^[a-z0-9]{6}$/.test(id) || !x || typeof x !== 'object') return; const dt = Math.abs(Date.now() - (+x.t || 0)), era = !!DSP[id];
+      DSP[id] = { n: String(x.n || id).slice(0, 32), g: slug(x.g), s: slug(x.s), l: String(x.l || '').slice(0, 24), ln: String(x.ln || '').slice(0, 32), f: x.f === 'horizontal' ? 'horizontal' : 'vertical', w: +x.w || 0, h: +x.h || 0, v: String(x.v || '').slice(0, 8), off: +x.off || 0, i: String(x.i || '').slice(0, 120), visto: ret ? (dt < 50000 ? Date.now() - dt : 0) : Date.now() };
+      pintaD(); if (!era && tab === 'directo') pintaT(); } }); pintaD(); }
+  setInterval(() => { if (canal && B) pintaD(); }, 10000);
+
+  /* ---------- ventana LISTAS ---------- */
+  function pintaL() { const cuenta = l => (l || []).reduce((n, c) => n + (MAN.carpetas[c] || []).length, 0), p = P(), cs = carpetas(), tot = cs.reduce((n, c) => n + MAN.carpetas[c].length, 0);
+    pon('#zona-listas', `<h2>${T('Listas')}<b class="cuenta">${cs.length} ${T('carpetas')} · ${tot} ${T('archivos')}</b></h2><div class="rej env">${Object.keys(B.playlists).map(id => tecla('sel', id, esc(B.playlists[id].nombre || id.toUpperCase()), id === sel, B.playlists[id].publico ? '<small>QR</small>' : '', ' draggable="true" data-arr="lista:' + esc(id) + '"')).join('')}</div>
+      ${campo('nueva', '', T('nueva lista'), ' maxlength="24"')}<div class="fila"><button type="button" class="tecla" data-a="nueva">+ ${T('Nueva')}</button><button type="button" class="tecla reset" data-a="borra"${Object.keys(B.playlists).length < 2 ? ' disabled' : ''}>${T('Borrar')}</button></div>
+      <div class="lcd res">${cuenta(p.contenido)} <small>${T('carteles')}</small> ${cuenta(p.anuncios)} <small>${T('anuncios')}</small></div>${canal ? `<div class="nota">${T('Arrastra una lista sobre un display para lanzarla.')}</div>` : ''}`); }
+
+  /* ---------- lienzo: barra, zoom y guías que se arrastran ---------- */
+  function pintaBarra() { const hor = P().formato === 'horizontal'; pon('#barra', `<div class="fila zm"><button type="button" class="tecla rd" data-a="zoom" data-v="-1" aria-label="zoom −">−</button><div class="lcd">${Math.round(zoom * 100)} %</div><button type="button" class="tecla rd" data-a="zoom" data-v="1" aria-label="zoom +">+</button><button type="button" class="tecla" data-a="zoom" data-v="0">${T('Ajustar')}</button></div>
+      <div class="fila">${tecla('formato', 'vertical', T('Vertical'), !hor)}${tecla('formato', 'horizontal', T('Horizontal'), hor)}${tecla('guias', '', T('Guías'), guias)}</div>`); }
+  function ajusta() { if (!B) return; const l = $('#lienzo'), d = $('#display'), hor = P().formato === 'horizontal', r = hor ? 16 / 9 : 9 / 16, pw = l.clientWidth - 20, ph = l.clientHeight - 20; if (pw < 40 || ph < 40) return;
+    const w = Math.max(90, Math.min(pw, ph * r)) * zoom; d.style.width = Math.round(w) + 'px'; d.style.height = Math.round(w / r) + 'px'; d.classList.toggle('hor', hor); guiasPon(); }
+  function guiasPon() { const g = $('#guias'), p = P(), hor = p.formato === 'horizontal'; g.hidden = !guias; if (!guias) return;
+    if (!g.firstChild) g.innerHTML = '<div class="g g-cab" data-g="cab"><b></b></div><div class="g g-pie" data-g="pie"><b></b></div><div class="g g-li v" data-g="li"><b></b></div><div class="g g-ld v" data-g="ld"><b></b></div>';
+    const [c, pi, li, ld] = g.children; c.hidden = hor; c.style.top = p.cabecera + '%'; c.firstChild.textContent = T('cabecera') + ' ' + p.cabecera + ' %'; pi.style.bottom = p.pie + '%'; pi.firstChild.textContent = T('pie') + ' ' + p.pie + ' %';
+    li.style.left = p.lado + '%'; ld.style.right = p.lado + '%'; li.firstChild.textContent = ld.firstChild.textContent = T('lados') + ' ' + p.lado + ' %'; }
+  const lim = (v, a, b) => Math.min(b, Math.max(a, v));
+  let arr = null;
+  $('#guias').addEventListener('pointerdown', e => { const g = e.target.closest('[data-g]'); if (!g) return; e.preventDefault(); try { g.setPointerCapture(e.pointerId); } catch (x) {} arr = g.dataset.g; g.classList.add('act'); });
+  $('#guias').addEventListener('pointermove', e => { if (!arr) return; const r = $('#guias').getBoundingClientRect(), y = (e.clientY - r.top) / r.height * 100, x = (e.clientX - r.left) / r.width * 100, p = P(), red = v => Math.round(v * 2) / 2;
+    if (arr === 'cab') p.cabecera = lim(red(y), 0, Math.min(50, 90 - p.pie)); else if (arr === 'pie') p.pie = lim(red(100 - y), 0, Math.min(40, 90 - (p.formato === 'horizontal' ? 0 : p.cabecera))); else p.lado = lim(red(arr === 'li' ? x : 100 - x), 0, 30); guiasPon(); envia(); });
+  const sueltaGuia = () => { if (!arr) return; arr = null; [...$('#guias').children].forEach(g => g.classList.remove('act')); guarda('gestor', B); pintaT(); estado(); };
+  $('#guias').addEventListener('pointerup', sueltaGuia); $('#guias').addEventListener('pointercancel', sueltaGuia);
+  $('#lienzo').addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); ACC.zoom(e.deltaY < 0 ? 1 : -1); }, { passive: false });
+  addEventListener('resize', ajusta); if (window.ResizeObserver) new ResizeObserver(ajusta).observe($('#lienzo'));
+
+  /* ---------- pestañas de la derecha ---------- */
+  const NOMBRE_TAB = { contenido: 'Contenido', diseno: 'Diseño', tiempos: 'Tiempos', directo: 'Directo', publicar: 'Publicar' };
+  const PINTA = {
+    contenido(p) { const fs = (MAN.carpetas.fondos || []).map(f => f.replace(/\.[a-z0-9]+$/i, '')), cs = carpetas(), n = c => `<small>${MAN.carpetas[c].length}</small>`, ar = (g, c) => ` draggable="true" data-arr="${g}:${esc(c)}"`;
+      return `<h2>${T('Fondo')}</h2><div class="rej media">${fs.map(f => tecla('fondo', f, esc(f), p.fondo === f)).join('')}${tecla('fondo', '', T('sin fondo'), !p.fondo)}</div>
+      <h2>${T('Carpetas de contenido')}</h2><div class="rej ancha">${cs.filter(c => !esAds(c)).map(c => tecla('contenido', c, esc(c), p.contenido.includes(c), n(c), ar('contenido', c))).join('')}</div>
+      <h2>${T('Carpetas de anuncios')}</h2><div class="rej ancha">${cs.filter(esAds).map(c => tecla('anuncios', c, esc(c), p.anuncios.includes(c), n(c), ar('anuncios', c))).join('')}</div>
+      <h2>${T('Cinta de texto')}</h2><div class="fila">${tecla('cintaAct', '', T('Cinta'), p.cinta.activo, '', ' style="flex:none"')}${campo('c-cinta-texto', p.cinta.texto, T('texto de la cinta'), ' maxlength="400" data-c="cinta.texto"')}</div>${campo('c-cinta-rss', p.cinta.rss, T('RSS: https://… o noticias.xml'), ' maxlength="300" inputmode="url" data-c="cinta.rss"')}
+      <h2>${T('Participación del público')}</h2><div class="fila">${tecla('publico', '', T('Lista elegible por el público'), p.publico)}</div><div class="nota">${T('Quien escanee el QR «El público elige» de un display podrá poner en él las listas marcadas así, y nada más.')}</div>${reset('contenido')}`; },
+    diseno(p) { const hor = p.formato === 'horizontal', q = p.qr, es = k => Object.keys(PLANT[k]).every(x => p[x] === PLANT[k][x]);
+      return `<h2>${T('Plantillas')}</h2><div class="rej dos">${[['cartelera', 'Cartelera'], ['completa', 'Pantalla completa'], ['marco', 'Marco centrado'], ['apaisado', 'Apaisado']].map(([k, t]) => tecla('plantilla', k, T(t), es(k))).join('')}</div>
+      <h2>${T('Márgenes')}</h2>${hor ? '' : paso('cabecera', `${p.cabecera} % <small>${T('cabecera')}</small>`)}${paso('pie', `${p.pie} % <small>${T('pie')}</small>`)}<div class="fila">${medio('lado', `${p.lado} % <small>${T('lados')}</small>`)}<button type="button" class="tecla on" data-a="alinea" style="flex:none"><i class="led"></i><span>${T(p.alinea === 'centro' ? 'Centro' : 'Abajo')}</span></button></div>
+      <h2>${T('Efectos')}</h2><div class="fila">${tecla('movimiento', '', T('Movimiento'), p.movimiento)}${tecla('llenar', '', T('Llenar'), p.llenar && !hor, '', hor ? ' disabled' : '')}${tecla('brillo', '', T('Brillo'), p.brillo)}</div>${hor ? `<div class="nota">${T('En horizontal, el margen de arriba es igual al de abajo y «Llenar» no se aplica.')}</div>` : ''}
+      <h2>${T('Transición')}</h2><div class="rej tipos">${TIPOS.map(t => tecla('tipo', t, T(t), p.fundido.tipo === t)).join('')}</div>${paso('fseg', `${p.fundido.segundos.toFixed(1)} s`)}
+      <h2>${T('Código QR')}</h2><div class="fila esq">${tecla('qrAct', '', T('QR en pantalla'), q.activo)}${[['ai', '◤'], ['ad', '◥'], ['bi', '◣'], ['bd', '◢']].map(([k, s]) => `<button type="button" class="tecla${q.pos === k ? ' on' : ''}" data-a="qrPos" data-v="${k}" aria-pressed="${q.pos === k}" aria-label="${T('Esquina')} ${k}">${s}</button>`).join('')}</div>
+      <div class="fila">${tecla('qrModo', 'url', T('Enlace'), q.modo !== 'publico')}${tecla('qrModo', 'publico', T('El público elige'), q.modo === 'publico')}</div>
+      ${q.modo === 'publico' ? '' : campo('c-qr-url', q.url, T('https://… destino del QR'), ' maxlength="300" inputmode="url" data-c="qr.url"')}${campo('c-qr-texto', q.texto, T('texto bajo el QR'), ' maxlength="60" data-c="qr.texto"')}${reset('diseno')}`; },
+    tiempos(p) { const h = p.horario, Dn = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+      return `<h2>${T('Duración')}</h2>${paso('segundos', `${p.segundos} s <small>${T('póster')}</small>`)}${paso('segundosAnuncio', `${p.segundosAnuncio} s <small>${T('anuncio')}</small>`)}
+      <h2>${T('Un anuncio cada')}</h2><div class="fila">${medio('amin', `${p.anunciosCada[0]} <small>${T('mín')}</small>`)}${medio('amax', `${p.anunciosCada[1]} <small>${T('máx')}</small>`)}</div>
+      <h2>${T('Horario de encendido')}</h2><div class="fila">${tecla('hact', '', T('En horario'), h.activo)}<input type="time" class="campo" id="hdesde" value="${esc(h.desde)}" aria-label="desde"><input type="time" class="campo" id="hhasta" value="${esc(h.hasta)}" aria-label="hasta"></div>
+      <div class="fila dias">${Dn.map((d, i) => `<button type="button" class="tecla${h.dias.includes(i + 1) ? ' on' : ''}" data-a="dia" data-v="${i + 1}" aria-pressed="${h.dias.includes(i + 1)}">${T(d)}</button>`).join('')}</div>
+      <h2>${T('Redirección')}</h2>${campo('c-redirige', p.redirige, T('https://… (vacío: reproduce la lista)'), ' type="url" inputmode="url" data-c="redirige"')}${reset('tiempos')}`; },
+    directo() { const d = dest.k === 'd' ? DSP[dest.v] : null, col = ['ambar', 'rojo', 'verde', 'azul'];
+      return `<h2>${T('Destino')}</h2><div class="lcd" id="dest-lcd">${esc(nombreDest())}${dest.k !== 'd' ? ' (' + destinos().length + ')' : ''}</div>${canal ? '' : `<div class="nota">${T('Sin directo: se ve solo en el lienzo')}</div>`}
+      <h2>${T('Lanzar una lista')}</h2><div class="rej env">${Object.keys(B.playlists).map(id => tecla('lanza', id, esc(B.playlists[id].nombre || id.toUpperCase()), d ? d.l === id : false)).join('')}</div>
+      <h2>${T('Aviso a toda pantalla')}</h2>${campo('d-aviso', D.aviso, T('texto del aviso'), ' maxlength="200" data-d="aviso"')}<div class="fila">${medio('aseg', `${D.seg} s`)}${col.map(c => `<button type="button" class="tecla col c-${c}${D.color === c ? ' on' : ''}" data-a="color" data-v="${c}" aria-pressed="${D.color === c}" aria-label="${c}"><i></i></button>`).join('')}</div><div class="fila"><button type="button" class="tecla pri" data-a="aviso">${T('Enviar aviso')}</button></div>
+      <h2>${T('Mensaje en la cinta')}</h2><div class="fila">${campo('d-cinta', D.cinta, T('mensaje'), ' maxlength="400" data-d="cinta"')}<button type="button" class="tecla" data-a="cintaPon" style="flex:none">${T('Poner')}</button><button type="button" class="tecla" data-a="cintaQuita" style="flex:none">${T('Quitar')}</button></div>
+      <h2>${T('Encendido')}</h2><div class="rej dos"><button type="button" class="tecla" data-a="enciende">${T('Encender')}</button><button type="button" class="tecla" data-a="apaga">${T('Apagar')}</button><button type="button" class="tecla" data-a="recarga">${T('Recargar')}</button><button type="button" class="tecla" data-a="ident">${T('Identificar')}</button></div>
+      ${d ? `<h2>${T('Este display')}</h2><div class="fila">${campo('d-n', D.n, T('nombre'), ' maxlength="32" data-d="n"')}</div><div class="fila">${campo('d-g', D.g, T('grupo'), ' maxlength="24" data-d="g"')}${campo('d-s', D.s, T('sede'), ' maxlength="24" data-d="s"')}</div><div class="fila"><button type="button" class="tecla" data-a="pon">${T('Aplicar')}</button><button type="button" class="tecla reset" data-a="olvida">${T('Olvidar')}</button></div>` : ''}`; },
+    publicar() { return `<h2>${T('URL para el kiosco')}</h2><div class="fila giro">${[0, 90, 180, 270].map(g => `<button type="button" class="tecla${giro === g ? ' on' : ''}" data-a="giro" data-v="${g}" aria-pressed="${giro === g}" aria-label="${T('Giro del display')} ${g}°"><i class="led"></i><span>${g}°</span></button>`).join('')}</div><div class="lcd url" id="url">${esc(urlKiosco(sel))}</div><div class="fila"><button type="button" class="tecla" data-a="copia">${T('Copiar')}</button><a class="tecla" href="${esc(cola(sel))}" target="_blank" rel="noopener">${T('Abrir')}</a></div>
+      <h2>${T('Canal en directo')}</h2><div class="lcd url">${canal ? esc(canal) : T('sin canal')}</div><div class="fila"><button type="button" class="tecla" data-a="canalNuevo">${T('Canal nuevo')}</button><button type="button" class="tecla reset" data-a="canalQuita"${canal ? '' : ' disabled'}>${T('Quitar')}</button>${tecla('enArchivo', '', T('En archivo'), enArchivo, '', canal ? '' : ' disabled')}</div><div class="nota">${T('El canal es la llave del directo: quien lo tenga puede mandar a tus displays. Va dentro de la URL del kiosco. Guárdalo «en el archivo» solo si tu web de listas es privada.')}</div>
+      <h2>${T('Origen privado')}</h2><div class="fila">${campo('c-origen', ORIG, T('https://… web privada (opcional)'), ' type="url" inputmode="url"')}<button type="button" class="tecla rd" data-a="origen" aria-label="${T('Abrir')}" title="${T('Abrir')}">➜</button></div>
+      <div class="pie-zona"><button type="button" class="tecla pri" data-a="guarda">${T('Guardar playlists.json')}</button><button type="button" class="tecla" data-a="importa">${T('Importar')}</button></div>
+      <div class="nota">${T('Para publicar las listas: guarda el archivo y súbelo a la raíz de tu web. Los displays lo recogen solos en menos de 5 minutos. El directo no necesita publicar nada.')}</div>`; }
+  };
+  function pintaT() { $('#tabs').innerHTML = TABS.map(t => `<button type="button" role="tab" class="tab${t === tab ? ' on' : ''}" data-a="tab" data-v="${t}" aria-selected="${t === tab}">${T(NOMBRE_TAB[t])}</button>`).join(''); const c = $('#cuerpo'); c.dataset.tab = tab; pon('#cuerpo', PINTA[tab](P())); }
+  function pintaFijo() { document.documentElement.lang = lang; $('#btn-idioma').textContent = lang.toUpperCase(); $('#zona-listas').setAttribute('aria-label', T('Listas')); $('#zona-tabs').setAttribute('aria-label', T('Ajustes')); $('.lienzo-zona').setAttribute('aria-label', T('Lienzo')); $('#suelta').textContent = T('Suelta aquí para añadirla a la lista');
     $('#pie').innerHTML = window.AVCREDITO ? window.AVCREDITO.html('ADPOSTER', 'v' + VERSION, lang) : `ADPOSTER v${VERSION} ${new Date().getFullYear()} ${T('es un proyecto hecho con')} by <a href="https://mediaservi.com" target="_blank" rel="noopener">mediaservi.com</a>`; }
-  if (window.AVCREDITO) window.AVCREDITO.alCambiar(() => { if (B) pintaFijo(); });   // la línea de crédito es la común de AVHUB: se edita en AVHUB ADMIN
-  // v0.5 · seta de aviso de fallos, común a toda la familia (fallo.js): en la barra, del mismo tamaño que la tecla de idioma
+  const todo = () => { pintaFijo(); pintaD(); pintaL(); pintaBarra(); pintaT(); ajusta(); estado(); };
+  if (window.AVCREDITO) window.AVCREDITO.alCambiar(() => { if (B) pintaFijo(); });   // la línea de crédito es la común de AVHUB
+  // seta de aviso de fallos, común a toda la familia (fallo.js): en la barra, del mismo tamaño que la tecla de idioma
   if (window.AVFALLO) { const bi = $('#btn-idioma'); if (bi) { const bf = window.AVFALLO.boton({ app: 'ADPOSTER', version: 'v' + VERSION, idioma: () => lang }); bf.id = 'btn-fallo'; bi.before(bf);
     const talla = () => { const h = bi.offsetHeight; if (h) bf.style.setProperty('--avf', h + 'px'); }; talla(); addEventListener('resize', talla); setTimeout(talla, 800); } }
 
+  /* ---------- directo: mandar órdenes ---------- */
+  function manda(o) { const fr = $('#previa'); if (fr.contentWindow && ['aviso', 'cinta', 'apaga', 'ident'].includes(o.t)) fr.contentWindow.postMessage({ adposter: 'orden', o }, '*');   // el lienzo enseña lo mismo que verán los displays
+    if (!canal) { estado(T('Sin directo: se ve solo en el lienzo')); return false; } if (!dir || !dir.up) { estado(T('Sin conexión con el repetidor: se ve solo en el lienzo')); return false; }
+    dir.pub(temaDest(), o); estado(T('Enviado a') + ' ' + nombreDest()); return true; }
+  function fijaDest(k, v) { dest = { k, v }; const d = k === 'd' ? DSP[v] : null; if (d) { D.n = d.n; D.g = d.g; D.s = d.s; } pintaD(); if (tab === 'directo') pintaT(); }
+
   /* ---------- acciones ---------- */
-  const lim = (v, a, b) => Math.min(b, Math.max(a, v)), alterna = (l, v) => { const i = l.indexOf(v); i < 0 ? l.push(v) : l.splice(i, 1); };
+  const alterna = (l, v) => { const i = l.indexOf(v); i < 0 ? l.push(v) : l.splice(i, 1); };
   const ACC = {
-    sel(v) { sel = v; guarda('sel', sel); pintaA(); pintaB(); previa(); },
-    nueva() { const n = ($('#nueva').value || '').trim(); const id = n.normalize('NFKD').replace(/[^\w\s-]/g, '').trim().toLowerCase().replace(/[\s_]+/g, '-').replace(/[^a-z0-9-]/g, '').slice(0, 24); if (!id) { $('#nueva').focus(); return; } if (!B.playlists[id]) { B.playlists[id] = completa(copia(P())); B.playlists[id].nombre = n.toUpperCase(); } ACC.sel(id); guarda('gestor', B); estado(); },
+    sel(v) { if (!B.playlists[v]) return; sel = v; guarda('sel', sel); pintaL(); pintaBarra(); pintaT(); ajusta(); previa(); },
+    nueva() { const n = ($('#nueva').value || '').trim(); const id = n.normalize('NFKD').replace(/[^\w\s-]/g, '').trim().toLowerCase().replace(/[\s_]+/g, '-').replace(/[^a-z0-9-]/g, '').slice(0, 24); if (!id) { $('#nueva').focus(); return; } if (!B.playlists[id]) { B.playlists[id] = completa(copia(P())); B.playlists[id].nombre = n.toUpperCase(); B.playlists[id].publico = false; } guarda('gestor', B); ACC.sel(id); estado(); },
     borra() { if (Object.keys(B.playlists).length < 2) return; delete B.playlists[sel]; guarda('gestor', B); ACC.sel(Object.keys(B.playlists)[0]); estado(); },
     fondo(v) { cambia(p => { p.fondo = v; }); }, contenido(v) { cambia(p => alterna(p.contenido, v)); }, anuncios(v) { cambia(p => alterna(p.anuncios, v)); },
     segundos(v) { cambia(p => { p.segundos = lim(p.segundos + +v, 2, 120); }); }, segundosAnuncio(v) { cambia(p => { p.segundosAnuncio = lim(p.segundosAnuncio + +v, 2, 120); }); },
     tipo(v) { cambia(p => { p.fundido.tipo = v; }); }, fseg(v) { cambia(p => { p.fundido.segundos = Math.round(lim(p.fundido.segundos + v * .5, 0, 8) * 10) / 10; }); },
     amin(v) { cambia(p => { p.anunciosCada[0] = lim(p.anunciosCada[0] + +v, 1, 30); if (p.anunciosCada[1] < p.anunciosCada[0]) p.anunciosCada[1] = p.anunciosCada[0]; }); }, amax(v) { cambia(p => { p.anunciosCada[1] = lim(p.anunciosCada[1] + +v, 1, 30); if (p.anunciosCada[0] > p.anunciosCada[1]) p.anunciosCada[0] = p.anunciosCada[1]; }); },
-    movimiento() { cambia(p => { p.movimiento = !p.movimiento; }); }, llenar() { cambia(p => { p.llenar = !p.llenar; }); }, brillo() { cambia(p => { p.brillo = !p.brillo; }); }, alinea() { cambia(p => { p.alinea = p.alinea === 'centro' ? 'abajo' : 'centro'; }); }, cabecera(v) { cambia(p => { p.cabecera = lim(p.cabecera + +v, 0, 50); }); },
+    movimiento() { cambia(p => { p.movimiento = !p.movimiento; }); }, llenar() { cambia(p => { p.llenar = !p.llenar; }); }, brillo() { cambia(p => { p.brillo = !p.brillo; }); }, alinea() { cambia(p => { p.alinea = p.alinea === 'centro' ? 'abajo' : 'centro'; }); },
+    cabecera(v) { cambia(p => { p.cabecera = lim(p.cabecera + +v, 0, Math.min(50, 90 - p.pie)); }); }, pie(v) { cambia(p => { p.pie = lim(Math.round((p.pie + v * .5) * 2) / 2, 0, 40); }); }, lado(v) { cambia(p => { p.lado = lim(Math.round((p.lado + v * .5) * 2) / 2, 0, 30); }); },
     hact() { cambia(p => { p.horario.activo = !p.horario.activo; }); }, dia(v) { cambia(p => { alterna(p.horario.dias, +v); p.horario.dias.sort(); }); },
-    giro(v) { giro = +v; pintaA(); },
+    formato(v) { cambia(p => { p.formato = v === 'horizontal' ? 'horizontal' : 'vertical'; }); }, plantilla(v) { if (PLANT[v]) cambia(p => Object.assign(p, PLANT[v])); },
+    cintaAct() { cambia(p => { p.cinta.activo = !p.cinta.activo; }); }, qrAct() { cambia(p => { p.qr.activo = !p.qr.activo; }); }, qrModo(v) { cambia(p => { p.qr.modo = v === 'publico' ? 'publico' : 'url'; if (v === 'publico') p.publico = true; }); }, qrPos(v) { cambia(p => { p.qr.pos = v; }); }, publico() { cambia(p => { p.publico = !p.publico; }); },
+    tab(v) { if (!TABS.includes(v)) return; tab = v; guarda('g-tab', tab); pintaT(); },
+    zoom(v) { v = +v; zoom = v === 0 ? 1 : lim(Math.round((zoom + v * .25) * 4) / 4, .5, 3); pintaBarra(); ajusta(); }, guias() { guias = !guias; guarda('g-guias', guias); pintaBarra(); guiasPon(); },
+    giro(v) { giro = +v; pintaT(); },
     copia() { const u = urlKiosco(sel), b = document.querySelector('[data-a="copia"]'), ok = () => { b.textContent = T('Copiada'); setTimeout(() => { b.textContent = T('Copiar'); }, 1500); }; (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(ok, () => { const r = document.createRange(); r.selectNodeContents($('#url')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); try { document.execCommand('copy'); ok(); } catch (e) {} }); },
-    guarda() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ recarga: PUB.recarga === undefined ? 1 : PUB.recarga, playlists: B.playlists }, null, 2) + '\n'], { type: 'application/json' })); a.download = 'playlists.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); },
+    guarda() { const o = { recarga: PUB.recarga === undefined ? 1 : PUB.recarga }; if (canal && enArchivo) o.canal = canal; o.playlists = B.playlists; const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(o, null, 2) + '\n'], { type: 'application/json' })); a.download = 'playlists.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); },
     importa() { $('#archivo').click(); },
-    reset() { B.playlists[sel] = PUB.playlists[sel] ? completa(copia(PUB.playlists[sel])) : Object.assign(completa(), { nombre: P().nombre }); guarda('gestor', B); envia(); pintaA(); pintaB(); estado(); },
-    idioma() { lang = IDI[(IDI.indexOf(lang) + 1) % IDI.length]; guarda('lang', lang); pintaFijo(); pintaA(); pintaB(); estado(); previa(); }
+    reset(g) { const ks = GRUPOS[g]; if (!ks) return; const de = completa(PUB.playlists[sel] ? copia(PUB.playlists[sel]) : {}); cambia(p => ks.forEach(k => { p[k] = de[k]; })); },
+    idioma() { lang = IDI[(IDI.indexOf(lang) + 1) % IDI.length]; guarda('lang', lang); todo(); previa(); },
+    canalNuevo() { canal = window.ADDIRECTO ? window.ADDIRECTO.canalNuevo() : ''; guarda('g-canal', canal || null); enArchivo = false; guarda('g-enarchivo', null); enlaza(); pintaL(); pintaT(); },
+    canalQuita() { canal = ''; enArchivo = false; guarda('g-canal', null); guarda('g-enarchivo', null); enlaza(); pintaL(); pintaT(); },
+    enArchivo() { if (!canal) return; enArchivo = !enArchivo; guarda('g-enarchivo', enArchivo || null); pintaT(); },
+    origen() { const v = ($('#c-origen').value || '').trim(), u = new URL(location.href); if (v && !/^(https:\/\/|http:\/\/(localhost|127\.0\.0\.1)[:\/])[^\s"'<>]+$/.test(v)) { $('#c-origen').focus(); return; } v ? u.searchParams.set('origen', v) : u.searchParams.delete('origen'); location.href = u.href; },
+    dest(v) { const i = v.indexOf(':'); fijaDest(v.slice(0, i), v.slice(i + 1)); },
+    lanza(v) { if (B.playlists[v]) manda({ t: 'lista', id: v }); },
+    aseg(v) { D.seg = lim(D.seg + v * 5, 5, 120); pintaT(); }, color(v) { D.color = v; pintaT(); },
+    aviso() { const x = D.aviso.trim(); if (!x) { const e = $('#d-aviso'); e && e.focus(); return; } manda({ t: 'aviso', x, s: D.seg, c: D.color }); },
+    cintaPon() { const x = D.cinta.trim(); if (!x) { const e = $('#d-cinta'); e && e.focus(); return; } manda({ t: 'cinta', x }); }, cintaQuita() { manda({ t: 'cinta', x: '' }); },
+    enciende() { manda({ t: 'apaga', v: false }); }, apaga() { manda({ t: 'apaga', v: true }); }, recarga() { manda({ t: 'recarga' }); }, ident() { manda({ t: 'ident' }); },
+    pon() { if (dest.k !== 'd' || !dir || !dir.up) return; dir.pub('orden/d/' + dest.v, { t: 'pon', n: D.n.trim(), g: D.g.trim(), s: D.s.trim() }); estado(T('Enviado a') + ' ' + nombreDest()); },
+    olvida() { if (dest.k !== 'd') return; const i = dest.v; if (dir && dir.up) dir.borra('estado/' + i); delete DSP[i]; fijaDest('todos', ''); }
   };
   document.addEventListener('click', e => { const t = e.target.closest('[data-a]'); if (t && ACC[t.dataset.a] && !t.disabled) ACC[t.dataset.a](t.dataset.v); });
+  /* campos de texto: cambian el ajuste mientras se escribe, sin repintar (para no perder el cursor) */
+  document.addEventListener('input', e => { const t = e.target; if (t.dataset.c) { const ks = t.dataset.c.split('.'), p = P(); if (ks.length === 2) p[ks[0]][ks[1]] = t.value; else p[ks[0]] = t.value.trim(); guarda('gestor', B); if (ks[0] !== 'redirige') enviaLuego(); estado(); } else if (t.dataset.d) D[t.dataset.d] = t.value; });
   document.addEventListener('change', e => { const t = e.target; if (t.id === 'hdesde' || t.id === 'hhasta') { P().horario[t.id === 'hdesde' ? 'desde' : 'hasta'] = t.value; guarda('gestor', B); envia(); estado(); }
-    else if (t.id === 'redirige') { P().redirige = t.value.trim(); guarda('gestor', B); estado(); }
     else if (t.id === 'archivo' && t.files[0]) { t.files[0].text().then(tx => { const j = JSON.parse(tx); if (!j || !j.playlists) throw 0; B = { playlists: {} }; Object.keys(j.playlists).forEach(k => { B.playlists[k] = completa(j.playlists[k]); }); guarda('gestor', B); ACC.sel(B.playlists[sel] ? sel : Object.keys(B.playlists)[0]); estado(); }).catch(() => {}); t.value = ''; } });
-  document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'nueva') ACC.nueva(); });
+  document.addEventListener('keydown', e => { if (e.key !== 'Enter') return; const i = e.target.id; if (i === 'nueva') ACC.nueva(); else if (i === 'd-aviso') ACC.aviso(); else if (i === 'd-cinta') ACC.cintaPon(); else if (i === 'c-origen') ACC.origen(); else if (i === 'd-n' || i === 'd-g' || i === 'd-s') ACC.pon(); });
   addEventListener('message', e => { const d = e.data; if (d && d.adposter === 'listo' && d.id === sel) { listo = true; envia(); } });
+  /* arrastrar y soltar: una carpeta sobre el lienzo la añade a la lista; una lista sobre un display (o un grupo, o «Todos») la lanza allí */
+  let arrastra = '';
+  document.addEventListener('dragstart', e => { const t = e.target.closest && e.target.closest('[data-arr]'); if (!t) return; arrastra = t.dataset.arr; try { e.dataTransfer.setData('text/plain', arrastra); e.dataTransfer.effectAllowed = 'copy'; } catch (x) {} document.body.classList.add(arrastra.indexOf('lista:') === 0 ? 'arr-lista' : 'arr-carpeta'); });
+  document.addEventListener('dragend', () => { arrastra = ''; document.body.classList.remove('arr-lista', 'arr-carpeta'); document.querySelectorAll('.sobre').forEach(x => x.classList.remove('sobre')); });
+  const diana = e => { if (!arrastra) return null; if (arrastra.indexOf('lista:') === 0) return e.target.closest && e.target.closest('[data-suelta]'); return e.target.closest && e.target.closest('#lienzo'); };
+  document.addEventListener('dragover', e => { const d = diana(e); document.querySelectorAll('.sobre').forEach(x => { if (x !== d) x.classList.remove('sobre'); }); if (d) { e.preventDefault(); d.classList.add('sobre'); } });
+  document.addEventListener('drop', e => { const d = diana(e); if (!d) return; e.preventDefault(); const i = arrastra.indexOf(':'), k = arrastra.slice(0, i), v = arrastra.slice(i + 1);
+    if (k === 'lista') { ACC.dest(d.dataset.v); ACC.lanza(v); } else if ((k === 'contenido' || k === 'anuncios') && !P()[k].includes(v)) ACC[k](v); });
 
   /* ---------- arranque ---------- */
-  // v0.8 · ?origen=https://… abre el gestor sobre un origen privado (otra web con la misma estructura): lee de allí carpetas y listas, y la vista previa lo usa
+  // ?origen=https://… abre el gestor sobre un origen privado (otra web con la misma estructura): lee de allí carpetas y listas, y la vista previa lo usa
   const ORIG = (() => { const p = new URLSearchParams(location.search).get('origen') || ''; return /^(https:\/\/|http:\/\/(localhost|127\.0\.0\.1)[:\/])[^\s"'<>]+$/.test(p) ? p.replace(/\/*$/, '/') : ''; })();
   const trae = u => fetch(ORIG + u + '?t=' + Date.now(), { cache: 'no-store' }).then(r => { if (!r.ok) throw r.status; return r.json(); });
   Promise.all([trae('assets/manifest.json').catch(() => ({ carpetas: {} })), trae('playlists.json').catch(() => ({ recarga: 1, playlists: {} }))]).then(([m, l]) => {
-    MAN = m; PUB = { recarga: l.recarga, playlists: {} }; Object.keys(l.playlists || {}).forEach(k => { PUB.playlists[k] = completa(l.playlists[k]); });
+    MAN = m && m.carpetas ? m : { carpetas: {} }; PUB = { recarga: l.recarga, playlists: {} }; Object.keys(l.playlists || {}).forEach(k => { PUB.playlists[k] = completa(l.playlists[k]); });
     const b = lee('gestor'); B = b && b.playlists && Object.keys(b.playlists).length ? { playlists: {} } : copia({ playlists: PUB.playlists }); if (b && b.playlists) Object.keys(b.playlists).forEach(k => { B.playlists[k] = completa(b.playlists[k]); });
     if (!Object.keys(B.playlists).length) B.playlists.demo = Object.assign(completa(), { nombre: 'DEMO' });
     sel = lee('sel'); if (!B.playlists[sel]) sel = Object.keys(B.playlists)[0];
-    pintaFijo(); pintaA(); pintaB(); estado(); previa();
+    const ok = c => typeof c === 'string' && /^[a-z0-9]{6,40}$/i.test(c), mio = lee('g-canal'); if (ok(mio)) { canal = mio; enArchivo = !!lee('g-enarchivo'); } else if (ok(l.canal)) { canal = l.canal; enArchivo = true; }
+    todo(); enlaza(); previa();
   });
 })();

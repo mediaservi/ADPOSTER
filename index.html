@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <!--
-  ADPOSTER · CARTELERÍA DIGITAL — gestor de playlists para displays FHD en vertical. Apartado de AVHUB (mediaservi.com).
-  Versión v0.9 (beta). Tres zonas, como el resto de la familia: «contenido» a la izquierda, el display con la vista previa en vivo en el centro
-  y «reproducción» a la derecha. Los reproductores son las URL que se dan al kiosco: …/cine, …/klub y …/p/?l=nombre.
-  Módulos: gestor.js (este gestor), player.js (reproductor), playlists.json (ajustes), assets/manifest.json (índice de imágenes, lo genera tools/preparar.py).
+  ADPOSTER · CARTELERÍA DIGITAL — gestor de listas y displays. Apartado de AVHUB (mediaservi.com).
+  Versión v1.0. Cuatro ventanas: a la izquierda, fijas, DISPLAYS (cómo está cada pantalla, en directo) y LISTAS; en el centro el LIENZO,
+  con la vista previa en vivo, zoom y guías que se arrastran; a la derecha, las pestañas CONTENIDO · DISEÑO · TIEMPOS · DIRECTO · PUBLICAR.
+  Los reproductores son las URL que se dan al kiosco: …/cine, …/klub y …/p/?l=nombre. La página del público es …/elige (se llega por QR).
+  Módulos: gestor.js (este gestor), player.js (reproductor), directo.js (canal en tiempo real), qr.js (códigos QR, de terceros, MIT),
+  playlists.json (ajustes) y assets/manifest.json (índice de imágenes y vídeos, lo genera tools/preparar.py).
   Licencia GPL-3.0 · mediaservi.com
 -->
 <html lang="es">
@@ -11,10 +13,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>ADPOSTER · Cartelería digital</title>
-  <meta name="description" content="ADPOSTER: cartelería digital sencilla pero potente para autónomos y negocios pequeños, en pantallas en vertical. Playlists de pósteres con anuncios intercalados, fundidos, horarios y arranque automático.">
+  <meta name="description" content="ADPOSTER: cartelería digital sencilla pero potente para autónomos y negocios pequeños. Listas de carteles con anuncios intercalados, en vertical u horizontal, con horarios, avisos al momento, cinta de texto, códigos QR y control de todas las pantallas desde el móvil.">
   <meta name="theme-color" content="#232325">
   <link rel="icon" href="assets/logos/adposter-icono.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="gestor.css?v=0.9">
+  <link rel="stylesheet" href="gestor.css?v=1.0">
 </head>
 <body>
   <header class="cab">
@@ -26,15 +28,23 @@
     </div>
   </header>
   <main class="consola">
-    <section class="zona" id="zona-a" aria-label="Contenido"></section>
-    <section class="centro-zona"><div class="display"><iframe id="previa" title="Vista previa" allow="fullscreen"></iframe></div><div class="estado" id="estado"><i></i><span></span></div></section>
-    <section class="zona" id="zona-b" aria-label="Reproducción"></section>
+    <div class="izq">
+      <section class="zona" id="zona-disp" aria-label="Displays"></section>
+      <section class="zona" id="zona-listas" aria-label="Listas"></section>
+    </div>
+    <section class="zona lienzo-zona" aria-label="Lienzo">
+      <div class="barra" id="barra"></div>
+      <div class="lienzo" id="lienzo"><div class="mesa"><div class="display" id="display"><iframe id="previa" title="Vista previa" allow="fullscreen"></iframe><div class="guias" id="guias"></div></div></div><div class="suelta" id="suelta"></div></div>
+      <div class="estado" id="estado"><i></i><span></span></div>
+    </section>
+    <section class="zona lado" id="zona-tabs" aria-label="Ajustes"><div class="tabs" id="tabs" role="tablist"></div><div class="cuerpo" id="cuerpo" role="tabpanel"></div></section>
   </main>
   <footer class="pie" id="pie"></footer>
   <input type="file" id="archivo" accept="application/json,.json" hidden>
   <noscript><p style="padding:2rem;color:#fff">ADPOSTER necesita JavaScript activado.</p></noscript>
-  <script src="credito.js?v=0.9"></script>
-  <script src="fallo.js?v=0.9"></script>
-  <script src="gestor.js?v=0.9"></script>
+  <script src="credito.js?v=1.0"></script>
+  <script src="fallo.js?v=1.0"></script>
+  <script src="directo.js?v=1.0"></script>
+  <script src="gestor.js?v=1.0"></script>
 </body>
 </html>

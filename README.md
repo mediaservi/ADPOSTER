@@ -1,51 +1,107 @@
 # ADPOSTER
 
-**Cartelería digital sencilla pero potente, que arranca sola.** Pensada para autónomos y negocios muy pequeños que no tienen medios para un sistema de cartelería profesional. ADPOSTER convierte cualquier pantalla en vertical en un cartel digital: pósteres que nunca se repiten, anuncios intercalados, fundidos, horarios y un gestor con vista previa en vivo. Es un apartado de [AVHUB](https://avhub.mediaservi.com/), *tools for AV people*, de [mediaservi.com](https://mediaservi.com).
+**Cartelería digital sencilla pero potente, que arranca sola.** Pensada para autónomos y negocios muy pequeños que no tienen medios para un sistema de cartelería de pago. ADPOSTER convierte cualquier pantalla, en vertical o en horizontal, en un cartel digital: carteles que nunca se repiten, anuncios intercalados, vídeo, cinta de texto, códigos QR, horarios y un gestor desde el que se ven y se mandan todas las pantallas al momento, también desde el móvil. Es un apartado de [AVHUB](https://avhub.mediaservi.com/), *tools for AV people*, de [mediaservi.com](https://mediaservi.com).
 
-**Versión actual: v0.9** (beta, en pruebas)
+Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
+
+**Versión actual: v1.0**
 
 ## Cómo funciona
 
-1. Cada **playlist** tiene su dirección: `adposter.mediaservi.com/cine`, `adposter.mediaservi.com/klub` o `adposter.mediaservi.com/p/?l=nombre`.
-2. Esa dirección se pone como **página de inicio del kiosco** (por ejemplo, la app Kiosk en un Xiaomi Smart TV Stick 4K conectado al HDMI del display).
+1. Cada **lista** tiene su dirección: `adposter.mediaservi.com/cine`, `adposter.mediaservi.com/klub` o `adposter.mediaservi.com/p/?l=nombre`.
+2. Esa dirección se pone como **página de inicio del kiosco** (por ejemplo, la app Kiosk en un stick de TV conectado al HDMI del display).
 3. Al dar corriente al display, **arranca solo** en unos segundos y no hay que tocar nada más.
 
-Si el display está girado, se añade el giro a la dirección: `…/cine/?rot=90` (derecha), `?rot=180` (boca abajo) o `?rot=270` (izquierda). También valen las direcciones cortas de siempre: `…/cine/v`, `…/cine/i` y `…/cine/V`. Y cualquier playlist nueva tiene la suya: `adposter.mediaservi.com/mi-bar`.
+Si el display está girado, se añade el giro a la dirección: `…/cine/?rot=90` (derecha), `?rot=180` (boca abajo) o `?rot=270` (izquierda). También valen las direcciones cortas de siempre: `…/cine/v`, `…/cine/i` y `…/cine/V`. Y cualquier lista nueva tiene la suya: `adposter.mediaservi.com/mi-bar`.
+
+El gestor (la página principal) prepara esa dirección con todo lo que es de cada aparato: giro, canal del directo y origen privado.
+
+## El gestor: cuatro ventanas
+
+| Ventana | Para qué |
+|---|---|
+| **DISPLAYS** (izquierda, arriba) | El estado de cada pantalla **en directo**: encendida, apagada, fuera de horario o sin señal; qué lista tiene, en qué formato, y su grupo y sede. Aquí se elige el destino de las órdenes: todas, un grupo, una sede o una sola. |
+| **LISTAS** (izquierda, abajo) | Las listas de reproducción: crear, borrar y elegir la que se edita. Cuenta de carpetas y archivos. |
+| **LIENZO** (centro) | La vista previa en vivo de la lista, en vertical u horizontal, con **zoom** y desplazamiento y **guías que se arrastran** para colocar la cabecera, el pie y los lados. |
+| **Pestañas** (derecha) | **CONTENIDO** · **DISEÑO** · **TIEMPOS** · **DIRECTO** · **PUBLICAR**, cada una con su botón de restablecer. |
+
+En tablet y móvil las ventanas se apilan, con el lienzo arriba; en móvil apaisado el lienzo se queda a la izquierda.
 
 ## Funciones
 
-- **Reproductor para FHD en vertical (9:16).** Fondo propio por playlist y pósteres encajados en su marco, grandes y nítidos sea cual sea su tamaño original.
-- **Nunca repite.** Baraja cada carpeta y no vuelve a enseñar un póster hasta agotar el mazo, ni siquiera después de apagar y encender.
-- **Anuncios intercalados** a pantalla completa, uno cada tantos pósteres (entre un mínimo y un máximo, al azar).
-- **Transiciones:** fundido, zoom, desliza, cortina o corte, con duración ajustable. Acercamiento lento y destello al entrar, opcionales.
-- **Zoom hasta llenar:** cada póster empieza encajado y va creciendo hasta rebosar justo su marco.
-- **Horarios:** la playlist se enciende y se apaga sola por horas y días de la semana, también en tramos que pasan de medianoche.
-- **Redirección:** una playlist puede enviar el display a cualquier otra URL.
-- **Contenido nuevo sin tocar el display:** cada cinco minutos mira si hay imágenes o ajustes nuevos y los aplica.
+**Reproducción**
+
+- **Vertical (9:16) u horizontal (16:9).** En horizontal, el cartel y el anuncio se ven a la vez, uno a cada lado, cada uno a su ritmo.
+- **Imágenes y vídeo.** Las imágenes se preparan solas en WebP para FHD; los vídeos (`.mp4`, `.webm`) se reproducen enteros, sin sonido.
+- **Nunca repite.** Baraja cada carpeta y no vuelve a enseñar un cartel hasta agotar el mazo, ni siquiera después de apagar y encender.
+- **Anuncios intercalados**, uno cada tantos carteles (entre un mínimo y un máximo, al azar).
+- **Transiciones:** fundido, zoom, desliza, cortina o corte, con duración ajustable. Acercamiento lento, destello al entrar y zoom hasta llenar, opcionales.
+- **Plantillas de diseño:** cartelera, pantalla completa, marco centrado y apaisado, como punto de partida que luego se retoca arrastrando las guías.
+- **Cinta de texto** al pie: un texto fijo, los titulares de un **RSS en vivo** o un mensaje enviado al momento.
+- **Código QR en pantalla**, en la esquina que se elija, con su texto: lleva a cualquier enlace o a la página de participación del público.
+- **Horario de encendido:** la lista se enciende y se apaga sola por horas y días de la semana, también en tramos que pasan de medianoche.
+- **Redirección:** una lista puede enviar el display a cualquier otra URL.
+- **Contenido nuevo sin tocar el display:** cada cinco minutos mira si hay archivos o ajustes nuevos y los aplica.
 - **Aguanta cortes:** si se cae la red sigue con lo que tiene; si algo se atasca, se recupera solo. Mantiene la pantalla despierta.
-- **Panel en el propio display:** con el OK del mando, un toque o un clic se abren los ajustes rápidos (duración, transición y carpetas), que se guardan solo en ese display.
-- **Gestor** (la página principal): playlists, fondo, carpetas, duraciones, transición, frecuencia de anuncios, horario y redirección, con la vista previa en vivo y la URL para el kiosco lista para copiar.
-- **Imágenes preparadas solas:** lo que se sube a `entrada/` se convierte a WebP de calidad alta para FHD y se publica (ver [entrada/LEEME.md](entrada/LEEME.md)).
+- **Panel en el propio display:** con el OK del mando, un toque o un clic se abren los ajustes rápidos, que se guardan solo en ese display.
+
+**Directo** (opcional: se activa con un toque y no necesita publicar nada)
+
+- **Panel de displays en tiempo real:** de una pantalla a las que hagan falta, agrupadas por **grupo** y por **sede**.
+- **Disparadores de un toque**, también desde el móvil: lanzar una lista en una pantalla, un grupo, una sede o todas. O arrastrando la lista sobre el display.
+- **Avisos a toda pantalla** con texto, color y duración.
+- **Mensaje al momento** en la cinta de texto.
+- **Encender, apagar, recargar e identificar** cada pantalla a distancia; cambiarle el nombre, el grupo y la sede.
+- **Participación del público:** quien escanea el QR de un display llega a una página donde elige entre las listas que el dueño haya marcado como elegibles. No puede hacer nada más.
+
+**Contenido propio**
+
+- **Arrastrar y soltar:** una carpeta sobre el lienzo la añade a la lista; una lista sobre un display la lanza.
+- **Origen privado:** un display (y el gestor) puede leer sus listas e imágenes de otra web con la misma estructura, que solo conoce él (`?origen=https://…`).
+- **Imágenes preparadas solas:** lo que se sube a `entrada/` se convierte y se publica (ver [entrada/LEEME.md](entrada/LEEME.md)).
 - Interfaz en español, inglés y catalán.
+
+### Cómo funciona el directo, y qué conviene saber
+
+No hay servidor propio. El gestor, los displays y la página del público se hablan a través de repetidores MQTT públicos y gratuitos, dentro de un **canal** con un código al azar que se crea en el gestor y viaja en la URL del kiosco (`?canal=…`).
+
+- **El canal es la llave:** quien lo tenga puede mandar a tus displays. No lo publiques. Se puede guardar dentro de `playlists.json` solo si esa web es privada.
+- **El público no recibe el canal.** El QR lleva otro código, derivado del canal con una huella de un solo sentido, que solo sirve para pedir una lista marcada como elegible, y no más de una vez cada pocos segundos.
+- Los repetidores son de terceros, abiertos y sin garantías: pueden fallar o cambiar. Si no hay conexión, los displays siguen reproduciendo su lista con normalidad. **No envíes datos personales** en avisos ni mensajes.
+- El RSS se lee desde el propio display: funciona con canales que permiten la lectura desde otra web, o con un archivo (`noticias.xml`) puesto junto a tus listas.
 
 ## Estructura
 
 | Ruta | Qué es |
 |---|---|
-| `index.html`, `gestor.js`, `gestor.css` | El gestor de playlists |
+| `index.html`, `gestor.js`, `gestor.css` | El gestor |
 | `cine/`, `klub/`, `p/` | Las direcciones de reproducción (la URL que se da al kiosco) |
+| `elige/` | La página del público (se llega por el QR) |
 | `player.js`, `player.css` | El reproductor |
-| `playlists.json` | Los ajustes de cada playlist |
-| `assets/<carpeta>/` | Las imágenes, ya en WebP. Las carpetas `ads-…` son anuncios; `fondos`, los fondos |
-| `assets/manifest.json` | El índice de imágenes (se genera solo) |
+| `directo.js` | El canal en tiempo real (cliente MQTT mínimo, propio) |
+| `qr.js` | Generador de códigos QR (de terceros, licencia MIT: ver [assets/LICENCIAS-TERCEROS.md](assets/LICENCIAS-TERCEROS.md)) |
+| `playlists.json` | Los ajustes de cada lista |
+| `assets/<carpeta>/` | Las imágenes y vídeos. Las carpetas `ads-…` o con «anuncios» en el nombre son anuncios; `fondos`, los fondos |
+| `assets/manifest.json` | El índice de archivos (se genera solo) |
 | `entrada/` | Donde se suben las imágenes originales para que se preparen solas |
-| `tools/preparar.py` | Convierte a WebP para FHD y regenera el índice |
+| `tools/preparar.py` | Convierte a WebP para FHD, copia los vídeos y regenera el índice |
 
-Para publicar los ajustes del gestor: **Guardar playlists.json** y subir ese archivo a la raíz. Los displays lo recogen solos.
+Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese archivo a la raíz. Los displays lo recogen solos. Las órdenes del directo no necesitan publicar nada.
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v0.9)
+## Cambios de la versión actual (v1.0)
+
+- **Gestor nuevo de cuatro ventanas:** DISPLAYS y LISTAS fijas a la izquierda, el lienzo en el centro con zoom, desplazamiento y guías que se arrastran, y cinco pestañas a la derecha (contenido, diseño, tiempos, directo y publicar), cada una con su restablecer.
+- **Directo:** panel de displays en tiempo real, lanzar listas con un toque, avisos a toda pantalla, mensaje en la cinta, encender, apagar, recargar e identificar; grupos y sedes.
+- **Participación del público por QR** con la página `elige/`.
+- **Formato horizontal**, con cartel y anuncio a la vez.
+- **Vídeo**, **cinta de texto** (fija o de un RSS en vivo) y **código QR** en pantalla.
+- **Plantillas** de diseño y **arrastrar y soltar** (carpetas al lienzo, listas a los displays).
+- El origen privado pasa a ser del aparato, no de cada lista: se conserva al cambiar de lista.
+- La política de privacidad recoge los repetidores del directo y el RSS.
+
+Sigue de la v0.9:
 
 - **Aviso legal:** se añade que es un proyecto personal del autor, ajeno a su empleador, que no lo encarga, financia ni respalda.
 
@@ -91,8 +147,9 @@ Sigue de la v0.1:
 ## Próximos pasos
 
 - Publicar desde el gestor sin subir archivos a mano, y subir imágenes arrastrándolas.
+- Varias zonas a medida en una misma pantalla y editor de carteles con texto propio.
 - Conexión con nubes y discos del usuario.
-- Copia espejo automática.
+- Repetidor propio para el directo.
 
 ## Licencia
 
@@ -100,7 +157,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v0.9 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.0 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

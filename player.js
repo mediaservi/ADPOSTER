@@ -1,21 +1,34 @@
-/* ADPOSTER · reproductor de cartelería digital para displays FHD en vertical
+/* ADPOSTER · reproductor de cartelería digital para displays FHD, en vertical o en horizontal
    Arranca solo: basta con dar la URL de la playlist (…/cine, …/klub, …/p/?l=nombre) como página de inicio del kiosco.
    Lee playlists.json (ajustes) y assets/manifest.json (qué hay en cada carpeta), baraja sin repetir, intercala anuncios,
    vuelve a mirar cada pocos minutos por si hay contenido nuevo y sigue funcionando si se cae la red.
+   v1.0 · formato horizontal (póster y anuncio a la vez), vídeo, cinta de texto (fija o de un RSS), código QR y, si la instalación tiene
+   un canal en directo (directo.js), obedece al gestor al momento: cambiar de lista, aviso, cinta, apagar, recargar e identificarse.
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '0.9';
+  const VERSION = '1.0';
   const SC = document.currentScript, Q = new URLSearchParams(location.search);
   const BASE = new URL(SC.dataset.base || '../', location.href).href;
   const ID = (SC.dataset.playlist || Q.get('l') || 'demo').toLowerCase().replace(/[^a-z0-9_-]/g, '');
   const PREV = Q.has('prev');                                              // vista previa dentro del gestor
   const K = 'adposter:' + ID + ':';
-  /* v0.8 · origen privado: un display puede leer sus listas e imágenes de OTRA web con la misma estructura (playlists.json + assets/), que solo conoce él.
+  /* lo que es del aparato y no de la lista (sobrevive al cambiar de lista): origen privado, canal en directo, identidad del display */
+  const G = 'adposter:', leeG = k => { try { return localStorage.getItem(G + k) || ''; } catch (e) { return ''; } }, guardaG = (k, v) => { try { v ? localStorage.setItem(G + k, v) : localStorage.removeItem(G + k); } catch (e) {} };
+  const URL_OK = /^(https:\/\/|http:\/\/(localhost|127\.0\.0\.1)[:\/])[^\s"'<>]+$/;
+  /* origen privado: un display puede leer sus listas e imágenes de OTRA web con la misma estructura (playlists.json + assets/), que solo conoce él.
      Se le da una vez con ?origen=https://… (queda guardado en ese display; ?origen=no lo quita). Los demás usuarios siguen viendo las muestras públicas. */
-  const ORIGEN = (() => { let o = ''; try { const p = Q.get('origen'); if (p === 'no') localStorage.removeItem(K + 'origen'); else if (p && /^(https:\/\/|http:\/\/(localhost|127\.0\.0\.1)[:\/])[^\s"'<>]+$/.test(p)) localStorage.setItem(K + 'origen', p.replace(/\/*$/, '/')); o = localStorage.getItem(K + 'origen') || ''; } catch (e) {} return o; })(), DATOS = ORIGEN || BASE;
+  const ORIGEN = (() => { const p = Q.get('origen'), val = p && URL_OK.test(p) ? p.replace(/\/*$/, '/') : ''; if (PREV) return val;
+    let viejo = ''; try { viejo = localStorage.getItem(K + 'origen') || ''; } catch (e) {}                                  // hasta v0.9 se guardaba por lista
+    if (p === 'no') { guardaG('origen', ''); try { localStorage.removeItem(K + 'origen'); } catch (e) {} } else if (val) guardaG('origen', val); else if (viejo && !leeG('origen')) guardaG('origen', viejo);
+    return leeG('origen'); })(), DATOS = ORIGEN || BASE;
+  const slug = s => String(s || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 24);
+  /* identidad del display: un código propio y, si se quiere, nombre, grupo y sede (?nombre= ?grupo= ?sede=). ?canal=código lo une al directo (?canal=no lo quita) */
+  const DISP = (() => { let d = leeG('disp'); if (!/^[a-z0-9]{6}$/.test(d)) { d = (Math.random().toString(36) + '000000').slice(2, 8); guardaG('disp', d); } return d; })();
+  if (!PREV) ['nombre', 'grupo', 'sede', 'canal'].forEach(k => { const v = Q.get(k); if (v !== null) guardaG(k, k === 'canal' ? (/^[a-z0-9]{6,40}$/i.test(v) ? v : '') : v.trim().slice(0, 32)); });
   const DEF = { nombre: ID.toUpperCase(), fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7],
-    fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true, horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '' };
+    fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true, horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '',
+    formato: 'vertical', qr: { activo: false, modo: 'url', url: '', texto: '', pos: 'bd' }, cinta: { activo: false, texto: '', rss: '' }, publico: false };
   const TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'];
 
   /* ---------- idioma (es · en · ca) ---------- */
@@ -23,7 +36,8 @@
   const TX = { 'Duración de cada póster': ['Time per poster', 'Durada de cada pòster'], 'Transición': ['Transition', 'Transició'], 'Carpetas de contenido': ['Content folders', 'Carpetes de contingut'], 'Carpetas de anuncios': ['Ad folders', "Carpetes d'anuncis"],
     'Aceptar y reproducir': ['Apply and play', 'Accepta i reprodueix'], 'Restablecer': ['Reset', 'Restableix'], 'Cerrar': ['Close', 'Tanca'], 'fundido': ['fade', 'fosa'], 'zoom': ['zoom', 'zoom'], 'desliza': ['slide', 'llisca'], 'cortina': ['wipe', 'cortina'], 'corte': ['cut', 'tall'],
     'Sin conexión: reintentando…': ['Offline: retrying…', 'Sense connexió: reintentant…'], 'Esta playlist no tiene imágenes todavía.': ['This playlist has no images yet.', 'Aquesta playlist encara no té imatges.'], 'No existe la playlist': ['Playlist not found', 'No existeix la playlist'],
-    'es un proyecto hecho con': ['is a project made with', 'és un projecte fet amb'], 'imágenes': ['images', 'imatges'], 'Contenido privado de este display': ['Private content of this display', 'Contingut privat d’aquest display'], 'Estos ajustes se guardan solo en este display.': ['These settings are saved on this display only.', 'Aquests ajustos es desen només en aquest display.'] };
+    'es un proyecto hecho con': ['is a project made with', 'és un projecte fet amb'], 'imágenes': ['images', 'imatges'], 'Contenido privado de este display': ['Private content of this display', 'Contingut privat d’aquest display'], 'Estos ajustes se guardan solo en este display.': ['These settings are saved on this display only.', 'Aquests ajustos es desen només en aquest display.'],
+    'Directo': ['Live', 'Directe'], 'conectado': ['connected', 'connectat'], 'sin conexión': ['offline', 'sense connexió'] };
   const T = s => { const t = TX[s]; return !t || LANG === 'es' ? s : (LANG === 'ca' ? t[1] : LANG === 'en' ? t[0] : s); };
 
   /* ---------- utilidades ---------- */
@@ -40,18 +54,18 @@
   /* ---------- escenario ---------- */
   document.body.classList.add('ap'); const rot = +Q.get('rot') || 0; if (rot === 90 || rot === 270) document.body.classList.add('rot', 'rot-' + rot); else if (rot === 180) document.body.classList.add('rot-180');   // giro del display: ?rot=90 (derecha), 180 (boca abajo) o 270 (izquierda)
   const escena = el('div'); escena.id = 'escena';
-  escena.innerHTML = '<div class="fondo"></div><div class="marco"><div class="capa"><div class="hoja"><img alt=""></div></div><div class="capa"><div class="hoja"><img alt=""></div></div></div><div class="anuncio"><img alt=""></div><div class="anuncio"><img alt=""></div><div class="apagado"></div><div class="aviso"></div><div class="panel"></div>';
+  escena.innerHTML = '<div class="fondo"></div><div class="marco"><div class="capa"><div class="hoja"><img alt=""></div></div><div class="capa"><div class="hoja"><img alt=""></div></div></div><div class="anuncio"><img alt=""></div><div class="anuncio"><img alt=""></div><div class="qr"><div class="q-img"></div><div class="q-txt"></div></div><div class="cinta"><div class="c-in"><span></span></div></div><div class="apagado"></div><div class="alerta"><div class="a-in"></div></div><div class="aviso"></div><div class="panel"></div>';
   document.body.appendChild(escena);
   const $ = s => escena.querySelector(s), $$ = s => [...escena.querySelectorAll(s)];
   const CAPAS = { feed: $$('.capa'), ads: $$('.anuncio') }, turno = { feed: 0, ads: 0 };
   const aviso = t => { const a = $('.aviso'); a.textContent = t || ''; a.classList.toggle('on', !!t); };
 
   /* ---------- ajustes: playlists.json ← ajustes de este display ← vista previa ---------- */
-  let MAN = null, LISTAS = null, cfg = null, previa = null, pool = { feed: [], ads: [] }, recarga = null, ultimo = Date.now(), cambio = false;
+  let MAN = null, LISTAS = null, cfg = null, previa = null, pool = { feed: [], ads: [] }, recarga = null, ultimo = Date.now(), gen = 0;
   function calcula() {
     const base = (LISTAS && LISTAS.playlists && LISTAS.playlists[ID]) || null, local = PREV ? null : lee('local');
     const c = Object.assign({}, DEF, base || {}, local || {}, previa || {}); c.existe = !!(base || previa);
-    c.fundido = Object.assign({}, DEF.fundido, (base || {}).fundido, (local || {}).fundido, (previa || {}).fundido); c.horario = Object.assign({}, DEF.horario, (base || {}).horario, (previa || {}).horario);
+    c.fundido = Object.assign({}, DEF.fundido, (base || {}).fundido, (local || {}).fundido, (previa || {}).fundido); c.horario = Object.assign({}, DEF.horario, (base || {}).horario, (previa || {}).horario); c.qr = Object.assign({}, DEF.qr, (base || {}).qr, (previa || {}).qr); c.cinta = Object.assign({}, DEF.cinta, (base || {}).cinta, (previa || {}).cinta); if (c.formato !== 'horizontal') c.formato = 'vertical';
     c.segundos = num(c.segundos, 8, 2, 600); c.segundosAnuncio = num(c.segundosAnuncio, c.segundos, 2, 600); c.fundido.segundos = num(c.fundido.segundos, 2.5, 0, 10); if (!TIPOS.includes(c.fundido.tipo)) c.fundido.tipo = 'fundido';
     const ac = Array.isArray(c.anunciosCada) ? c.anunciosCada : [4, 7]; c.anunciosCada = [num(ac[0], 4, 1, 99), num(ac[1], 7, 1, 99)].sort((a, b) => a - b);
     return c;
@@ -59,13 +73,18 @@
   function aplica() {
     cfg = calcula(); const car = (MAN && MAN.carpetas) || {}, junta = l => (l || []).flatMap(c => (car[c] || []).map(f => c + '/' + f));
     pool = { feed: junta(cfg.contenido), ads: junta(cfg.anuncios) };
-    const st = escena.style; st.setProperty('--cab', num(cfg.cabecera, 18, 0, 60) + '%'); st.setProperty('--pie', num(cfg.pie, 4.5, 0, 40) + '%'); st.setProperty('--lado', num(cfg.lado, 5, 0, 30) + '%');
+    const st = escena.style, hor = HOR();
     st.setProperty('--t', (cfg.fundido.tipo === 'corte' ? 0 : cfg.fundido.segundos) + 's'); st.setProperty('--dur', (cfg.segundos + cfg.fundido.segundos) + 's');
-    escena.className = 't-' + cfg.fundido.tipo + (cfg.movimiento ? ' mov' : '') + (cfg.llenar ? ' llena' : '') + (cfg.brillo ? ' brillo' : ''); CAPAS.feed.forEach(c => c.classList.toggle('centro', cfg.alinea === 'centro'));
+    escena.className = 't-' + cfg.fundido.tipo + (cfg.movimiento ? ' mov' : '') + (cfg.llenar && !hor ? ' llena' : '') + (cfg.brillo ? ' brillo' : '') + (hor ? ' horizontal' : '') + (hor && pool.feed.length && pool.ads.length ? ' dos' : ''); CAPAS.feed.forEach(c => c.classList.toggle('centro', cfg.alinea === 'centro'));
     const f = $('.fondo'), fs = car.fondos || [], fa = cfg.fondo && fs.find(x => x.replace(/\.[a-z0-9]+$/i, '') === cfg.fondo);
     if (fa) { const u = url('fondos/' + fa); if (f.dataset.u !== u) { const i = new Image(); i.onload = () => { f.style.backgroundImage = 'url("' + u + '")'; f.dataset.u = u; f.classList.add('on'); }; i.src = u; } } else { f.classList.remove('on'); f.dataset.u = ''; }
-    document.title = 'ADPOSTER · ' + cfg.nombre; cambio = true;
+    cinta(); margenes(); qr(); if ((cfg.cinta.activo ? cfg.cinta.rss || '' : '') !== rssU) rss(); enlaza(); menu();
+    document.title = 'ADPOSTER · ' + cfg.nombre; gen++;
   }
+  const HOR = () => !!cfg && cfg.formato === 'horizontal';
+  /* márgenes del póster. En horizontal el de arriba es igual al de abajo; con la cinta en marcha, el de abajo le deja sitio */
+  function margenes() { const st = escena.style, hor = HOR(), con = escena.classList.contains('con-cinta'), pie = Math.max(num(cfg.pie, 4.5, 0, 40), con ? (hor ? 8 : 4.6) : 0);
+    st.setProperty('--cab', (hor ? pie : num(cfg.cabecera, 18, 0, 60)) + '%'); st.setProperty('--pie', pie + '%'); st.setProperty('--lado', num(cfg.lado, 5, 0, 30) + '%'); requestAnimationFrame(() => CAPAS.feed.forEach(encaja)); }
   async function carga(primera) {
     try { const [m, l] = await Promise.all([json('assets/manifest.json'), json('playlists.json')]);
       const nuevo = !MAN || m.version !== MAN.version || JSON.stringify(l) !== JSON.stringify(LISTAS); if (recarga !== null && l.recarga !== recarga && !PREV) { location.reload(); return true; }
@@ -82,31 +101,84 @@
   function saca(tipo) { const todo = pool[tipo]; if (!todo.length) return null; const hay = new Set(todo); let m = PREV ? (saca['m' + tipo] || []) : (lee('mazo-' + tipo) || []); m = m.filter(f => hay.has(f));
     if (!m.length) { m = mezcla(todo.slice()); const ult = saca['u' + tipo]; if (m.length > 1 && m[m.length - 1] === ult) [m[0], m[m.length - 1]] = [m[m.length - 1], m[0]]; }
     const f = m.pop(); saca['u' + tipo] = f; if (PREV) saca['m' + tipo] = m; else guarda('mazo-' + tipo, m); return f; }
-  function precarga(u) { return new Promise(res => { const i = new Image(); let fin = false; const ok = v => { if (!fin) { fin = true; res(v); } }; const t = setTimeout(() => ok(false), 12000);
+  const esVideo = f => /\.(mp4|webm|m4v|mov)(\?|$)/i.test(f);
+  function precarga(u) {
+    if (esVideo(u)) return new Promise(res => { const v = document.createElement('video'); let fin = false; const ok = x => { if (!fin) { fin = true; clearTimeout(t); res(x); } }, t = setTimeout(() => ok(false), 20000);
+      v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.setAttribute('muted', ''); v.preload = 'auto'; v.onloadeddata = () => ok(v); v.onerror = () => ok(false); v.src = u; v.load(); });
+    return new Promise(res => { const i = new Image(); let fin = false; const ok = v => { if (!fin) { fin = true; res(v); } }; const t = setTimeout(() => ok(false), 12000);
     i.onload = () => { clearTimeout(t); (i.decode ? i.decode().catch(() => {}) : Promise.resolve()).then(() => ok(i)); }; i.onerror = () => { clearTimeout(t); ok(false); }; i.src = u; }); }
   /* cada póster ocupa todo lo que cabe en su marco, sea cual sea su tamaño original */
   function encaja(capa) { const h = capa.querySelector('.hoja'); if (!h || !h.dataset.r) return; const m = $('.marco'), r = +h.dataset.r, w = Math.min(m.clientWidth, m.clientHeight * r); h.style.width = w + 'px'; h.style.height = w / r + 'px'; h.style.setProperty('--k', (Math.max(m.clientWidth / w, m.clientHeight / (w / r)) * 1.015).toFixed(4)); }
   addEventListener('resize', () => CAPAS.feed.forEach(encaja));
+  const actual = { feed: '', ads: '' };
   async function paso(tipo) {
     const f = saca(tipo); if (!f) return false; const u = url(f), pre = await precarga(u); if (!pre) { await espera(400); return false; }
-    const capas = CAPAS[tipo], n = turno[tipo] % 2, entra = capas[n], sale = capas[1 - n], img = entra.querySelector('img'); img.src = u; turno[tipo]++; if (tipo === 'feed' && pre.naturalWidth) { const hj = entra.querySelector('.hoja'); hj.dataset.r = pre.naturalWidth / pre.naturalHeight; encaja(entra); hj.classList.remove('anim'); void hj.offsetWidth; hj.classList.add('anim'); }   // el movimiento arranca con cada póster y se mantiene mientras se va
+    const g = gen, vid = pre.tagName === 'VIDEO', capas = CAPAS[tipo], n = turno[tipo] % 2, entra = capas[n], sale = capas[1 - n], caja = c => (tipo === 'feed' ? c.querySelector('.hoja') : c), cj = caja(entra), img = cj.querySelector('img'), viejo = cj.querySelector('video'); turno[tipo]++;
+    if (viejo) { viejo.pause(); viejo.remove(); } if (vid) { img.style.display = 'none'; img.removeAttribute('src'); cj.appendChild(pre); const pl = pre.play(); pl && pl.catch && pl.catch(() => {}); } else { img.style.display = ''; img.src = u; }
+    const w = vid ? pre.videoWidth : pre.naturalWidth, h = vid ? pre.videoHeight : pre.naturalHeight;
+    if (tipo === 'feed' && w && h) { cj.dataset.r = w / h; encaja(entra); cj.classList.remove('anim'); void cj.offsetWidth; cj.classList.add('anim'); }   // el movimiento arranca con cada póster y se mantiene mientras se va
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-    sale.classList.add('sale'); sale.classList.remove('on'); entra.classList.remove('sale'); entra.classList.add('on'); const tf = cfg.fundido.tipo === 'corte' ? 0 : cfg.fundido.segundos * 1000;
-    if (tipo === 'feed') { setTimeout(() => CAPAS.ads.forEach(c => c.classList.remove('on', 'sale')), tf ? 60 : 0); }
-    setTimeout(() => sale.classList.remove('sale'), tf + 80); ultimo = Date.now(); cambio = false;
-    const dur = (tipo === 'ads' ? cfg.segundosAnuncio : cfg.segundos) * 1000 + tf, t0 = Date.now(); while (Date.now() - t0 < dur && !cambio) await espera(200); return true;
+    sale.classList.add('sale'); sale.classList.remove('on'); entra.classList.remove('sale'); entra.classList.add('on'); const tf = cfg.fundido.tipo === 'corte' ? 0 : cfg.fundido.segundos * 1000, vs = caja(sale).querySelector('video');
+    if (tipo === 'feed' && !escena.classList.contains('dos')) { setTimeout(() => CAPAS.ads.forEach(c => c.classList.remove('on', 'sale')), tf ? 60 : 0); }
+    setTimeout(() => { sale.classList.remove('sale'); if (vs && vs.parentNode && !sale.classList.contains('on')) { vs.pause(); vs.remove(); } }, tf + 80); ultimo = Date.now(); actual[tipo] = f; if (tipo === 'feed') actual.ads = '';
+    const base = (tipo === 'ads' ? cfg.segundosAnuncio : cfg.segundos) * 1000, dur = (vid && isFinite(pre.duration) && pre.duration > 0 ? Math.min(600000, Math.max(2000, pre.duration * 1000 - tf)) : base) + tf, t0 = Date.now();   // un vídeo dura lo que dura
+    while (Date.now() - t0 < dur && g === gen) { await espera(200); ultimo = Date.now(); } return true;
   }
+  let offR = !PREV && leeG('off') === '1';                                   // apagado a distancia desde el gestor
+  const activo = () => enHorario() && !offR;
+  async function serie(tipo, g) { while (g === gen && activo() && pool[tipo].length) { if (!(await paso(tipo))) await espera(300); } }
   async function bucle() {
     for (;;) {
       ultimo = Date.now();
       if (!cfg.existe) { if (!PREV) aviso(T('No existe la playlist') + ' «' + ID + '»'); await espera(PREV ? 300 : 5000); continue; }
-      if (!enHorario()) { $('.apagado').classList.add('on'); aviso(''); await espera(PREV ? 1000 : 20000); continue; } $('.apagado').classList.remove('on');
+      if (!activo()) { $('.apagado').classList.add('on'); aviso(''); await espera(PREV ? 600 : offR ? 1500 : 20000); continue; } $('.apagado').classList.remove('on');
       if (!pool.feed.length && !pool.ads.length) { aviso(T('Esta playlist no tiene imágenes todavía.')); await espera(3000); continue; } aviso('');
+      if (HOR() && pool.feed.length && pool.ads.length) { const g = gen; await Promise.all([serie('feed', g), serie('ads', g)]); continue; }   // en horizontal, póster y anuncio conviven: cada uno lleva su ritmo
       if (pool.ads.length) await paso('ads');
       if (!pool.feed.length) continue;
-      const n = entre(cfg.anunciosCada[0], cfg.anunciosCada[1]); for (let i = 0; i < n && pool.feed.length && enHorario(); i++) await paso('feed');
+      const n = entre(cfg.anunciosCada[0], cfg.anunciosCada[1]); for (let i = 0; i < n && pool.feed.length && activo(); i++) await paso('feed');
     }
   }
+
+  /* ---------- cinta de texto, código QR y aviso ---------- */
+  let cintaR = PREV ? '' : leeG('cinta'), rssT = '', rssU = '', tAl = 0;
+  function cinta() { const c = $('.cinta'), sp = c.querySelector('span'), x = (cintaR || (cfg && cfg.cinta.activo ? (rssT || cfg.cinta.texto) : '') || '').replace(/\s+/g, ' ').trim().slice(0, 1500);
+    if (sp.textContent !== x) { sp.textContent = x; c.style.setProperty('--ct', Math.max(14, Math.round(x.length * .22 + 10)) + 's'); sp.style.animation = 'none'; void sp.offsetWidth; sp.style.animation = ''; }
+    c.classList.toggle('on', !!x); escena.classList.toggle('con-cinta', !!x); }
+  /* RSS en vivo: titulares de un canal RSS o Atom. Vale una dirección https (si ese servidor deja leerla desde otra web) o un archivo del propio origen (noticias.xml) */
+  async function rss() { const u = cfg && cfg.cinta.activo ? (cfg.cinta.rss || '').trim() : ''; rssU = u; let txt = '';
+    if (u) { try { const d = new URL(u, DATOS); if (!/^https?:$/.test(d.protocol)) throw 0; const r = await fetch(d.href, { cache: 'no-store' }); if (!r.ok) throw 0;
+      const x = new DOMParser().parseFromString(await r.text(), 'text/xml'); txt = [...x.querySelectorAll('item > title, entry > title')].map(t => (t.textContent || '').replace(/\s+/g, ' ').trim()).filter(Boolean).slice(0, 15).join('   •   '); } catch (e) { txt = rssT && rssU === u ? rssT : ''; } }
+    if (rssU !== u) return; rssT = txt; cinta(); margenes(); }
+  function qr() { const q = $('.qr'), c = cfg.qr || {}; let u = ''; escena.classList.remove('qr-d', 'qr-i'); if (c.activo) { if (c.modo === 'publico') u = canalP ? BASE + 'elige/?c=' + canalP + '&d=' + DISP : (PREV ? BASE + 'elige/' : ''); else if (/^https?:\/\/\S+$/i.test((c.url || '').trim())) u = c.url.trim(); }
+    if (!u || !window.qrcode) { q.classList.remove('on'); return; }
+    if (q.dataset.u !== u) { try { const g = window.qrcode(0, 'M'); g.addData(u); g.make(); q.querySelector('.q-img').innerHTML = g.createSvgTag({ cellSize: 4, margin: 0, scalable: true }); q.dataset.u = u; } catch (e) { q.classList.remove('on'); return; } }
+    const t = q.querySelector('.q-txt'); t.textContent = String(c.texto || '').slice(0, 60); t.style.display = t.textContent ? '' : 'none'; const pos = ['bi', 'bd', 'ai', 'ad'].includes(c.pos) ? c.pos : 'bd'; q.className = 'qr on p-' + pos; escena.classList.add(pos[1] === 'i' ? 'qr-i' : 'qr-d'); requestAnimationFrame(() => CAPAS.feed.forEach(encaja)); }
+  function alerta(x, s, c) { const a = $('.alerta'), i = a.firstElementChild; clearTimeout(tAl); x = String(x || '').trim().slice(0, 280); if (!x) { a.classList.remove('on'); return; }
+    i.textContent = x; i.className = 'a-in c-' + (['ambar', 'rojo', 'verde', 'azul'].includes(c) ? c : 'ambar') + (x.length > 90 ? ' xs' : x.length > 36 ? ' sm' : ''); a.classList.remove('on'); void a.offsetWidth; a.classList.add('on'); tAl = setTimeout(() => a.classList.remove('on'), num(s, 10, 2, 600) * 1000); }
+
+  /* ---------- directo: el display obedece al gestor al momento y le cuenta cómo está ---------- */
+  let dir = null, dirP = null, dirK = null, canalP = '', uPide = 0;
+  const yo = () => ({ n: leeG('nombre') || 'DISPLAY ' + DISP.toUpperCase(), g: slug(leeG('grupo')), s: slug(leeG('sede')) });
+  const canalAct = () => leeG('canal') || (LISTAS && typeof LISTAS.canal === 'string' ? LISTAS.canal : '');
+  function estado() { if (!dir || !cfg) return; const y = yo(); dir.pub('estado/' + DISP, { n: y.n, g: y.g, s: y.s, l: ID, ln: cfg.nombre, f: cfg.formato, w: innerWidth, h: innerHeight, v: VERSION, off: offR ? 2 : enHorario() ? 0 : 1, i: actual.ads || actual.feed || '', p: ORIGEN ? 1 : 0, t: Date.now() }, true); }
+  function menu() { if (!dirP || !LISTAS) return; const pl = LISTAS.playlists || {}; dirP.pub('menu/' + DISP, { n: yo().n, l: ID, listas: Object.keys(pl).filter(k => pl[k] && pl[k].publico).slice(0, 24).map(k => ({ id: k, n: String(pl[k].nombre || k.toUpperCase()).slice(0, 40) })), t: Date.now() }, true); }
+  function ir(id) { id = String(id || '').toLowerCase().replace(/[^a-z0-9_-]/g, ''); if (PREV || !id || id === ID || !LISTAS || !LISTAS.playlists || !LISTAS.playlists[id]) return false;
+    const q = new URLSearchParams(); q.set('l', id); if (rot) q.set('rot', rot); if (Q.get('lang')) q.set('lang', Q.get('lang')); location.replace(BASE + 'p/?' + q); return true; }
+  function orden(o) { if (!o || typeof o !== 'object') return;
+    if (o.t === 'lista') ir(o.id);
+    else if (o.t === 'aviso') alerta(o.x, o.s, o.c);
+    else if (o.t === 'cinta') { cintaR = String(o.x || '').slice(0, 600); if (!PREV) guardaG('cinta', cintaR); cinta(); margenes(); }
+    else if (o.t === 'apaga') { offR = !!o.v; if (!PREV) guardaG('off', offR ? '1' : ''); gen++; estado(); }
+    else if (o.t === 'recarga') { if (!PREV) location.reload(); }
+    else if (o.t === 'ident') { const y = yo(); alerta(y.n + '\n' + DISP.toUpperCase() + (y.g ? ' · ' + y.g : '') + (y.s ? ' · ' + y.s : ''), 8, 'azul'); }
+    else if (o.t === 'pon' && !PREV) { [['n', 'nombre'], ['g', 'grupo'], ['s', 'sede']].forEach(([a, k]) => { if (typeof o[a] === 'string') guardaG(k, o[a].trim().slice(0, 32)); }); enlaza(); estado(); menu(); } }
+  function enlaza() { if (PREV || !window.ADDIRECTO) return; const c = canalAct(), y = yo(), k = c + '|' + y.g + '|' + y.s; if (k === dirK) return; dirK = k;
+    if (dir) { dir.cierra(); dir = null; } if (dirP) { dirP.cierra(); dirP = null; } canalP = ''; if (!window.ADDIRECTO.canalOk(c)) { if (cfg) qr(); return; }
+    dir = window.ADDIRECTO.conecta(c, { temas: ['orden/todos', 'orden/d/' + DISP].concat(y.g ? ['orden/g/' + y.g] : [], y.s ? ['orden/s/' + y.s] : []), alMensaje: (t, d) => orden(d), alCambiar: v => { if (v) estado(); } });
+    /* el público entra por un canal aparte, derivado del principal: solo puede pedir una de las listas marcadas como elegibles, y no más de una cada pocos segundos */
+    window.ADDIRECTO.publico(c).then(p => { if (!p || dirK !== k) return; canalP = p;
+      dirP = window.ADDIRECTO.conecta(p, { temas: ['pide/' + DISP], alMensaje: (t, d) => { const id = d && d.t === 'lista' ? String(d.id || '').toLowerCase().replace(/[^a-z0-9_-]/g, '') : '', pl = (LISTAS && LISTAS.playlists) || {}; if (id && pl[id] && pl[id].publico && Date.now() - uPide > 8000) { uPide = Date.now(); ir(id); } }, alCambiar: v => { if (v) menu(); } }); if (cfg) qr(); }); }
 
   /* ---------- panel del display (OK del mando, toque o clic) ---------- */
   let borr = null, tPanel = 0;
@@ -118,7 +190,7 @@
       <h3>${T('Carpetas de contenido')}</h3><div class="lista">${con.map(c => chk(c, 'contenido')).join('')}</div>
       <h3>${T('Carpetas de anuncios')}</h3><div class="lista">${ads.map(c => chk(c, 'anuncios')).join('')}</div>
       <div class="acc"><button class="pri" data-a="ok">${T('Aceptar y reproducir')}</button><button data-a="reset">${T('Restablecer')}</button><button data-a="cerrar">${T('Cerrar')}</button></div>
-      <div class="firma">${T('Estos ajustes se guardan solo en este display.')}${ORIGEN ? '<br>🔒 ' + T('Contenido privado de este display') : ''}<br>${window.AVCREDITO ? window.AVCREDITO.html('ADPOSTER', 'v' + VERSION, LANG, { sinEnlaces: true }) : 'ADPOSTER v' + VERSION + ' ' + new Date().getFullYear() + ' ' + T('es un proyecto hecho con') + ' by mediaservi.com'}</div>`; }
+      <div class="firma">${T('Estos ajustes se guardan solo en este display.')}${ORIGEN ? '<br>🔒 ' + T('Contenido privado de este display') : ''}<br>${leeG('nombre') ? leeG('nombre').replace(/[<>&"]/g, '') + ' · ' : 'DISPLAY '}${DISP.toUpperCase()}${dir ? ' · ' + T('Directo') + ': ' + T(dir.up ? 'conectado' : 'sin conexión') : ''}<br>${window.AVCREDITO ? window.AVCREDITO.html('ADPOSTER', 'v' + VERSION, LANG, { sinEnlaces: true }) : 'ADPOSTER v' + VERSION + ' ' + new Date().getFullYear() + ' ' + T('es un proyecto hecho con') + ' by mediaservi.com'}</div>`; }
   function abre() { if (PREV || !cfg) return; borr = { segundos: cfg.segundos, fundido: { tipo: cfg.fundido.tipo, segundos: cfg.fundido.segundos }, contenido: cfg.contenido.slice(), anuncios: cfg.anuncios.slice() }; pinta(); document.body.classList.add('con-panel'); tPanel = Date.now(); const b = $('.panel .pri'); b && b.focus(); }
   function cierra() { document.body.classList.remove('con-panel'); }
   function accion(t) { const a = t.dataset.a, foco = sel => { pinta(); const e = $(sel); e && e.focus(); }; tPanel = Date.now();
@@ -139,7 +211,7 @@
   let tRaton = 0; addEventListener('mousemove', () => { document.body.classList.add('raton'); clearTimeout(tRaton); tRaton = setTimeout(() => document.body.classList.remove('raton'), 2500); });
 
   /* ---------- vista previa del gestor: recibe los ajustes en vivo ---------- */
-  if (PREV) addEventListener('message', e => { const d = e.data; if (d && d.adposter === 'cfg' && d.id === ID) { previa = d.cfg || null; if (MAN) aplica(); } });
+  if (PREV) addEventListener('message', e => { const d = e.data; if (d && d.adposter === 'cfg' && d.id === ID) { previa = d.cfg || null; if (MAN) aplica(); } else if (d && d.adposter === 'orden' && d.o && ['aviso', 'cinta', 'apaga', 'ident'].includes(d.o.t)) orden(d.o); });   // el gestor enseña aquí lo que manda a los displays
 
   /* ---------- arranque ---------- */
   (async () => {
@@ -151,6 +223,7 @@
     if (!PREV) {
       setInterval(() => { if (document.body.classList.contains('con-panel') && Date.now() - tPanel > 90000) cierra();
         const lim = Math.max(180000, (cfg.segundos + cfg.segundosAnuncio + cfg.fundido.segundos) * 6000); if (Date.now() - ultimo > lim && navigator.onLine !== false) location.reload(); }, 15000);                 // si algo se atasca, se recupera solo
+      setInterval(estado, 20000); setInterval(() => { if (cfg && cfg.cinta.activo && cfg.cinta.rss) rss(); }, 600000);
       const despierta = () => { try { navigator.wakeLock && navigator.wakeLock.request('screen').catch(() => {}); } catch (e) {} }; despierta(); document.addEventListener('visibilitychange', () => { if (!document.hidden) despierta(); });
     }
   })();
