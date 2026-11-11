@@ -1,14 +1,15 @@
-/* ADPOSTER · gestor de listas y displays (v1.1).
+/* ADPOSTER · gestor de listas y displays (v1.2).
    Cuatro ventanas: DISPLAYS y LISTAS, fijas a la izquierda; el LIENZO en el centro, con la vista previa en vivo, zoom y guías que se arrastran;
    y a la derecha las pestañas CONTENIDO · DISEÑO · TIEMPOS · DIRECTO · PUBLICAR.
    Los cambios de las listas se quedan en este navegador como borrador hasta que se publican (subiendo playlists.json a la web).
    El directo (directo.js) no necesita publicar nada: habla con los displays al momento a través de un canal que solo conoce la instalación.
    v1.1 · una lista puede ser de CARTELES (carpetas que rotan, como hasta ahora) o una COMPOSICIÓN de escenas que se editan en el lienzo (editor.js),
    con galería de plantillas, biblioteca de archivos y calendario. Este archivo expone window.ADG para esos módulos.
+   v1.2 · instalable y con uso sin conexión: botón «Instalar» (instalar.js) junto a la seta y service worker (sw.js).
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.1', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS_C = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'], TABS_E = ['piezas', 'escena', 'tiempos', 'directo', 'publicar'];
+  const VERSION = '1.2', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS_C = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'], TABS_E = ['piezas', 'escena', 'tiempos', 'directo', 'publicar'];
   const DEF = { nombre: '', fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7], fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true,
     horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '', formato: 'vertical', qr: { activo: false, modo: 'url', url: '', texto: '', pos: 'bd' }, cinta: { activo: false, texto: '', rss: '' }, publico: false, modo: 'carteles', escenas: [], orden: 'azar', secuencia: [], archivos: {} };
   const ESCM = p => !!p && p.modo === 'escenas', tabsDe = p => ESCM(p) ? TABS_E : TABS_C, X = () => window.ADG.ext || {};
@@ -181,6 +182,9 @@
   // seta de aviso de fallos, común a toda la familia (fallo.js): en la barra, del mismo tamaño que la tecla de idioma
   if (window.AVFALLO) { const bi = $('#btn-idioma'); if (bi) { const bf = window.AVFALLO.boton({ app: 'ADPOSTER', version: 'v' + VERSION, idioma: () => lang }); bf.id = 'btn-fallo'; bi.before(bf);
     const talla = () => { const h = bi.offsetHeight; if (h) bf.style.setProperty('--avf', h + 'px'); }; talla(); addEventListener('resize', talla); setTimeout(talla, 800); } }
+  // botón «Instalar», común a toda la familia (instalar.js): instala el gestor como una app y lo deja listo para usarse sin conexión
+  if (window.AVINSTALA) { const bi = $('#btn-idioma'); if (bi) { const bn = window.AVINSTALA.boton({ app: 'ADPOSTER', idioma: () => lang, sw: 'sw.js' }); bn.id = 'btn-instala'; ($('#btn-fallo') || bi).before(bn);
+    const talla = () => { const h = bi.offsetHeight; if (h) bn.style.setProperty('--avi', h + 'px'); }; talla(); addEventListener('resize', talla); setTimeout(talla, 800); } }
 
   /* ---------- directo: mandar órdenes ---------- */
   function manda(o) { const fr = $('#previa'); if (fr.contentWindow && ['aviso', 'cinta', 'apaga', 'ident'].includes(o.t)) fr.contentWindow.postMessage({ adposter: 'orden', o }, '*');   // el lienzo enseña lo mismo que verán los displays
@@ -191,7 +195,7 @@
   /* ---------- acciones ---------- */
   const alterna = (l, v) => { const i = l.indexOf(v); i < 0 ? l.push(v) : l.splice(i, 1); };
   const ACC = {
-    sel(v) { if (!B.playlists[v]) return; sel = v; guarda('sel', sel); X().alSalir && X().alSalir(); pintaL(); pintaBarra(); pintaT(); ajusta(); previa(); X().alLista && X().alLista(); },
+    sel(v) { if (!B.playlists[v]) return; sel = v; guarda('sel', sel); X().alSalir && X().alSalir(); pintaL(); pintaBarra(); pintaT(); ajusta(); previa(); X().alLista && X().alLista(true); },
     nueva() { const n = ($('#nueva').value || '').trim(); const id = n.normalize('NFKD').replace(/[^\w\s-]/g, '').trim().toLowerCase().replace(/[\s_]+/g, '-').replace(/[^a-z0-9-]/g, '').slice(0, 24); if (!id) { $('#nueva').focus(); return; } if (!B.playlists[id]) { B.playlists[id] = completa(copia(P())); B.playlists[id].nombre = n.toUpperCase(); B.playlists[id].publico = false; } guarda('gestor', B); ACC.sel(id); estado(); },
     borra() { if (Object.keys(B.playlists).length < 2) return; delete B.playlists[sel]; guarda('gestor', B); ACC.sel(Object.keys(B.playlists)[0]); estado(); },
     fondo(v) { cambia(p => { p.fondo = v; }); }, contenido(v) { cambia(p => alterna(p.contenido, v)); }, anuncios(v) { cambia(p => alterna(p.anuncios, v)); },

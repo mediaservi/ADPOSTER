@@ -6,10 +6,11 @@
    un canal en directo (directo.js), obedece al gestor al momento: cambiar de lista, aviso, cinta, apagar, recargar e identificarse.
    v1.1 · composiciones: una lista puede ser una serie de ESCENAS (escena.js) con textos, imágenes, zonas, reloj, el tiempo, noticias y QR;
    calendario (qué lista toca según la fecha, el día y la hora), orden fijo y duración por archivo.
+   v1.2 · sin conexión: registra el service worker (sw.js) y le pide guardar las imágenes de la lista; si se cae la red, el display sigue con la última copia.
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.1';
+  const VERSION = '1.2';
   const SC = document.currentScript, Q = new URLSearchParams(location.search);
   const BASE = new URL(SC.dataset.base || '../', location.href).href;
   const ID = (SC.dataset.playlist || Q.get('l') || 'demo').toLowerCase().replace(/[^a-z0-9_-]/g, '');
@@ -73,6 +74,15 @@
     const ac = Array.isArray(c.anunciosCada) ? c.anunciosCada : [4, 7]; c.anunciosCada = [num(ac[0], 4, 1, 99), num(ac[1], 7, 1, 99)].sort((a, b) => a - b);
     return c;
   }
+  /* ---------- sin conexión: el service worker guarda la app y las imágenes de la lista; si cae la red, el display sigue con la última copia ---------- */
+  const SW = !PREV && 'serviceWorker' in navigator && (location.protocol === 'https:' || /^(localhost|127\.)/.test(location.hostname)) && new URL(DATOS).origin === location.origin;
+  if (SW) { try { navigator.serviceWorker.register(BASE + 'sw.js').catch(() => {}); } catch (e) {} }
+  let copiado = '';
+  function copia() { if (!SW || !MAN || !cfg) return; const car = MAN.carpetas || {}, de = c => (car[c] || []).map(f => c + '/' + f), fs = new Set(pool.feed.concat(pool.ads));
+    if (cfg.fondo) (car.fondos || []).forEach(x => { if (x.replace(/\.[a-z0-9]+$/i, '') === cfg.fondo) fs.add('fondos/' + x); });
+    cfg.escenas.forEach(e => { if (e.fondo && e.fondo.t === 'img' && /^[\w .()\-\/]+$/.test(e.fondo.src || '')) fs.add(e.fondo.src); (e.piezas || []).forEach(z => { if (z.t === 'zona') (z.carp || []).forEach(c => de(c).forEach(f => fs.add(f))); else if (z.t === 'imagen' && /^[\w .()\-\/]+$/.test(z.src || '')) fs.add(z.src); }); });
+    const urls = [...fs].filter(f => !esVideo(f)).slice(0, 600).map(url).concat([location.href.split('#')[0]]), firma = urls.join('|'); if (firma === copiado) return; copiado = firma;
+    navigator.serviceWorker.ready.then(r => { r.active && r.active.postMessage({ t: 'pre', urls }); }).catch(() => {}); }
   function aplica() {
     cfg = calcula(); const car = (MAN && MAN.carpetas) || {}, junta = l => (l || []).flatMap(c => (car[c] || []).map(f => c + '/' + f)).filter(f => !(cfg.archivos[f] && cfg.archivos[f].off));
     pool = { feed: junta(cfg.contenido), ads: junta(cfg.anuncios) };
@@ -82,7 +92,7 @@
     const f = $('.fondo'), fs = car.fondos || [], fa = cfg.fondo && fs.find(x => x.replace(/\.[a-z0-9]+$/i, '') === cfg.fondo);
     if (fa) { const u = url('fondos/' + fa); if (f.dataset.u !== u) { const i = new Image(); i.onload = () => { f.style.backgroundImage = 'url("' + u + '")'; f.dataset.u = u; f.classList.add('on'); }; i.src = u; } } else { f.classList.remove('on'); f.dataset.u = ''; }
     cinta(); margenes(); qr(); if ((cfg.cinta.activo ? cfg.cinta.rss || '' : '') !== rssU) rss(); enlaza(); menu();
-    document.title = 'ADPOSTER · ' + cfg.nombre; gen++;
+    document.title = 'ADPOSTER · ' + cfg.nombre; gen++; copia();
   }
   const HOR = () => !!cfg && cfg.formato === 'horizontal';
   const ESC = () => !!cfg && cfg.modo === 'escenas' && cfg.escenas.length > 0 && !!window.ADESCENA;

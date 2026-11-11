@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.1**
+**Versión actual: v1.2**
 
 ## Cómo funciona
 
@@ -72,6 +72,12 @@ En tablet y móvil las ventanas se apilan, con el lienzo arriba; en móvil apais
 - **Imágenes preparadas solas:** lo que se sube a `entrada/` se convierte y se publica (ver [entrada/LEEME.md](entrada/LEEME.md)).
 - Interfaz en español, inglés y catalán.
 
+**Instalable y sin conexión** (nuevo en v1.2)
+
+- **Botón «Instalar»** en la cabecera del gestor: instala ADPOSTER como una aplicación en el móvil, la tableta, el ordenador o la tele. Es el botón común a la familia AVHUB.
+- **Los displays siguen mostrando sus carteles si se cae internet:** cada pantalla guarda una copia de la app, de sus listas y de las imágenes que le tocan. Al volver la conexión se pone al día sola.
+- No se guardan los vídeos (pesan demasiado) ni lo que viene de fuera: el tiempo, las noticias, las webs incrustadas y el directo necesitan conexión.
+
 ### Cómo funciona el directo, y qué conviene saber
 
 No hay servidor propio. El gestor, los displays y la página del público se hablan a través de repetidores MQTT públicos y gratuitos, dentro de un **canal** con un código al azar que se crea en el gestor y viaja en la URL del kiosco (`?canal=…`).
@@ -94,6 +100,8 @@ No hay servidor propio. El gestor, los displays y la página del público se hab
 | `elige/` | La página del público (se llega por el QR) |
 | `player.js`, `player.css` | El reproductor |
 | `directo.js` | El canal en tiempo real (cliente MQTT mínimo, propio) |
+| `instalar.js` | El botón «Instalar», común a la familia AVHUB |
+| `manifest.json`, `sw.js` | Lo que hace la app instalable y guarda la copia para usarla sin conexión |
 | `qr.js` | Generador de códigos QR (de terceros, licencia MIT: ver [assets/LICENCIAS-TERCEROS.md](assets/LICENCIAS-TERCEROS.md)) |
 | `playlists.json` | Los ajustes de cada lista, sus escenas, el calendario (`agenda`) y las imágenes propias (`medios`) |
 | `assets/<carpeta>/` | Las imágenes y vídeos. Las carpetas `ads-…` o con «anuncios» en el nombre son anuncios; `fondos`, los fondos |
@@ -105,7 +113,19 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.1)
+## Cambios de la versión actual (v1.2)
+
+- **Instalable:** botón «Instalar» en la cabecera del gestor, con su icono propio; ADPOSTER se abre como una aplicación más.
+- **Sin conexión:** el gestor y los displays guardan una copia de la app, de las listas y de las imágenes de sus carpetas (hasta 600 por pantalla), y siguen funcionando con ella si no hay internet. Con conexión se carga siempre lo último.
+- **Corregido:** en el móvil, al abrir el gestor la pantalla ya no salta sola al lienzo; solo baja hasta él cuando se elige una lista a mano.
+- **Corregido:** en un display real, la pieza «El tiempo» sin datos ya no enseña el ejemplo del editor.
+- No cambia nada más del aspecto ni del funcionamiento.
+
+**Conviene saber:** la instalación directa depende del navegador; donde no la ofrece, el botón explica cómo hacerlo a mano. Los vídeos, el tiempo, las noticias, las webs y el directo no se guardan.
+
+## Versiones anteriores
+
+### v1.1
 
 - **Composiciones:** una lista puede ser una serie de escenas que se editan en el lienzo, pieza a pieza (texto, imagen, vídeo, zona de carpeta, forma, reloj, fecha, el tiempo, noticias, QR y web).
 - **Editor en el lienzo** con mover, escalar, girar, imán, capas, deshacer y teclado; pestañas PIEZAS y ESCENA.
@@ -118,8 +138,6 @@ En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o 
 - Las listas de carteles siguen funcionando igual que en v1.0.
 
 **Conviene saber:** el tiempo usa el servicio abierto Open-Meteo; las noticias solo funcionan con canales RSS que permiten leerse desde otra web; muchas webs no dejan mostrarse dentro de otra. Al cambiar una composición de vertical a horizontal las piezas conservan su posición relativa: es mejor partir de la plantilla en el formato que toca. Sigue sin haber cuentas de usuario ni almacenamiento propio.
-
-## Versiones anteriores
 
 ### v1.0
 
@@ -189,7 +207,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.1 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.2 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

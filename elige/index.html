@@ -52,12 +52,12 @@
   </main>
   <footer id="pie"></footer>
   <noscript><p style="padding:2rem">ADPOSTER necesita JavaScript activado.</p></noscript>
-  <script src="../credito.js?v=1.1"></script>
-  <script src="../directo.js?v=1.1"></script>
+  <script src="../credito.js?v=1.2"></script>
+  <script src="../directo.js?v=1.2"></script>
   <script>
   (function () {
     'use strict';
-    var VERSION = '1.1', Q = new URLSearchParams(location.search), C = Q.get('c') || '', D = (Q.get('d') || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 12);
+    var VERSION = '1.2', Q = new URLSearchParams(location.search), C = Q.get('c') || '', D = (Q.get('d') || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 12);
     var lang = (Q.get('lang') || navigator.language || 'es').slice(0, 2).toLowerCase(); if (['es', 'en', 'ca'].indexOf(lang) < 0) lang = 'es';
     var TX = { 'Pantalla': ['Screen', 'Pantalla'], 'Elige qué quieres ver': ['Choose what to watch', 'Tria què vols veure'], 'Buscando la pantalla…': ['Looking for the screen…', 'Buscant la pantalla…'],
       'Esta pantalla no tiene listas para elegir ahora mismo.': ['This screen has no lists to choose from right now.', 'Aquesta pantalla no té llistes per triar ara mateix.'],
