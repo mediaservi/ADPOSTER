@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.5**
+**Versión actual: v1.6**
 
 ## Cómo funciona
 
@@ -114,7 +114,11 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.5)
+## Cambios de la versión actual (v1.6)
+
+- Cartel de **LA FORTUNA** de la lista KLUB actualizado: rótulo en rojo terciopelo con bombillas amarillas más visibles.
+
+### v1.5
 
 - **KLUB con las carátulas de MSGAME**: la lista de muestra KLUB rota ahora las 19 carátulas de los juegos de MSGAME (carpeta `assets/msgame-caratulas/`, a tamaño de cartel FHD), en lugar de los carteles de demostración.
 - **CINE** sigue con los carteles de demostración de ADPOSTER (`assets/demo-carteles/`).
@@ -229,7 +233,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.5 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.6 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 
