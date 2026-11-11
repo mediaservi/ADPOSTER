@@ -3,7 +3,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '0.8', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'];
+  const VERSION = '0.9', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'];
   const DEF = { nombre: '', fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7], fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true,
     horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '' };
   const $ = s => document.querySelector(s), copia = o => JSON.parse(JSON.stringify(o));
