@@ -1,16 +1,19 @@
-/* ADPOSTER · gestor de listas y displays (v1.0).
+/* ADPOSTER · gestor de listas y displays (v1.1).
    Cuatro ventanas: DISPLAYS y LISTAS, fijas a la izquierda; el LIENZO en el centro, con la vista previa en vivo, zoom y guías que se arrastran;
    y a la derecha las pestañas CONTENIDO · DISEÑO · TIEMPOS · DIRECTO · PUBLICAR.
    Los cambios de las listas se quedan en este navegador como borrador hasta que se publican (subiendo playlists.json a la web).
    El directo (directo.js) no necesita publicar nada: habla con los displays al momento a través de un canal que solo conoce la instalación.
+   v1.1 · una lista puede ser de CARTELES (carpetas que rotan, como hasta ahora) o una COMPOSICIÓN de escenas que se editan en el lienzo (editor.js),
+   con galería de plantillas, biblioteca de archivos y calendario. Este archivo expone window.ADG para esos módulos.
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.0', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'];
+  const VERSION = '1.1', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS_C = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'], TABS_E = ['piezas', 'escena', 'tiempos', 'directo', 'publicar'];
   const DEF = { nombre: '', fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7], fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true,
-    horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '', formato: 'vertical', qr: { activo: false, modo: 'url', url: '', texto: '', pos: 'bd' }, cinta: { activo: false, texto: '', rss: '' }, publico: false };
+    horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '', formato: 'vertical', qr: { activo: false, modo: 'url', url: '', texto: '', pos: 'bd' }, cinta: { activo: false, texto: '', rss: '' }, publico: false, modo: 'carteles', escenas: [], orden: 'azar', secuencia: [], archivos: {} };
+  const ESCM = p => !!p && p.modo === 'escenas', tabsDe = p => ESCM(p) ? TABS_E : TABS_C, X = () => window.ADG.ext || {};
   /* qué ajustes restablece el botón de cada pestaña */
-  const GRUPOS = { contenido: ['fondo', 'contenido', 'anuncios', 'cinta', 'publico'], diseno: ['formato', 'cabecera', 'pie', 'lado', 'alinea', 'movimiento', 'llenar', 'brillo', 'fundido', 'qr'], tiempos: ['segundos', 'segundosAnuncio', 'anunciosCada', 'horario', 'redirige'] };
+  const GRUPOS = { contenido: ['fondo', 'contenido', 'anuncios', 'cinta', 'publico'], diseno: ['formato', 'cabecera', 'pie', 'lado', 'alinea', 'movimiento', 'llenar', 'brillo', 'fundido', 'qr'], tiempos: ['segundos', 'segundosAnuncio', 'anunciosCada', 'horario', 'redirige'], piezas: ['escenas'], escena: ['escenas', 'fundido'] };
   /* plantillas: un punto de partida para el diseño, que luego se retoca */
   const PLANT = { cartelera: { formato: 'vertical', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', llenar: false, movimiento: true, brillo: true }, completa: { formato: 'vertical', cabecera: 0, pie: 0, lado: 0, alinea: 'centro', llenar: true, movimiento: false, brillo: false },
     marco: { formato: 'vertical', cabecera: 9, pie: 9, lado: 9, alinea: 'centro', llenar: false, movimiento: true, brillo: true }, apaisado: { formato: 'horizontal', pie: 5, lado: 4, alinea: 'centro', llenar: false, movimiento: true, brillo: true } };
@@ -23,7 +26,7 @@
     'Carpetas de contenido': ['Content folders', 'Carpetes de contingut'], 'Carpetas de anuncios': ['Ad folders', "Carpetes d'anuncis"], 'URL para el kiosco': ['URL for the kiosk', 'URL per al quiosc'], 'Giro del display': ['Display rotation', 'Gir del display'], 'Copiar': ['Copy', 'Copia'], 'Copiada': ['Copied', 'Copiada'], 'Abrir': ['Open', 'Obre'],
     'Duración': ['Duration', 'Durada'], 'póster': ['poster', 'pòster'], 'anuncio': ['ad', 'anunci'], 'Transición': ['Transition', 'Transició'], 'fundido': ['fade', 'fosa'], 'zoom': ['zoom', 'zoom'], 'desliza': ['slide', 'llisca'], 'cortina': ['wipe', 'cortina'], 'corte': ['cut', 'tall'],
     'Un anuncio cada': ['One ad every', 'Un anunci cada'], 'mín': ['min', 'mín'], 'máx': ['max', 'màx'], 'Efectos': ['Effects', 'Efectes'], 'Movimiento': ['Motion', 'Moviment'], 'Llenar': ['Fill', 'Omple'], 'Brillo': ['Shine', 'Brillantor'], 'Abajo': ['Bottom', 'A baix'], 'Centro': ['Centre', 'Centre'],
-    'cabecera': ['header', 'capçalera'], 'pie': ['footer', 'peu'], 'lados': ['sides', 'costats'], 'Horario de encendido': ['Power schedule', "Horari d'encesa"], 'En horario': ['Scheduled', 'En horari'], 'Redirección': ['Redirect', 'Redirecció'], 'https://… (vacío: reproduce la lista)': ['https://… (empty: plays the list)', 'https://… (buit: reprodueix la llista)'],
+    'cabecera': ['header', 'capçalera'], 'pie': ['footer', 'peu'], 'lados': ['sides', 'costats'], 'Horario de encendido': ['Power schedule', "Horari d'encesa"], 'En horario': ['Scheduled', 'En horari'], 'Redirección': ['Redirect', 'Redirecció'], 'https://… (opcional)': ['https://… (optional)', 'https://… (opcional)'],
     'Guardar playlists.json': ['Save playlists.json', 'Desa playlists.json'], 'Importar': ['Import', 'Importa'], 'Restablecer': ['Reset', 'Restableix'],
     'Para publicar las listas: guarda el archivo y súbelo a la raíz de tu web. Los displays lo recogen solos en menos de 5 minutos. El directo no necesita publicar nada.': ['To publish the lists: save the file and upload it to your site root. Displays pick it up on their own within 5 minutes. Live control needs no publishing.', "Per publicar les llistes: desa l'arxiu i puja'l a l'arrel del teu web. Els displays el recullen sols en menys de 5 minuts. El directe no necessita publicar res."],
     'Publicado': ['Published', 'Publicat'], 'Cambios sin publicar': ['Unpublished changes', 'Canvis sense publicar'], 'es un proyecto hecho con': ['is a project made with', 'és un projecte fet amb'],
@@ -41,29 +44,33 @@
     'Este display': ['This display', 'Aquest display'], 'nombre': ['name', 'nom'], 'Aplicar': ['Apply', 'Aplica'], 'Olvidar': ['Forget', 'Oblida'], 'Enviado a': ['Sent to', 'Enviat a'], 'Sin directo: se ve solo en el lienzo': ['No live control: shown on the canvas only', 'Sense directe: es veu només al llenç'], 'Sin conexión con el repetidor: se ve solo en el lienzo': ['No relay connection: shown on the canvas only', 'Sense connexió amb el repetidor: es veu només al llenç'],
     'Canal en directo': ['Live channel', 'Canal en directe'], 'sin canal': ['no channel', 'sense canal'], 'Canal nuevo': ['New channel', 'Canal nou'], 'En archivo': ['In file', "A l'arxiu"],
     'El canal es la llave del directo: quien lo tenga puede mandar a tus displays. Va dentro de la URL del kiosco. Guárdalo «en el archivo» solo si tu web de listas es privada.': ['The channel is the key to live control: whoever has it can command your displays. It travels inside the kiosk URL. Keep it “in the file” only if your lists site is private.', "El canal és la clau del directe: qui el tingui pot manar als teus displays. Va dins de la URL del quiosc. Desa'l «a l'arxiu» només si el teu web de llistes és privat."],
-    'Origen privado': ['Private source', 'Origen privat'], 'https://… web privada (opcional)': ['https://… private site (optional)', 'https://… web privat (opcional)'], 'archivos': ['files', 'arxius'], 'carpetas': ['folders', 'carpetes'], 'carteles': ['posters', 'cartells'], 'anuncios': ['ads', 'anuncis'],
+    'Origen privado': ['Private source', 'Origen privat'], 'archivos': ['files', 'arxius'], 'carpetas': ['folders', 'carpetes'], 'carteles': ['posters', 'cartells'], 'anuncios': ['ads', 'anuncis'],
     'Suelta aquí para añadirla a la lista': ['Drop here to add it to the list', 'Deixa-la aquí per afegir-la a la llista'], 'En horizontal, el margen de arriba es igual al de abajo y «Llenar» no se aplica.': ['In landscape, the top margin equals the bottom one and “Fill” does not apply.', 'En horitzontal, el marge de dalt és igual al de baix i «Omple» no s’aplica.'],
     'Arrastra una lista sobre un display para lanzarla.': ['Drag a list onto a display to launch it.', 'Arrossega una llista sobre un display per llançar-la.'] };
   const T = s => { const t = TX[s]; return !t || lang === 'es' ? s : t[lang === 'en' ? 0 : 1]; };
 
   /* ---------- datos ---------- */
   let MAN = { carpetas: {} }, PUB = { recarga: 1, playlists: {} }, B = null, sel = '', listo = false, giro = 0;
-  let tab = TABS.includes(lee('g-tab')) ? lee('g-tab') : 'contenido', zoom = 1, guias = lee('g-guias') !== false;
+  let tab = TABS_C.concat(TABS_E).includes(lee('g-tab')) ? lee('g-tab') : 'contenido', zoom = 1, guias = lee('g-guias') !== false;
   let canal = '', enArchivo = false, dir = null, DSP = {}, dest = { k: 'todos', v: '' };
   const D = { aviso: '', seg: 10, color: 'ambar', cinta: '', n: '', g: '', s: '' };                 // lo que se está escribiendo en la pestaña DIRECTO
   const P = () => B.playlists[sel], carpetas = () => Object.keys(MAN.carpetas).filter(c => c !== 'fondos'), esAds = c => /^ads?[-_]/i.test(c) || /anuncio/i.test(c);
-  const completa = p => { p = p || {}; const c = Object.assign({}, copia(DEF), p); c.fundido = Object.assign({}, DEF.fundido, p.fundido); c.horario = Object.assign({}, copia(DEF.horario), p.horario); c.qr = Object.assign({}, DEF.qr, p.qr); c.cinta = Object.assign({}, DEF.cinta, p.cinta); if (c.formato !== 'horizontal') c.formato = 'vertical'; return c; };
-  const sucio = () => JSON.stringify(B.playlists) !== JSON.stringify(PUB.playlists);
+  const completa = p => { p = p || {}; const c = Object.assign({}, copia(DEF), p); c.fundido = Object.assign({}, DEF.fundido, p.fundido); c.horario = Object.assign({}, copia(DEF.horario), p.horario); c.qr = Object.assign({}, DEF.qr, p.qr); c.cinta = Object.assign({}, DEF.cinta, p.cinta); if (c.formato !== 'horizontal') c.formato = 'vertical';
+    c.modo = c.modo === 'escenas' ? 'escenas' : 'carteles'; c.escenas = Array.isArray(p.escenas) ? p.escenas.filter(e => e && typeof e === 'object' && Array.isArray(e.piezas)) : []; c.orden = c.orden === 'fijo' ? 'fijo' : 'azar'; c.secuencia = Array.isArray(p.secuencia) ? p.secuencia.slice() : []; c.archivos = p.archivos && typeof p.archivos === 'object' ? copia(p.archivos) : {}; return c; };
+  const raiz = o => ({ agenda: Array.isArray(o && o.agenda) ? o.agenda.filter(r => r && typeof r === 'object') : [], medios: o && o.medios && typeof o.medios === 'object' ? o.medios : {} });
+  const sucio = () => JSON.stringify([B.playlists, B.agenda, B.medios]) !== JSON.stringify([PUB.playlists, PUB.agenda, PUB.medios]);
   const slug = s => String(s || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 24);
   function base() { const d = new URL('./', location.href).href; return /githack/.test(location.host) ? 'https://adposter.mediaservi.com/' : d; }
   /* la URL del kiosco lleva lo que es de cada aparato: el giro, el canal del directo y, si lo hay, el origen privado */
   const cola = id => { const q = []; if (!CON_CARPETA.includes(id)) q.push('l=' + id); if (giro) q.push('rot=' + giro); if (canal && !enArchivo) q.push('canal=' + canal); if (ORIG) q.push('origen=' + encodeURIComponent(ORIG)); return (CON_CARPETA.includes(id) ? id + '/' : 'p/') + (q.length ? '?' + q.join('&') : ''); };
   const urlKiosco = id => base() + cola(id);
   let tEnv = 0;
-  function envia() { const fr = $('#previa'); if (listo && fr.contentWindow) fr.contentWindow.postMessage({ adposter: 'cfg', id: sel, cfg: P() }, '*'); }
+  function envia() { const fr = $('#previa'); if (listo && fr.contentWindow) fr.contentWindow.postMessage({ adposter: 'cfg', id: sel, cfg: P(), medios: B.medios }, '*'); }
   const enviaLuego = () => { clearTimeout(tEnv); tEnv = setTimeout(envia, 220); };
-  function cambia(f) { f(P()); guarda('gestor', B); envia(); pintaT(); pintaL(); pintaBarra(); ajusta(); estado(); }
-  function previa() { listo = false; $('#previa').src = 'p/?l=' + encodeURIComponent(sel) + '&prev=1&lang=' + lang + (ORIG ? '&origen=' + encodeURIComponent(ORIG) : ''); }
+  function cambia(f) { f(P()); guarda('gestor', B); envia(); pintaT(); pintaL(); pintaBarra(); ajusta(); estado(); X().alCambiar && X().alCambiar(); }
+  const toca = () => { guarda('gestor', B); estado(); };                    // un cambio hecho en el lienzo: se guarda, sin repintar las ventanas
+  function previa() { listo = false; if (ESCM(P()) && !(X().probando && X().probando())) { $('#previa').removeAttribute('src'); return; }   // una composición se edita en el lienzo: el reproductor solo se carga al probarla
+    $('#previa').src = 'p/?l=' + encodeURIComponent(sel) + '&prev=1&lang=' + lang + (ORIG ? '&origen=' + encodeURIComponent(ORIG) : ''); }
   let tFlash = 0;
   function estado(msg) { const e = $('#estado'), s = sucio(); if (msg) { clearTimeout(tFlash); e.className = 'estado flash'; e.lastElementChild.textContent = msg; tFlash = setTimeout(() => { tFlash = 0; estado(); }, 2600); return; } if (tFlash) return;
     e.className = 'estado' + (s ? ' sucio' : ''); e.lastElementChild.textContent = T(s ? 'Cambios sin publicar' : 'Publicado'); }
@@ -105,15 +112,17 @@
   /* ---------- ventana LISTAS ---------- */
   function pintaL() { const cuenta = l => (l || []).reduce((n, c) => n + (MAN.carpetas[c] || []).length, 0), p = P(), cs = carpetas(), tot = cs.reduce((n, c) => n + MAN.carpetas[c].length, 0);
     pon('#zona-listas', `<h2>${T('Listas')}<b class="cuenta">${cs.length} ${T('carpetas')} · ${tot} ${T('archivos')}</b></h2><div class="rej env">${Object.keys(B.playlists).map(id => tecla('sel', id, esc(B.playlists[id].nombre || id.toUpperCase()), id === sel, B.playlists[id].publico ? '<small>QR</small>' : '', ' draggable="true" data-arr="lista:' + esc(id) + '"')).join('')}</div>
+      <div class="fila">${tecla('modo', 'carteles', T('Carteles'), !ESCM(p))}${tecla('modo', 'escenas', T('Composición'), ESCM(p))}</div>
       ${campo('nueva', '', T('nueva lista'), ' maxlength="24"')}<div class="fila"><button type="button" class="tecla" data-a="nueva">+ ${T('Nueva')}</button><button type="button" class="tecla reset" data-a="borra"${Object.keys(B.playlists).length < 2 ? ' disabled' : ''}>${T('Borrar')}</button></div>
-      <div class="lcd res">${cuenta(p.contenido)} <small>${T('carteles')}</small> ${cuenta(p.anuncios)} <small>${T('anuncios')}</small></div>${canal ? `<div class="nota">${T('Arrastra una lista sobre un display para lanzarla.')}</div>` : ''}`); }
+      <div class="lcd res">${ESCM(p) ? p.escenas.length + ' <small>' + T('escenas') + '</small> ' + p.escenas.reduce((n, e) => n + e.piezas.length, 0) + ' <small>' + T('piezas') + '</small>' : cuenta(p.contenido) + ' <small>' + T('carteles') + '</small> ' + cuenta(p.anuncios) + ' <small>' + T('anuncios') + '</small>'}</div>
+      <div class="fila"><button type="button" class="tecla" data-a="biblio">${T('Biblioteca')}</button><button type="button" class="tecla" data-a="agenda">${T('Calendario')}${B.agenda.length ? '<small>' + B.agenda.length + '</small>' : ''}</button></div>${canal ? `<div class="nota">${T('Arrastra una lista sobre un display para lanzarla.')}</div>` : ''}`); }
 
   /* ---------- lienzo: barra, zoom y guías que se arrastran ---------- */
-  function pintaBarra() { const hor = P().formato === 'horizontal'; pon('#barra', `<div class="fila zm"><button type="button" class="tecla rd" data-a="zoom" data-v="-1" aria-label="zoom −">−</button><div class="lcd">${Math.round(zoom * 100)} %</div><button type="button" class="tecla rd" data-a="zoom" data-v="1" aria-label="zoom +">+</button><button type="button" class="tecla" data-a="zoom" data-v="0">${T('Ajustar')}</button></div>
-      <div class="fila">${tecla('formato', 'vertical', T('Vertical'), !hor)}${tecla('formato', 'horizontal', T('Horizontal'), hor)}${tecla('guias', '', T('Guías'), guias)}</div>`); }
+  function pintaBarra() { const hor = P().formato === 'horizontal'; pon('#barra', `<div class="fila zm"><button type="button" class="tecla rd" data-a="zoom" data-v="-1" aria-label="zoom −">−</button><div class="lcd">${Math.round(zoom * 100)} %</div><button type="button" class="tecla rd" data-a="zoom" data-v="1" aria-label="zoom +">+</button><button type="button" class="tecla" data-a="zoom" data-v="0">${T('Ajustar')}</button>${ESCM(P()) && X().barraZm ? X().barraZm() : ''}</div>
+      <div class="fila">${tecla('formato', 'vertical', T('Vertical'), !hor)}${tecla('formato', 'horizontal', T('Horizontal'), hor)}${ESCM(P()) ? (X().barra ? X().barra() : '') : tecla('guias', '', T('Guías'), guias)}</div>`); }
   function ajusta() { if (!B) return; const l = $('#lienzo'), d = $('#display'), hor = P().formato === 'horizontal', r = hor ? 16 / 9 : 9 / 16, pw = l.clientWidth - 20, ph = l.clientHeight - 20; if (pw < 40 || ph < 40) return;
-    const w = Math.max(90, Math.min(pw, ph * r)) * zoom; d.style.width = Math.round(w) + 'px'; d.style.height = Math.round(w / r) + 'px'; d.classList.toggle('hor', hor); guiasPon(); }
-  function guiasPon() { const g = $('#guias'), p = P(), hor = p.formato === 'horizontal'; g.hidden = !guias; if (!guias) return;
+    const w = Math.max(90, Math.min(pw, ph * r)) * zoom; d.style.width = Math.round(w) + 'px'; d.style.height = Math.round(w / r) + 'px'; d.classList.toggle('hor', hor); d.classList.toggle('compone', ESCM(P())); guiasPon(); X().alAjustar && X().alAjustar(); }
+  function guiasPon() { const g = $('#guias'), p = P(), hor = p.formato === 'horizontal'; g.hidden = !guias || ESCM(p); if (g.hidden) return;
     if (!g.firstChild) g.innerHTML = '<div class="g g-cab" data-g="cab"><b></b></div><div class="g g-pie" data-g="pie"><b></b></div><div class="g g-li v" data-g="li"><b></b></div><div class="g g-ld v" data-g="ld"><b></b></div>';
     const [c, pi, li, ld] = g.children; c.hidden = hor; c.style.top = p.cabecera + '%'; c.firstChild.textContent = T('cabecera') + ' ' + p.cabecera + ' %'; pi.style.bottom = p.pie + '%'; pi.firstChild.textContent = T('pie') + ' ' + p.pie + ' %';
     li.style.left = p.lado + '%'; ld.style.right = p.lado + '%'; li.firstChild.textContent = ld.firstChild.textContent = T('lados') + ' ' + p.lado + ' %'; }
@@ -128,7 +137,7 @@
   addEventListener('resize', ajusta); if (window.ResizeObserver) new ResizeObserver(ajusta).observe($('#lienzo'));
 
   /* ---------- pestañas de la derecha ---------- */
-  const NOMBRE_TAB = { contenido: 'Contenido', diseno: 'Diseño', tiempos: 'Tiempos', directo: 'Directo', publicar: 'Publicar' };
+  const NOMBRE_TAB = { contenido: 'Contenido', diseno: 'Diseño', tiempos: 'Tiempos', directo: 'Directo', publicar: 'Publicar', piezas: 'Piezas', escena: 'Escena' };
   const PINTA = {
     contenido(p) { const fs = (MAN.carpetas.fondos || []).map(f => f.replace(/\.[a-z0-9]+$/i, '')), cs = carpetas(), n = c => `<small>${MAN.carpetas[c].length}</small>`, ar = (g, c) => ` draggable="true" data-arr="${g}:${esc(c)}"`;
       return `<h2>${T('Fondo')}</h2><div class="rej media">${fs.map(f => tecla('fondo', f, esc(f), p.fondo === f)).join('')}${tecla('fondo', '', T('sin fondo'), !p.fondo)}</div>
@@ -145,11 +154,12 @@
       <div class="fila">${tecla('qrModo', 'url', T('Enlace'), q.modo !== 'publico')}${tecla('qrModo', 'publico', T('El público elige'), q.modo === 'publico')}</div>
       ${q.modo === 'publico' ? '' : campo('c-qr-url', q.url, T('https://… destino del QR'), ' maxlength="300" inputmode="url" data-c="qr.url"')}${campo('c-qr-texto', q.texto, T('texto bajo el QR'), ' maxlength="60" data-c="qr.texto"')}${reset('diseno')}`; },
     tiempos(p) { const h = p.horario, Dn = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
-      return `<h2>${T('Duración')}</h2>${paso('segundos', `${p.segundos} s <small>${T('póster')}</small>`)}${paso('segundosAnuncio', `${p.segundosAnuncio} s <small>${T('anuncio')}</small>`)}
-      <h2>${T('Un anuncio cada')}</h2><div class="fila">${medio('amin', `${p.anunciosCada[0]} <small>${T('mín')}</small>`)}${medio('amax', `${p.anunciosCada[1]} <small>${T('máx')}</small>`)}</div>
+      return `${ESCM(p) ? '' : `<h2>${T('Duración')}</h2>${paso('segundos', `${p.segundos} s <small>${T('póster')}</small>`)}${paso('segundosAnuncio', `${p.segundosAnuncio} s <small>${T('anuncio')}</small>`)}
+      <h2>${T('Un anuncio cada')}</h2><div class="fila">${medio('amin', `${p.anunciosCada[0]} <small>${T('mín')}</small>`)}${medio('amax', `${p.anunciosCada[1]} <small>${T('máx')}</small>`)}</div>`}
+      <h2>${T('Calendario')}</h2><div class="fila"><button type="button" class="tecla" data-a="agenda">${T('Programar por fechas')}${B.agenda.length ? '<small>' + B.agenda.length + '</small>' : ''}</button></div><div class="nota">${T('Qué lista sale cada día y a cada hora, en todos los displays o solo en un grupo.')}</div>
       <h2>${T('Horario de encendido')}</h2><div class="fila">${tecla('hact', '', T('En horario'), h.activo)}<input type="time" class="campo" id="hdesde" value="${esc(h.desde)}" aria-label="desde"><input type="time" class="campo" id="hhasta" value="${esc(h.hasta)}" aria-label="hasta"></div>
       <div class="fila dias">${Dn.map((d, i) => `<button type="button" class="tecla${h.dias.includes(i + 1) ? ' on' : ''}" data-a="dia" data-v="${i + 1}" aria-pressed="${h.dias.includes(i + 1)}">${T(d)}</button>`).join('')}</div>
-      <h2>${T('Redirección')}</h2>${campo('c-redirige', p.redirige, T('https://… (vacío: reproduce la lista)'), ' type="url" inputmode="url" data-c="redirige"')}${reset('tiempos')}`; },
+      <h2>${T('Redirección')}</h2>${campo('c-redirige', p.redirige, T('https://… (opcional)'), ' type="url" inputmode="url" data-c="redirige"')}${reset('tiempos')}`; },
     directo() { const d = dest.k === 'd' ? DSP[dest.v] : null, col = ['ambar', 'rojo', 'verde', 'azul'];
       return `<h2>${T('Destino')}</h2><div class="lcd" id="dest-lcd">${esc(nombreDest())}${dest.k !== 'd' ? ' (' + destinos().length + ')' : ''}</div>${canal ? '' : `<div class="nota">${T('Sin directo: se ve solo en el lienzo')}</div>`}
       <h2>${T('Lanzar una lista')}</h2><div class="rej env">${Object.keys(B.playlists).map(id => tecla('lanza', id, esc(B.playlists[id].nombre || id.toUpperCase()), d ? d.l === id : false)).join('')}</div>
@@ -159,14 +169,14 @@
       ${d ? `<h2>${T('Este display')}</h2><div class="fila">${campo('d-n', D.n, T('nombre'), ' maxlength="32" data-d="n"')}</div><div class="fila">${campo('d-g', D.g, T('grupo'), ' maxlength="24" data-d="g"')}${campo('d-s', D.s, T('sede'), ' maxlength="24" data-d="s"')}</div><div class="fila"><button type="button" class="tecla" data-a="pon">${T('Aplicar')}</button><button type="button" class="tecla reset" data-a="olvida">${T('Olvidar')}</button></div>` : ''}`; },
     publicar() { return `<h2>${T('URL para el kiosco')}</h2><div class="fila giro">${[0, 90, 180, 270].map(g => `<button type="button" class="tecla${giro === g ? ' on' : ''}" data-a="giro" data-v="${g}" aria-pressed="${giro === g}" aria-label="${T('Giro del display')} ${g}°"><i class="led"></i><span>${g}°</span></button>`).join('')}</div><div class="lcd url" id="url">${esc(urlKiosco(sel))}</div><div class="fila"><button type="button" class="tecla" data-a="copia">${T('Copiar')}</button><a class="tecla" href="${esc(cola(sel))}" target="_blank" rel="noopener">${T('Abrir')}</a></div>
       <h2>${T('Canal en directo')}</h2><div class="lcd url">${canal ? esc(canal) : T('sin canal')}</div><div class="fila"><button type="button" class="tecla" data-a="canalNuevo">${T('Canal nuevo')}</button><button type="button" class="tecla reset" data-a="canalQuita"${canal ? '' : ' disabled'}>${T('Quitar')}</button>${tecla('enArchivo', '', T('En archivo'), enArchivo, '', canal ? '' : ' disabled')}</div><div class="nota">${T('El canal es la llave del directo: quien lo tenga puede mandar a tus displays. Va dentro de la URL del kiosco. Guárdalo «en el archivo» solo si tu web de listas es privada.')}</div>
-      <h2>${T('Origen privado')}</h2><div class="fila">${campo('c-origen', ORIG, T('https://… web privada (opcional)'), ' type="url" inputmode="url"')}<button type="button" class="tecla rd" data-a="origen" aria-label="${T('Abrir')}" title="${T('Abrir')}">➜</button></div>
+      <h2>${T('Origen privado')}</h2><div class="fila">${campo('c-origen', ORIG, T('https://… (opcional)'), ' type="url" inputmode="url"')}<button type="button" class="tecla rd" data-a="origen" aria-label="${T('Abrir')}" title="${T('Abrir')}">➜</button></div>
       <div class="pie-zona"><button type="button" class="tecla pri" data-a="guarda">${T('Guardar playlists.json')}</button><button type="button" class="tecla" data-a="importa">${T('Importar')}</button></div>
       <div class="nota">${T('Para publicar las listas: guarda el archivo y súbelo a la raíz de tu web. Los displays lo recogen solos en menos de 5 minutos. El directo no necesita publicar nada.')}</div>`; }
   };
-  function pintaT() { $('#tabs').innerHTML = TABS.map(t => `<button type="button" role="tab" class="tab${t === tab ? ' on' : ''}" data-a="tab" data-v="${t}" aria-selected="${t === tab}">${T(NOMBRE_TAB[t])}</button>`).join(''); const c = $('#cuerpo'); c.dataset.tab = tab; pon('#cuerpo', PINTA[tab](P())); }
+  function pintaT() { const TABS = tabsDe(P()); if (!TABS.includes(tab)) tab = TABS[0]; $('#tabs').innerHTML = TABS.map(t => `<button type="button" role="tab" class="tab${t === tab ? ' on' : ''}" data-a="tab" data-v="${t}" aria-selected="${t === tab}">${T(NOMBRE_TAB[t])}</button>`).join(''); const c = $('#cuerpo'); c.dataset.tab = tab; pon('#cuerpo', PINTA[tab] ? PINTA[tab](P()) : ''); X().alPintar && X().alPintar(); }
   function pintaFijo() { document.documentElement.lang = lang; $('#btn-idioma').textContent = lang.toUpperCase(); $('#zona-listas').setAttribute('aria-label', T('Listas')); $('#zona-tabs').setAttribute('aria-label', T('Ajustes')); $('.lienzo-zona').setAttribute('aria-label', T('Lienzo')); $('#suelta').textContent = T('Suelta aquí para añadirla a la lista');
     $('#pie').innerHTML = window.AVCREDITO ? window.AVCREDITO.html('ADPOSTER', 'v' + VERSION, lang) : `ADPOSTER v${VERSION} ${new Date().getFullYear()} ${T('es un proyecto hecho con')} by <a href="https://mediaservi.com" target="_blank" rel="noopener">mediaservi.com</a>`; }
-  const todo = () => { pintaFijo(); pintaD(); pintaL(); pintaBarra(); pintaT(); ajusta(); estado(); };
+  const todo = () => { pintaFijo(); pintaD(); pintaL(); pintaBarra(); pintaT(); ajusta(); estado(); X().alLista && X().alLista(); };
   if (window.AVCREDITO) window.AVCREDITO.alCambiar(() => { if (B) pintaFijo(); });   // la línea de crédito es la común de AVHUB
   // seta de aviso de fallos, común a toda la familia (fallo.js): en la barra, del mismo tamaño que la tecla de idioma
   if (window.AVFALLO) { const bi = $('#btn-idioma'); if (bi) { const bf = window.AVFALLO.boton({ app: 'ADPOSTER', version: 'v' + VERSION, idioma: () => lang }); bf.id = 'btn-fallo'; bi.before(bf);
@@ -181,7 +191,7 @@
   /* ---------- acciones ---------- */
   const alterna = (l, v) => { const i = l.indexOf(v); i < 0 ? l.push(v) : l.splice(i, 1); };
   const ACC = {
-    sel(v) { if (!B.playlists[v]) return; sel = v; guarda('sel', sel); pintaL(); pintaBarra(); pintaT(); ajusta(); previa(); },
+    sel(v) { if (!B.playlists[v]) return; sel = v; guarda('sel', sel); X().alSalir && X().alSalir(); pintaL(); pintaBarra(); pintaT(); ajusta(); previa(); X().alLista && X().alLista(); },
     nueva() { const n = ($('#nueva').value || '').trim(); const id = n.normalize('NFKD').replace(/[^\w\s-]/g, '').trim().toLowerCase().replace(/[\s_]+/g, '-').replace(/[^a-z0-9-]/g, '').slice(0, 24); if (!id) { $('#nueva').focus(); return; } if (!B.playlists[id]) { B.playlists[id] = completa(copia(P())); B.playlists[id].nombre = n.toUpperCase(); B.playlists[id].publico = false; } guarda('gestor', B); ACC.sel(id); estado(); },
     borra() { if (Object.keys(B.playlists).length < 2) return; delete B.playlists[sel]; guarda('gestor', B); ACC.sel(Object.keys(B.playlists)[0]); estado(); },
     fondo(v) { cambia(p => { p.fondo = v; }); }, contenido(v) { cambia(p => alterna(p.contenido, v)); }, anuncios(v) { cambia(p => alterna(p.anuncios, v)); },
@@ -193,13 +203,14 @@
     hact() { cambia(p => { p.horario.activo = !p.horario.activo; }); }, dia(v) { cambia(p => { alterna(p.horario.dias, +v); p.horario.dias.sort(); }); },
     formato(v) { cambia(p => { p.formato = v === 'horizontal' ? 'horizontal' : 'vertical'; }); }, plantilla(v) { if (PLANT[v]) cambia(p => Object.assign(p, PLANT[v])); },
     cintaAct() { cambia(p => { p.cinta.activo = !p.cinta.activo; }); }, qrAct() { cambia(p => { p.qr.activo = !p.qr.activo; }); }, qrModo(v) { cambia(p => { p.qr.modo = v === 'publico' ? 'publico' : 'url'; if (v === 'publico') p.publico = true; }); }, qrPos(v) { cambia(p => { p.qr.pos = v; }); }, publico() { cambia(p => { p.publico = !p.publico; }); },
-    tab(v) { if (!TABS.includes(v)) return; tab = v; guarda('g-tab', tab); pintaT(); },
+    tab(v) { if (!tabsDe(P()).includes(v)) return; tab = v; guarda('g-tab', tab); pintaT(); },
     zoom(v) { v = +v; zoom = v === 0 ? 1 : lim(Math.round((zoom + v * .25) * 4) / 4, .5, 3); pintaBarra(); ajusta(); }, guias() { guias = !guias; guarda('g-guias', guias); pintaBarra(); guiasPon(); },
     giro(v) { giro = +v; pintaT(); },
     copia() { const u = urlKiosco(sel), b = document.querySelector('[data-a="copia"]'), ok = () => { b.textContent = T('Copiada'); setTimeout(() => { b.textContent = T('Copiar'); }, 1500); }; (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(ok, () => { const r = document.createRange(); r.selectNodeContents($('#url')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); try { document.execCommand('copy'); ok(); } catch (e) {} }); },
-    guarda() { const o = { recarga: PUB.recarga === undefined ? 1 : PUB.recarga }; if (canal && enArchivo) o.canal = canal; o.playlists = B.playlists; const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(o, null, 2) + '\n'], { type: 'application/json' })); a.download = 'playlists.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); },
+    guarda() { const o = { recarga: PUB.recarga === undefined ? 1 : PUB.recarga }; if (canal && enArchivo) o.canal = canal; o.playlists = B.playlists; if (B.agenda.length) o.agenda = B.agenda; const usados = JSON.stringify(B.playlists), ms = {}; Object.keys(B.medios).forEach(k => { if (usados.indexOf('"m:' + k + '"') >= 0) ms[k] = B.medios[k]; }); if (Object.keys(ms).length) o.medios = ms;   // solo viajan las imágenes que alguna escena usa
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(o, null, 2) + '\n'], { type: 'application/json' })); a.download = 'playlists.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); },
     importa() { $('#archivo').click(); },
-    reset(g) { const ks = GRUPOS[g]; if (!ks) return; const de = completa(PUB.playlists[sel] ? copia(PUB.playlists[sel]) : {}); cambia(p => ks.forEach(k => { p[k] = de[k]; })); },
+    reset(g) { const ks = GRUPOS[g]; if (!ks) return; const de = completa(PUB.playlists[sel] ? copia(PUB.playlists[sel]) : {}); X().antes && X().antes(); cambia(p => ks.forEach(k => { p[k] = de[k]; })); X().alLista && X().alLista(); },
     idioma() { lang = IDI[(IDI.indexOf(lang) + 1) % IDI.length]; guarda('lang', lang); todo(); previa(); },
     canalNuevo() { canal = window.ADDIRECTO ? window.ADDIRECTO.canalNuevo() : ''; guarda('g-canal', canal || null); enArchivo = false; guarda('g-enarchivo', null); enlaza(); pintaL(); pintaT(); },
     canalQuita() { canal = ''; enArchivo = false; guarda('g-canal', null); guarda('g-enarchivo', null); enlaza(); pintaL(); pintaT(); },
@@ -218,7 +229,7 @@
   /* campos de texto: cambian el ajuste mientras se escribe, sin repintar (para no perder el cursor) */
   document.addEventListener('input', e => { const t = e.target; if (t.dataset.c) { const ks = t.dataset.c.split('.'), p = P(); if (ks.length === 2) p[ks[0]][ks[1]] = t.value; else p[ks[0]] = t.value.trim(); guarda('gestor', B); if (ks[0] !== 'redirige') enviaLuego(); estado(); } else if (t.dataset.d) D[t.dataset.d] = t.value; });
   document.addEventListener('change', e => { const t = e.target; if (t.id === 'hdesde' || t.id === 'hhasta') { P().horario[t.id === 'hdesde' ? 'desde' : 'hasta'] = t.value; guarda('gestor', B); envia(); estado(); }
-    else if (t.id === 'archivo' && t.files[0]) { t.files[0].text().then(tx => { const j = JSON.parse(tx); if (!j || !j.playlists) throw 0; B = { playlists: {} }; Object.keys(j.playlists).forEach(k => { B.playlists[k] = completa(j.playlists[k]); }); guarda('gestor', B); ACC.sel(B.playlists[sel] ? sel : Object.keys(B.playlists)[0]); estado(); }).catch(() => {}); t.value = ''; } });
+    else if (t.id === 'archivo' && t.files[0]) { t.files[0].text().then(tx => { const j = JSON.parse(tx); if (!j || !j.playlists) throw 0; B = Object.assign({ playlists: {} }, raiz(j)); Object.keys(j.playlists).forEach(k => { B.playlists[k] = completa(j.playlists[k]); }); guarda('gestor', B); ACC.sel(B.playlists[sel] ? sel : Object.keys(B.playlists)[0]); estado(); }).catch(() => {}); t.value = ''; } });
   document.addEventListener('keydown', e => { if (e.key !== 'Enter') return; const i = e.target.id; if (i === 'nueva') ACC.nueva(); else if (i === 'd-aviso') ACC.aviso(); else if (i === 'd-cinta') ACC.cintaPon(); else if (i === 'c-origen') ACC.origen(); else if (i === 'd-n' || i === 'd-g' || i === 'd-s') ACC.pon(); });
   addEventListener('message', e => { const d = e.data; if (d && d.adposter === 'listo' && d.id === sel) { listo = true; envia(); } });
   /* arrastrar y soltar: una carpeta sobre el lienzo la añade a la lista; una lista sobre un display (o un grupo, o «Todos») la lanza allí */
@@ -230,15 +241,22 @@
   document.addEventListener('drop', e => { const d = diana(e); if (!d) return; e.preventDefault(); const i = arrastra.indexOf(':'), k = arrastra.slice(0, i), v = arrastra.slice(i + 1);
     if (k === 'lista') { ACC.dest(d.dataset.v); ACC.lanza(v); } else if ((k === 'contenido' || k === 'anuncios') && !P()[k].includes(v)) ACC[k](v); });
 
+  /* ---------- puente para los módulos de composición (editor.js, biblio.js, agenda.js) ---------- */
+  window.ADG = { VERSION, get B() { return B; }, get PUB() { return PUB; }, get MAN() { return MAN; }, get sel() { return sel; }, get lang() { return lang; }, get tab() { return tab; }, get zoom() { return zoom; }, get DSP() { return DSP; }, get ORIG() { return ORIG; },
+    P, T, TX, PINTA, ACC, GRUPOS, DEF, ESCM, $, esc, tecla, paso, medio, campo, reset, pon, lim, copia, lee, guarda, cambia, toca, pintaT, pintaL, pintaBarra, ajusta, estado, envia, previa, carpetas, esAds, completa, slug,
+    urlAsset: f => ORIG + 'assets/' + String(f).split('/').map(encodeURIComponent).join('/'), ext: {} };
+
   /* ---------- arranque ---------- */
   // ?origen=https://… abre el gestor sobre un origen privado (otra web con la misma estructura): lee de allí carpetas y listas, y la vista previa lo usa
   const ORIG = (() => { const p = new URLSearchParams(location.search).get('origen') || ''; return /^(https:\/\/|http:\/\/(localhost|127\.0\.0\.1)[:\/])[^\s"'<>]+$/.test(p) ? p.replace(/\/*$/, '/') : ''; })();
   const trae = u => fetch(ORIG + u + '?t=' + Date.now(), { cache: 'no-store' }).then(r => { if (!r.ok) throw r.status; return r.json(); });
   Promise.all([trae('assets/manifest.json').catch(() => ({ carpetas: {} })), trae('playlists.json').catch(() => ({ recarga: 1, playlists: {} }))]).then(([m, l]) => {
-    MAN = m && m.carpetas ? m : { carpetas: {} }; PUB = { recarga: l.recarga, playlists: {} }; Object.keys(l.playlists || {}).forEach(k => { PUB.playlists[k] = completa(l.playlists[k]); });
-    const b = lee('gestor'); B = b && b.playlists && Object.keys(b.playlists).length ? { playlists: {} } : copia({ playlists: PUB.playlists }); if (b && b.playlists) Object.keys(b.playlists).forEach(k => { B.playlists[k] = completa(b.playlists[k]); });
+    MAN = m && m.carpetas ? m : { carpetas: {} }; PUB = Object.assign({ recarga: l.recarga, playlists: {} }, raiz(l)); Object.keys(l.playlists || {}).forEach(k => { PUB.playlists[k] = completa(l.playlists[k]); });
+    const b = lee('gestor'); B = b && b.playlists && Object.keys(b.playlists).length ? Object.assign({ playlists: {} }, raiz(b)) : copia({ playlists: PUB.playlists, agenda: PUB.agenda, medios: PUB.medios }); if (b && b.playlists) Object.keys(b.playlists).forEach(k => { B.playlists[k] = completa(b.playlists[k]); });
+    /* un borrador guardado con una versión anterior no conoce las listas publicadas después: se le añaden una vez, y se enseña la primera */
+    let nueva = ''; if (b && b.playlists && lee('g-ver') !== VERSION) Object.keys(PUB.playlists).forEach(k => { if (!B.playlists[k]) { B.playlists[k] = copia(PUB.playlists[k]); nueva = nueva || k; } }); guarda('g-ver', VERSION);
     if (!Object.keys(B.playlists).length) B.playlists.demo = Object.assign(completa(), { nombre: 'DEMO' });
-    sel = lee('sel'); if (!B.playlists[sel]) sel = Object.keys(B.playlists)[0];
+    sel = nueva || lee('sel'); if (!B.playlists[sel]) sel = Object.keys(B.playlists)[0];
     const ok = c => typeof c === 'string' && /^[a-z0-9]{6,40}$/i.test(c), mio = lee('g-canal'); if (ok(mio)) { canal = mio; enArchivo = !!lee('g-enarchivo'); } else if (ok(l.canal)) { canal = l.canal; enArchivo = true; }
     todo(); enlaza(); previa();
   });

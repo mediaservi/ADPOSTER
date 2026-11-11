@@ -32,7 +32,9 @@ Como cualquier web, al abrirla tu navegador se conecta a los servicios que la ha
 | GitHub Pages (GitHub, Inc.) | alojamiento de la web | dirección IP y datos técnicos de la conexión, que GitHub registra por seguridad |
 | Google Apps Script y Gmail (Google) | leer textos y datos comunes de la familia y recibir los avisos de fallo | dirección IP; en un aviso de fallo, lo que tú escribas, el correo que indiques (opcional), las capturas que adjuntes, la dirección de la página, el tamaño de pantalla y el tipo de navegador |
 | Repetidores MQTT públicos (EMQX, HiveMQ, Mosquitto), solo si activas el «directo» | unir al momento el gestor, los displays y la página del público | direcciones IP de los aparatos; el estado de cada display (nombre, grupo, lista y archivo en pantalla) y las órdenes que envíes, incluido el texto de los avisos y de la cinta. Son servicios de terceros, abiertos: no envíes datos personales ni nada confidencial por ahí |
-| El servidor del canal RSS que tú escribas en la cinta de texto, si escribes uno | leer sus titulares | dirección IP del display |
+| El servidor del canal RSS que tú escribas en la cinta de texto o en una pieza de noticias, si escribes uno | leer sus titulares | dirección IP del display |
+| Open-Meteo (open-meteo.com), solo si una composición lleva la pieza «El tiempo» o buscas una ciudad en el editor | pedir el tiempo y la previsión del lugar que hayas puesto | dirección IP del display y las coordenadas o el nombre de ese lugar |
+| Las webs e imágenes de fuera que tú pongas en una composición (pieza «Web», o una imagen o vídeo con dirección https) | mostrarlas en la pantalla | dirección IP del display y lo que recoja cada web |
 
 Esos proveedores aplican sus propias políticas de privacidad y el autor no tiene acceso a sus registros.
 

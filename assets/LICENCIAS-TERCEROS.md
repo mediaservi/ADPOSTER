@@ -7,8 +7,11 @@ ADPOSTER es GPL-3.0 (ver `LICENSE`). Incluye estas piezas de otros autores, cada
 | QR Code Generator for JavaScript v2.0.4 | `qr.js` | Kazuhiko Arase | MIT |
 | Inter | `assets/fonts/inter-*.woff2` | The Inter Project Authors | SIL Open Font License 1.1 |
 | Share Tech Mono | `assets/fonts/share-tech-mono-*.woff2` | Carrois Type Design | SIL Open Font License 1.1 |
+| Abril Fatface, Alfa Slab One, Anton, Archivo Black, Bebas Neue, Caveat, Cinzel, Courier Prime, Fredoka, League Gothic, Marcellus, Montserrat, Oswald, Pacifico, Playfair Display, Poppins, Righteous | `assets/fonts/*.woff2` (subconjunto latino) | Sus respectivos autores (proyectos de Google Fonts, vía Fontsource) | SIL Open Font License 1.1 |
 
 «QR Code» es una marca registrada de DENSO WAVE INCORPORATED.
+
+Los datos de la pieza «El tiempo» son de [Open-Meteo](https://open-meteo.com/) (licencia CC BY 4.0); la pieza lo indica en pantalla. ADPOSTER no incluye ningún dato suyo: cada display los pide al mostrar la pieza.
 
 ## Licencia MIT de QR Code Generator
 

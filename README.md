@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.0**
+**Versión actual: v1.1**
 
 ## Cómo funciona
 
@@ -21,13 +21,24 @@ El gestor (la página principal) prepara esa dirección con todo lo que es de ca
 | Ventana | Para qué |
 |---|---|
 | **DISPLAYS** (izquierda, arriba) | El estado de cada pantalla **en directo**: encendida, apagada, fuera de horario o sin señal; qué lista tiene, en qué formato, y su grupo y sede. Aquí se elige el destino de las órdenes: todas, un grupo, una sede o una sola. |
-| **LISTAS** (izquierda, abajo) | Las listas de reproducción: crear, borrar y elegir la que se edita. Cuenta de carpetas y archivos. |
-| **LIENZO** (centro) | La vista previa en vivo de la lista, en vertical u horizontal, con **zoom** y desplazamiento y **guías que se arrastran** para colocar la cabecera, el pie y los lados. |
-| **Pestañas** (derecha) | **CONTENIDO** · **DISEÑO** · **TIEMPOS** · **DIRECTO** · **PUBLICAR**, cada una con su botón de restablecer. |
+| **LISTAS** (izquierda, abajo) | Las listas de reproducción: crear, borrar y elegir la que se edita. Cada lista es de **carteles** (carpetas que rotan) o una **composición** de escenas. Desde aquí se abren la **biblioteca** y el **calendario**. |
+| **LIENZO** (centro) | En una lista de carteles, la vista previa en vivo, con **zoom**, desplazamiento y **guías que se arrastran**. En una composición, el **editor**: cada pieza se selecciona, se mueve, se escala y se gira con el ratón o el dedo, con imán, deshacer y la tira de escenas debajo. |
+| **Pestañas** (derecha) | **CONTENIDO** · **DISEÑO** · **TIEMPOS** · **DIRECTO** · **PUBLICAR**. En una composición, las dos primeras son **PIEZAS** (añadir, propiedades y capas) y **ESCENA** (fondo, duración, temporada y transición). Con botón de restablecer. |
 
 En tablet y móvil las ventanas se apilan, con el lienzo arriba; en móvil apaisado el lienzo se queda a la izquierda.
 
 ## Funciones
+
+**Composición** (nuevo en v1.1)
+
+- **Escenas compuestas pieza a pieza.** Una lista puede ser una serie de escenas, cada una un lienzo con piezas colocadas libremente: **texto** (19 tipos de letra, con ajuste automático a la caja para que nunca se corte), **imagen**, **vídeo**, **zona** (una carpeta que va pasando dentro de un recuadro), **forma**, **reloj** (digital o analógico), **fecha**, **el tiempo** (con previsión), **noticias** de un RSS (cinta, lista o de una en una), **código QR** y **página web**.
+- **Editor en el lienzo:** mover, escalar y girar; imán a bordes, centros y otras piezas; capas con bloqueo y ocultar; duplicar, copiar y pegar; teclado (flechas, Supr, Ctrl+D, Ctrl+Z/Y); deshacer y rehacer; caja con fondo, esquinas, borde, sombra y opacidad; animación de entrada de cada pieza.
+- **Galería de plantillas:** 34 puntos de partida propios, cada uno en vertical y en horizontal, por categorías (hostelería, comercio, eventos, empresa, información, QR y redes, fotos y carteles). Se añaden como escena nueva o sustituyen la actual, y luego se retocan.
+- **Fondos:** color, degradado, malla de color o imagen, con oscurecido y trama.
+- **Escenas de temporada:** una escena puede salir solo entre dos fechas.
+- **«Probar»** pone la composición en el reproductor de verdad, dentro del lienzo.
+- **Biblioteca:** todas las carpetas con sus miniaturas. En una lista de carteles, **orden fijo arrastrando**, **duración propia de cada archivo** y dejar alguno fuera. **Mis imágenes:** las que se suben desde el gestor (o se sueltan sobre el lienzo) viajan dentro de `playlists.json`, sin tocar el repositorio: pensado para logos y fotos sueltas.
+- **Calendario:** reglas «esta lista, estos días, a estas horas, en estos displays» (todos, un grupo, una sede o uno solo), vistas sobre el mes. Cada display vuelve a su lista de casa cuando ninguna regla coincide.
 
 **Reproducción**
 
@@ -75,12 +86,16 @@ No hay servidor propio. El gestor, los displays y la página del público se hab
 | Ruta | Qué es |
 |---|---|
 | `index.html`, `gestor.js`, `gestor.css` | El gestor |
+| `editor.js` | El editor de composiciones en el lienzo, las pestañas PIEZAS y ESCENA y la galería de plantillas |
+| `gestion.js` | La biblioteca de archivos y el calendario |
+| `escena.js`, `escena.css` | El motor que pinta las escenas; lo usan igual el editor y el reproductor |
+| `plantillas.js` | Las plantillas de composición |
 | `cine/`, `klub/`, `p/` | Las direcciones de reproducción (la URL que se da al kiosco) |
 | `elige/` | La página del público (se llega por el QR) |
 | `player.js`, `player.css` | El reproductor |
 | `directo.js` | El canal en tiempo real (cliente MQTT mínimo, propio) |
 | `qr.js` | Generador de códigos QR (de terceros, licencia MIT: ver [assets/LICENCIAS-TERCEROS.md](assets/LICENCIAS-TERCEROS.md)) |
-| `playlists.json` | Los ajustes de cada lista |
+| `playlists.json` | Los ajustes de cada lista, sus escenas, el calendario (`agenda`) y las imágenes propias (`medios`) |
 | `assets/<carpeta>/` | Las imágenes y vídeos. Las carpetas `ads-…` o con «anuncios» en el nombre son anuncios; `fondos`, los fondos |
 | `assets/manifest.json` | El índice de archivos (se genera solo) |
 | `entrada/` | Donde se suben las imágenes originales para que se preparen solas |
@@ -90,7 +105,23 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.0)
+## Cambios de la versión actual (v1.1)
+
+- **Composiciones:** una lista puede ser una serie de escenas que se editan en el lienzo, pieza a pieza (texto, imagen, vídeo, zona de carpeta, forma, reloj, fecha, el tiempo, noticias, QR y web).
+- **Editor en el lienzo** con mover, escalar, girar, imán, capas, deshacer y teclado; pestañas PIEZAS y ESCENA.
+- **Galería de 34 plantillas**, cada una en vertical y en horizontal.
+- **Biblioteca** con miniaturas, orden fijo arrastrando, duración por archivo e imágenes propias dentro de `playlists.json`.
+- **Calendario** de reglas por fechas, días, horas y displays.
+- **Dos listas de muestra nuevas:** ESCAPARATE (vertical) y PANEL (horizontal).
+- 19 tipos de letra propios para las composiciones (todos con licencia abierta, alojados en el repositorio).
+- Los rótulos que no caben en un botón saltan de línea en vez de cortarse.
+- Las listas de carteles siguen funcionando igual que en v1.0.
+
+**Conviene saber:** el tiempo usa el servicio abierto Open-Meteo; las noticias solo funcionan con canales RSS que permiten leerse desde otra web; muchas webs no dejan mostrarse dentro de otra. Al cambiar una composición de vertical a horizontal las piezas conservan su posición relativa: es mejor partir de la plantilla en el formato que toca. Sigue sin haber cuentas de usuario ni almacenamiento propio.
+
+## Versiones anteriores
+
+### v1.0
 
 - **Gestor nuevo de cuatro ventanas:** DISPLAYS y LISTAS fijas a la izquierda, el lienzo en el centro con zoom, desplazamiento y guías que se arrastran, y cinco pestañas a la derecha (contenido, diseño, tiempos, directo y publicar), cada una con su restablecer.
 - **Directo:** panel de displays en tiempo real, lanzar listas con un toque, avisos a toda pantalla, mensaje en la cinta, encender, apagar, recargar e identificar; grupos y sedes.
@@ -147,7 +178,8 @@ Sigue de la v0.1:
 ## Próximos pasos
 
 - Publicar desde el gestor sin subir archivos a mano, y subir imágenes arrastrándolas.
-- Varias zonas a medida en una misma pantalla y editor de carteles con texto propio.
+- Selección de varias piezas a la vez, alinear y repartir; más plantillas.
+- Adaptar sola una composición al cambiar de vertical a horizontal.
 - Conexión con nubes y discos del usuario.
 - Repetidor propio para el directo.
 
@@ -157,7 +189,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.0 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.1 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

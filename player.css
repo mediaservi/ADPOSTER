@@ -39,6 +39,16 @@ body.rot #escena.horizontal { --u0: min(1vw, calc(100vh * 9 / 1600)); }
 .horizontal.dos .anuncio img, .horizontal.dos .anuncio video { filter: drop-shadow(0 calc(var(--u) * 1.2) calc(var(--u) * 2.4) rgba(0, 0, 0, .6)); }
 
 /* tipos de transición */
+/* composiciones: dos capas que se relevan con la misma transición que los carteles */
+.esc-capa { position: absolute; inset: 0; opacity: 0; pointer-events: none; will-change: opacity, transform; transition: opacity var(--t, 2.5s) ease-in-out, transform var(--t, 2.5s) cubic-bezier(.22, .8, .3, 1), clip-path var(--t, 2.5s) cubic-bezier(.6, 0, .2, 1); }
+.esc-capa.on { opacity: 1; z-index: 2; }
+.esc-capa.sale { opacity: 1; z-index: 1; }
+#escena:not(.modo-esc) .esc-capa { display: none; }
+.modo-esc > .fondo, .modo-esc > .marco, .modo-esc > .anuncio { display: none; }
+.t-zoom .esc-capa { transform: scale(1.06); }
+.t-desliza .esc-capa { transform: translateX(7%); }
+.t-cortina .esc-capa { opacity: 1; clip-path: inset(0 0 100% 0); z-index: 1; }
+.t-corte .esc-capa { transition: none; }
 .t-zoom .capa, .t-zoom .anuncio { transform: scale(1.06); }
 .t-zoom .on { transform: none; }
 .t-desliza .capa, .t-desliza .anuncio { transform: translateX(7%); }

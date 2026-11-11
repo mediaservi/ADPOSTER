@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <!--
   ADPOSTER · CARTELERÍA DIGITAL — gestor de listas y displays. Apartado de AVHUB (mediaservi.com).
-  Versión v1.0. Cuatro ventanas: a la izquierda, fijas, DISPLAYS (cómo está cada pantalla, en directo) y LISTAS; en el centro el LIENZO,
+  Versión v1.1. Cuatro ventanas: a la izquierda, fijas, DISPLAYS (cómo está cada pantalla, en directo) y LISTAS; en el centro el LIENZO,
   con la vista previa en vivo, zoom y guías que se arrastran; a la derecha, las pestañas CONTENIDO · DISEÑO · TIEMPOS · DIRECTO · PUBLICAR.
   Los reproductores son las URL que se dan al kiosco: …/cine, …/klub y …/p/?l=nombre. La página del público es …/elige (se llega por QR).
-  Módulos: gestor.js (este gestor), player.js (reproductor), directo.js (canal en tiempo real), qr.js (códigos QR, de terceros, MIT),
+  Una lista puede ser de carteles (carpetas que rotan) o una composición de escenas que se editan en el lienzo, pieza a pieza.
+  Módulos: gestor.js (este gestor), editor.js (composición en el lienzo y galería de plantillas), gestion.js (biblioteca y calendario), escena.js (pinta las escenas, también en el reproductor), plantillas.js, player.js (reproductor), directo.js (canal en tiempo real), qr.js (códigos QR, de terceros, MIT),
   playlists.json (ajustes) y assets/manifest.json (índice de imágenes y vídeos, lo genera tools/preparar.py).
   Licencia GPL-3.0 · mediaservi.com
 -->
@@ -16,7 +17,8 @@
   <meta name="description" content="ADPOSTER: cartelería digital sencilla pero potente para autónomos y negocios pequeños. Listas de carteles con anuncios intercalados, en vertical u horizontal, con horarios, avisos al momento, cinta de texto, códigos QR y control de todas las pantallas desde el móvil.">
   <meta name="theme-color" content="#232325">
   <link rel="icon" href="assets/logos/adposter-icono.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="gestor.css?v=1.0">
+  <link rel="stylesheet" href="escena.css?v=1.1">
+  <link rel="stylesheet" href="gestor.css?v=1.1">
 </head>
 <body>
   <header class="cab">
@@ -34,17 +36,25 @@
     </div>
     <section class="zona lienzo-zona" aria-label="Lienzo">
       <div class="barra" id="barra"></div>
-      <div class="lienzo" id="lienzo"><div class="mesa"><div class="display" id="display"><iframe id="previa" title="Vista previa" allow="fullscreen"></iframe><div class="guias" id="guias"></div></div></div><div class="suelta" id="suelta"></div></div>
+      <div class="lienzo" id="lienzo"><div class="mesa"><div class="display" id="display"><iframe id="previa" title="Vista previa" allow="fullscreen"></iframe><div class="guias" id="guias"></div><div class="ed" id="ed"><div class="ed-esc" id="ed-esc"></div><div class="ed-capa" id="ed-capa"></div></div></div></div><div class="suelta" id="suelta"></div></div>
+      <div class="tira" id="tira" hidden></div>
       <div class="estado" id="estado"><i></i><span></span></div>
     </section>
     <section class="zona lado" id="zona-tabs" aria-label="Ajustes"><div class="tabs" id="tabs" role="tablist"></div><div class="cuerpo" id="cuerpo" role="tabpanel"></div></section>
   </main>
   <footer class="pie" id="pie"></footer>
+  <div class="modal" id="modal" hidden></div>
   <input type="file" id="archivo" accept="application/json,.json" hidden>
+  <input type="file" id="sube-img" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" hidden>
   <noscript><p style="padding:2rem;color:#fff">ADPOSTER necesita JavaScript activado.</p></noscript>
-  <script src="credito.js?v=1.0"></script>
-  <script src="fallo.js?v=1.0"></script>
-  <script src="directo.js?v=1.0"></script>
-  <script src="gestor.js?v=1.0"></script>
+  <script src="credito.js?v=1.1"></script>
+  <script src="fallo.js?v=1.1"></script>
+  <script src="directo.js?v=1.1"></script>
+  <script src="qr.js?v=1.1"></script>
+  <script src="escena.js?v=1.1"></script>
+  <script src="plantillas.js?v=1.1"></script>
+  <script src="gestor.js?v=1.1"></script>
+  <script src="editor.js?v=1.1"></script>
+  <script src="gestion.js?v=1.1"></script>
 </body>
 </html>
