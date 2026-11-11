@@ -304,3 +304,5 @@ button.bf { cursor: pointer; } button.bf:hover, button.bf:focus-visible { border
 @media (max-width: 900px) { body.compone .izq { order: 1; } }
 /* móvil apaisado: el lienzo necesita toda la altura que haya */
 @media (max-width: 900px) and (orientation: landscape) { .barra .zm { display: none; } .mini { padding: 2px; } .mini .mm { width: 20px; } .mini.hor .mm { width: 46px; } .mini .mn { font-size: 9px; } .tira { gap: 4px; } }
+.barra .par { flex: none; display: flex; gap: 6px; }   /* deshacer y rehacer van siempre juntos */
+.barra .par .rd { flex: none; width: var(--alto); padding: 0; font-size: 1.25em; }

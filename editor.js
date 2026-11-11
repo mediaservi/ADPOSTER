@@ -242,7 +242,7 @@
 
   /* ---------- lo que el gestor pregunta a este módulo ---------- */
   Object.assign(G.ext, {
-    barraZm: () => `<button type="button" class="tecla rd" data-a="deshace" aria-label="${T('Deshacer')}" title="${T('Deshacer')}"${hist().u.length ? '' : ' disabled'}>↶</button><button type="button" class="tecla rd" data-a="rehace" aria-label="${T('Rehacer')}" title="${T('Rehacer')}"${hist().r.length ? '' : ' disabled'}>↷</button>`,
+    barraZm: () => `<span class="par"><button type="button" class="tecla rd" data-a="deshace" aria-label="${T('Deshacer')}" title="${T('Deshacer')}"${hist().u.length ? '' : ' disabled'}>↶</button><button type="button" class="tecla rd" data-a="rehace" aria-label="${T('Rehacer')}" title="${T('Rehacer')}"${hist().r.length ? '' : ' disabled'}>↷</button></span>`,
     barra: () => `${tecla('iman', '', T('Imán'), iman)}<button type="button" class="tecla${probando ? ' on pri' : ''}" data-a="probar" aria-pressed="${probando}">${probando ? '■ ' + T('Editar') : '▶ ' + T('Probar')}</button>`,
     probando: () => probando, antes,
     alAjustar() { if (mont) { mont.ajusta(); capa(); } },
