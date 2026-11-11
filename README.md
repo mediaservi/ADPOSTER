@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.4**
+**Versión actual: v1.5**
 
 ## Cómo funciona
 
@@ -114,15 +114,20 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.4)
+## Cambios de la versión actual (v1.5)
+
+- **KLUB con las carátulas de MSGAME**: la lista de muestra KLUB rota ahora las 19 carátulas de los juegos de MSGAME (carpeta `assets/msgame-caratulas/`, a tamaño de cartel FHD), en lugar de los carteles de demostración.
+- **CINE** sigue con los carteles de demostración de ADPOSTER (`assets/demo-carteles/`).
+
+## Versiones anteriores
+
+### v1.4
 
 - **Acceso privado (candado del pie)**: un candado discreto en el pie del gestor abre el acceso del propietario. Se le da una vez la dirección de la web privada (la que lleva sus carteles y sus listas) y el gestor trabaja ya siempre sobre ella en ese navegador, sin escribir `?origen=`. El candado se enciende mientras el acceso está abierto; «Salir» lo cierra y vuelve a las muestras públicas. `?origen=no` enseña las muestras sin cerrar el acceso.
 - **Publicar desde el gestor**: con el repositorio de la web privada y una llave de GitHub (token con permiso de escritura solo en ese repositorio), el botón pasa a llamarse **PUBLICAR** y sube `playlists.json` directamente; los displays recogen los cambios solos. Si la subida falla, se descarga el archivo como siempre.
 - Dirección, repositorio y llave se guardan solo en ese navegador; no viajan al ADPOSTER público ni a ningún otro sitio que no sea GitHub.
 - El borrador de la web privada se guarda aparte del de las muestras: ya no se mezclan.
 - La URL de kiosco de cada display incluye el origen privado, lista para pegar.
-
-## Versiones anteriores
 
 ### v1.3
 
@@ -224,7 +229,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.4 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.5 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

@@ -1129,9 +1129,7 @@
       "pie": 4.5,
       "lado": 5,
       "alinea": "abajo",
-      "contenido": [
-        "demo-carteles"
-      ],
+      "contenido": ["msgame-caratulas"],
       "anuncios": [
         "demo-anuncios"
       ],
