@@ -1,8 +1,8 @@
 # ADPOSTER
 
-**Cartelería digital profesional, fácil y que arranca sola.** ADPOSTER convierte cualquier pantalla en vertical en un cartel digital: pósteres que nunca se repiten, anuncios intercalados, fundidos, horarios y un gestor con vista previa en vivo. Es un apartado de [AVHUB](https://avhub.mediaservi.com/), *tools for AV people*, de [mediaservi.com](https://mediaservi.com).
+**Cartelería digital sencilla pero potente, que arranca sola.** Pensada para autónomos y negocios muy pequeños que no tienen medios para un sistema de cartelería profesional. ADPOSTER convierte cualquier pantalla en vertical en un cartel digital: pósteres que nunca se repiten, anuncios intercalados, fundidos, horarios y un gestor con vista previa en vivo. Es un apartado de [AVHUB](https://avhub.mediaservi.com/), *tools for AV people*, de [mediaservi.com](https://mediaservi.com).
 
-**Versión actual: v0.5** (beta, en pruebas)
+**Versión actual: v0.6** (beta, en pruebas)
 
 ## Cómo funciona
 
@@ -45,7 +45,12 @@ Para publicar los ajustes del gestor: **Guardar playlists.json** y subir ese arc
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v0.5)
+## Cambios de la versión actual (v0.6)
+
+- **Aviso legal** enlazado detrás de la línea de crédito: software gratuito hecho por afición, sin garantías y de uso bajo la responsabilidad de cada cual (es/en/ca).
+- **Descripción nueva:** cartelería digital sencilla pero potente para autónomos y negocios muy pequeños; no se presenta como una solución profesional.
+
+Sigue de la v0.5:
 
 - **Seta roja de aviso de fallos** en la barra del gestor, del mismo tamaño que la tecla de idioma. Al pasar el cursor explica para qué es; al pulsarla se abre una ventana para contar el fallo y adjuntar hasta tres capturas. Los displays no cambian.
 
@@ -82,4 +87,8 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v0.5 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v0.6 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+
+## Aviso
+
+Software gratuito y de código abierto, hecho con pasión por un aficionado en su tiempo libre. No es un producto profesional. Se ofrece «tal cual», sin garantías de ningún tipo; los resultados son orientativos y hay que comprobarlos siempre; se usa bajo la responsabilidad de cada cual, hasta donde lo permita la ley aplicable. El aviso completo (es/en/ca) está en la propia app, en el enlace «Aviso legal» que acompaña a la línea de crédito. Licencia GPL-3.0.
