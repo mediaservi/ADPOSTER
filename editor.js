@@ -247,7 +247,7 @@
     probando: () => probando, antes,
     alAjustar() { if (mont) { mont.ajusta(); capa(); } },
     alCambiar() { render(); tira(); },
-    alLista() { if (probando && !G.ESCM(P())) probando = false; iE = 0; selId = ''; remonta(); },
+    alLista() { if (probando && !G.ESCM(P())) probando = false; iE = 0; selId = ''; remonta(); if (G.ESCM(P())) alLienzo(); },
     alSalir() { if (probando) { probando = false; } },
     abreModal, cierraModal, cabModal, urlDe, hor, ctx
   });
