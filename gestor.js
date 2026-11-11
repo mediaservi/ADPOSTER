@@ -10,7 +10,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.6', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS_C = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'], TABS_E = ['piezas', 'escena', 'tiempos', 'directo', 'publicar'];
+  const VERSION = '1.7', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS_C = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'], TABS_E = ['piezas', 'escena', 'tiempos', 'directo', 'publicar'];
   const DEF = { nombre: '', fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7], fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true,
     horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '', formato: 'vertical', qr: { activo: false, modo: 'url', url: '', texto: '', pos: 'bd' }, cinta: { activo: false, texto: '', rss: '' }, publico: false, modo: 'carteles', escenas: [], orden: 'azar', secuencia: [], archivos: {} };
   const ESCM = p => !!p && p.modo === 'escenas', tabsDe = p => ESCM(p) ? TABS_E : TABS_C, X = () => window.ADG.ext || {};
@@ -50,7 +50,7 @@
     'Entrar': ['Enter', 'Entra'], 'Salir': ['Sign out', 'Surt'], 'Cerrar': ['Close', 'Tanca'], 'Publicar': ['Publish', 'Publica'], 'Publicando…': ['Publishing…', 'Publicant…'], 'Publicado': ['Published', 'Publicat'], 'Comprobando…': ['Checking…', 'Comprovant…'],
     'No se ha podido leer esa dirección.': ['That address could not be read.', "No s'ha pogut llegir aquesta adreça."], 'No se ha podido publicar': ['Could not publish', "No s'ha pogut publicar"], 'La llave no vale o no tiene permiso en ese repositorio.': ['The key is not valid or has no permission on that repository.', 'La clau no val o no té permís en aquest repositori.'],
     'Solo tú: se guarda en este navegador y no viaja a ningún otro sitio. Con el repositorio y la llave, «Publicar» sube tus listas sin descargar nada.': ['Only you: it is kept in this browser and goes nowhere else. With the repository and the key, “Publish” uploads your lists with no download.', 'Només tu: es desa en aquest navegador i no viatja enlloc més. Amb el repositori i la clau, «Publica» puja les teves llistes sense descarregar res.'],
-    'Acceso privado activo': ['Private access on', 'Accés privat actiu'],
+    'Acceso privado activo': ['Private access on', 'Accés privat actiu'], 'Subir carteles': ['Upload posters', 'Puja cartells'],
     'Publicar sube las listas a tu web privada. Los displays las recogen solos en unos minutos. El directo no necesita publicar nada.': ['Publish uploads the lists to your private site. Displays pick them up on their own within minutes. Live control needs no publishing.', 'Publica puja les llistes a la teva web privada. Els displays les recullen sols en uns minuts. El directe no necessita publicar res.'], 'archivos': ['files', 'arxius'], 'carpetas': ['folders', 'carpetes'], 'carteles': ['posters', 'cartells'], 'anuncios': ['ads', 'anuncis'],
     'Suelta aquí para añadirla a la lista': ['Drop here to add it to the list', 'Deixa-la aquí per afegir-la a la llista'], 'En horizontal, el margen de arriba es igual al de abajo y «Llenar» no se aplica.': ['In landscape, the top margin equals the bottom one and “Fill” does not apply.', 'En horitzontal, el marge de dalt és igual al de baix i «Omple» no s’aplica.'],
     'Arrastra una lista sobre un display para lanzarla.': ['Drag a list onto a display to launch it.', 'Arrossega una llista sobre un display per llançar-la.'] };
@@ -122,7 +122,7 @@
       <div class="fila">${tecla('modo', 'carteles', T('Carteles'), !ESCM(p))}${tecla('modo', 'escenas', T('Composición'), ESCM(p))}</div>
       ${campo('nueva', '', T('nueva lista'), ' maxlength="24"')}<div class="fila"><button type="button" class="tecla" data-a="nueva">+ ${T('Nueva')}</button><button type="button" class="tecla reset" data-a="borra"${Object.keys(B.playlists).length < 2 ? ' disabled' : ''}>${T('Borrar')}</button></div>
       <div class="lcd res">${ESCM(p) ? p.escenas.length + ' <small>' + T('escenas') + '</small> ' + p.escenas.reduce((n, e) => n + e.piezas.length, 0) + ' <small>' + T('piezas') + '</small>' : cuenta(p.contenido) + ' <small>' + T('carteles') + '</small> ' + cuenta(p.anuncios) + ' <small>' + T('anuncios') + '</small>'}</div>
-      <div class="fila"><button type="button" class="tecla" data-a="biblio">${T('Biblioteca')}</button><button type="button" class="tecla" data-a="agenda">${T('Calendario')}${B.agenda.length ? '<small>' + B.agenda.length + '</small>' : ''}</button></div>${canal ? `<div class="nota">${T('Arrastra una lista sobre un display para lanzarla.')}</div>` : ''}`); }
+      <div class="fila"><button type="button" class="tecla" data-a="biblio">${T('Biblioteca')}</button><button type="button" class="tecla" data-a="agenda">${T('Calendario')}${B.agenda.length ? '<small>' + B.agenda.length + '</small>' : ''}</button></div>${PUEDE() ? `<div class="fila"><button type="button" class="tecla pri" data-a="subir">${T('Subir carteles')}</button></div>` : ''}${canal ? `<div class="nota">${T('Arrastra una lista sobre un display para lanzarla.')}</div>` : ''}`); }
 
   /* ---------- lienzo: barra, zoom y guías que se arrastran ---------- */
   function pintaBarra() { const hor = P().formato === 'horizontal'; pon('#barra', `<div class="fila zm"><button type="button" class="tecla rd" data-a="zoom" data-v="-1" aria-label="zoom −">−</button><div class="lcd">${Math.round(zoom * 100)} %</div><button type="button" class="tecla rd" data-a="zoom" data-v="1" aria-label="zoom +">+</button><button type="button" class="tecla" data-a="zoom" data-v="0">${T('Ajustar')}</button>${ESCM(P()) && X().barraZm ? X().barraZm() : ''}</div>
@@ -228,6 +228,7 @@
         .then(() => { PUB = Object.assign({ recarga: o.recarga, playlists: copia(B.playlists) }, raiz(o)); estado(T('Publicado')); })
         .catch(c => { estado(T('No se ha podido publicar') + (c === 401 || c === 403 || c === 404 ? ' · ' + T('La llave no vale o no tiene permiso en ese repositorio.') : '')); baja(); }); },
     /* el candado del pie: acceso privado del propietario. Guarda en ESTE navegador la dirección de su web privada (y, si quiere publicar desde aquí, repositorio y llave) */
+    subir() { window.ADSUBIR && window.ADSUBIR.abre(); },
     candado() { let d = $('#adm'); if (!d) { d = document.createElement('dialog'); d.id = 'adm'; d.className = 'adm'; document.body.appendChild(d); d.addEventListener('click', e => { if (e.target === d) d.close(); }); }
       const A = ADM || {}; d.innerHTML = `<form method="dialog" class="adm-c"><h2>${T('Acceso privado')}</h2>
         ${campo('a-origen', A.origen || '', T('Dirección de tu web privada'), ' type="url" inputmode="url"')}${campo('a-repo', A.repo || '', T('Repositorio (usuario/nombre)'), '')}${campo('a-token', A.token || '', T('Llave de GitHub (token)'), ' type="password"')}
@@ -274,7 +275,7 @@
   /* ---------- puente para los módulos de composición (editor.js, biblio.js, agenda.js) ---------- */
   window.ADG = { VERSION, get B() { return B; }, get PUB() { return PUB; }, get MAN() { return MAN; }, get sel() { return sel; }, get lang() { return lang; }, get tab() { return tab; }, get zoom() { return zoom; }, get DSP() { return DSP; }, get ORIG() { return ORIG; },
     P, T, TX, PINTA, ACC, GRUPOS, DEF, ESCM, $, esc, tecla, paso, medio, campo, reset, pon, lim, copia, lee, guarda, cambia, toca, pintaT, pintaL, pintaBarra, ajusta, estado, envia, previa, carpetas, esAds, completa, slug,
-    urlAsset: f => ORIG + 'assets/' + String(f).split('/').map(encodeURIComponent).join('/'), ext: {} };
+    urlAsset: f => ORIG + 'assets/' + String(f).split('/').map(encodeURIComponent).join('/'), get adm() { return ADM; }, puede: () => PUEDE(), repinta: () => todo(), ext: {} };
 
   /* ---------- arranque ---------- */
   // ?origen=https://… abre el gestor sobre un origen privado (otra web con la misma estructura): lee de allí carpetas y listas, y la vista previa lo usa

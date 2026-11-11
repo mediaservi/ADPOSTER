@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.6**
+**Versión actual: v1.7**
 
 ## Cómo funciona
 
@@ -114,7 +114,14 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.6)
+## Cambios de la versión actual (v1.7)
+
+- **Consola de subida de carteles** (solo con el acceso privado abierto y con llave; el público no la ve): botón **SUBIR CARTELES** en la ventana de listas. Se sueltan, se pegan (Ctrl+V) o se eligen imágenes de cualquier formato y tamaño, varias a la vez.
+- **Ajuste automático a póster**: cada imagen se convierte en el navegador a vertical 2:3 en WebP, al tamaño justo para un display FHD (1080 × 1620 como máximo; en las carpetas de anuncios `ads-…`, pantalla completa 9:16, 1080 × 1920; nunca se amplía). Si su proporción se parece a la del póster se recorta un poco por los bordes; si es muy distinta se coloca entera sobre un fondo desenfocado de la propia imagen. En cada una se puede cambiar entre «Recortar» y «Entera» viendo el resultado y su peso.
+- **Destino con botones**: un botón por cada carpeta de la web privada (o una carpeta nueva). Todo sube al repositorio en una sola confirmación, junto con el índice `assets/manifest.json`, para que la web se publique una vez; los displays lo recogen solos.
+- **Logo nuevo de MSGAME** en la barra de apps y en los 19 carteles de la lista KLUB.
+
+### v1.6
 
 - Cartel de **LA FORTUNA** de la lista KLUB actualizado: rótulo en rojo terciopelo con bombillas amarillas más visibles.
 
@@ -233,7 +240,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.6 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.7 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

@@ -328,3 +328,21 @@ dialog.adm::backdrop { background: #000a; }
 .adm-c input.campo { flex: none; width: 100%; }
 .adm-c .fila { margin-top: 4px; }
 .adm-c .fila .tecla { flex: 1; }
+
+/* v1.7 · consola de subida de carteles (solo con acceso privado y llave) */
+dialog.sb { width: min(720px, calc(100vw - 24px)); }
+.sb h2 small { font-weight: 400; opacity: .7; margin-left: .5em; }
+.sb-zona { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; padding: 16px 12px; border: 2px dashed #6a6a72; border-radius: 10px; background: #141416; text-align: center; color: #b9bdc6; }
+.sb-zona.sobre, .sb-zona:focus-visible { border-color: #ffc23d; outline: none; background: #1d1a10; }
+.sb-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; max-height: 38vh; overflow: auto; }
+.sb-lista:empty { display: none; }
+.sb-it { display: flex; gap: 8px; padding: 6px; border: 1px solid var(--linea); border-radius: 8px; background: #141416; min-width: 0; }
+.sb-it img { flex: none; width: 64px; height: 96px; object-fit: cover; border-radius: 4px; background: #000; }
+.sb-d { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.sb-d b { overflow-wrap: anywhere; font-size: .9em; line-height: 1.15; }
+.sb-d small { opacity: .7; }
+.sb-d .fila { margin-top: auto; gap: 4px; } .sb-d .fila .tecla { padding: 0 6px; min-width: 0; } .sb-d .fila .rd { flex: none; }
+.sb-dest { display: flex; flex-wrap: wrap; gap: 6px; }
+.sb-dest .tecla { flex: 0 1 auto; white-space: normal; text-align: left; line-height: 1.1; padding-top: 3px; padding-bottom: 3px; }
+.sb-dest .tecla small { margin-left: .5em; opacity: .65; font-weight: 400; }
+.sb .nota.mal { color: #ff8a7a; }
