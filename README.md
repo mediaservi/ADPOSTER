@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.8**
+**Versión actual: v1.9**
 
 ## Cómo funciona
 
@@ -114,7 +114,11 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.8)
+## Cambios de la versión actual (v1.9)
+
+- **Logo de MSGAME**: se sirve con una dirección nueva para que nadie siga viendo el antiguo desde la copia guardada en su dispositivo, y se renueva la caché sin conexión.
+
+### v1.8
 
 - **Logo definitivo de MSGAME** («MS» en 3D con filete verde y «GAME» en fichas) en la barra de apps y en los 19 carteles de la lista KLUB, regenerados.
 
