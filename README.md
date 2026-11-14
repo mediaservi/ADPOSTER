@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.10**
+**Versión actual: v1.11**
 
 ## Cómo funciona
 
@@ -114,7 +114,11 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.10, beta)
+## Cambios de la versión actual (v1.11, beta)
+
+- Logo de MSGAME de la barra de apps con la calavera nueva: el ojo derecho es una cruceta de mando, como si guiñara.
+
+### v1.10 (beta)
 
 - **ADPOSTER en la plantilla de bloques de AVHUB (BLOCKS, beta 1), con `?blocks` en la dirección (o entrando por `blocks/`, que lleva allí):** el gestor es el de siempre (`gestor.js`, sin tocar: mismas funciones) con el reparto de bloques fijos que ya usan SCREENS y SYSTEMS. A la izquierda, DISPLAYS y LISTAS; en los dos bloques grandes, **dos vistas distintas**: el LIENZO (el más ancho, porque es donde se trabaja) y el panel de la pestaña elegida; abajo, las cinco pestañas como bloques grandes (CONTENIDO · DISEÑO · TIEMPOS · DIRECTO · PUBLICAR, o PIEZAS y ESCENA en una composición). Solo en escritorio y TV; en tablet y móvil se queda el gestor apilado. La portada sigue siendo el gestor clásico, que **no cambia** (sin `?blocks` no se carga nada nuevo); desde BLOCKS se vuelve a él pulsando el logo.
 - Pie con el texto común nuevo de AVHUB («… forma parte del proyecto AVHUB ideado por el fundador de mediaservi.com · Aviso legal»).

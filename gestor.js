@@ -10,7 +10,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.10', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS_C = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'], TABS_E = ['piezas', 'escena', 'tiempos', 'directo', 'publicar'];
+  const VERSION = '1.11', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS_C = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'], TABS_E = ['piezas', 'escena', 'tiempos', 'directo', 'publicar'];
   const DEF = { nombre: '', fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7], fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true,
     horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '', formato: 'vertical', qr: { activo: false, modo: 'url', url: '', texto: '', pos: 'bd' }, cinta: { activo: false, texto: '', rss: '' }, publico: false, modo: 'carteles', escenas: [], orden: 'azar', secuencia: [], archivos: {} };
   const ESCM = p => !!p && p.modo === 'escenas', tabsDe = p => ESCM(p) ? TABS_E : TABS_C, X = () => window.ADG.ext || {};
