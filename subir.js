@@ -3,6 +3,7 @@
    en WebP, al tamaño justo para un display FHD (nunca se amplía). Si la proporción se parece a la del póster se recorta un poco;
    si es muy distinta se coloca entera sobre un fondo desenfocado de la propia imagen. Se elige la carpeta de destino y todo sube
    al repositorio de la web privada en UNA sola confirmación (imágenes + índice), para que se publique una vez.
+   v1.14 · dentro del panel AVHUB ADMIN, las imágenes ya convertidas se las pasa al panel, que las publica en Netlify de una vez (con el índice y sus huellas).
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
@@ -13,7 +14,7 @@
     'Elige una carpeta.': ['Pick a folder.', 'Tria una carpeta.'], 'Añade alguna imagen.': ['Add some image.', 'Afegeix alguna imatge.'], 'Preparando…': ['Preparing…', 'Preparant…'], 'Subiendo': ['Uploading', 'Pujant'], 'Publicando…': ['Publishing…', 'Publicant…'],
     'Subido. Tu web lo publica en uno o dos minutos y los displays lo recogen solos.': ['Uploaded. Your site publishes it in a minute or two and displays pick it up on their own.', 'Pujat. La teva web ho publica en un o dos minuts i els displays ho recullen sols.'],
     'No se ha podido subir': ['Could not upload', "No s'ha pogut pujar"], 'La llave no vale o no tiene permiso en ese repositorio.': ['The key is not valid or has no permission on that repository.', 'La clau no val o no té permís en aquest repositori.'], 'Esa imagen no se puede leer.': ['That image cannot be read.', 'Aquesta imatge no es pot llegir.'],
-    'Cada imagen se convierte a póster vertical 2:3 en WebP, al tamaño justo para FHD.': ['Each image becomes a 2:3 vertical poster in WebP, at the right size for FHD.', 'Cada imatge es converteix en pòster vertical 2:3 en WebP, a la mida justa per a FHD.'], 'imágenes': ['images', 'imatges'] };
+    'Cada imagen se convierte a póster vertical 2:3 en WebP, al tamaño justo para FHD.': ['Each image becomes a 2:3 vertical poster in WebP, at the right size for FHD.', 'Cada imatge es converteix en pòster vertical 2:3 en WebP, a la mida justa per a FHD.'], 'sube menos de una vez': ['upload fewer at a time', 'puja’n menys de cop'], 'imágenes': ['images', 'imatges'] };
   const T = s => { const t = TX[s], l = G.lang; return !t || l === 'es' ? s : t[l === 'en' ? 0 : 1]; };
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const $ = (s, r) => (r || document).querySelector(s);
@@ -63,6 +64,15 @@
   /* ---------- subida: una sola confirmación con todas las imágenes y el índice ---------- */
   async function sube() { if (ocupado) return; const A = G.adm, nueva = nombre($('#sb-nueva', D).value.trim() || ''), carpeta = dest || ($('#sb-nueva', D).value.trim() ? nueva : '');
     if (!items.length) return msg(T('Añade alguna imagen.'), 1); if (!carpeta || carpeta === 'fondos') return msg(T('Elige una carpeta.'), 1);
+    if (G.panelOk) {   // desde el panel: una sola publicación con todas
+      let peso = 0; items.forEach(it => { peso += it.blob.size; }); if (peso > 24 * 1048576) return msg(T('No se ha podido subir') + ' · ' + Math.round(peso / 1048576) + ' MB: ' + T('sube menos de una vez'), 1);
+      ocupado = true; lista(); msg(T('Preparando…'));
+      try { const archivos = []; for (const it of items) archivos.push({ n: it.n, b64: await b64(it.blob) }); msg(T('Publicando…'));
+        const r = await G.panel('sube', { carpeta, archivos }); if (G.MAN && r && r.manifiesto) { G.MAN.carpetas = r.manifiesto.carpetas; G.MAN.huellas = r.manifiesto.huellas; G.MAN.version = r.manifiesto.version; }
+        items.forEach(it => it.url && URL.revokeObjectURL(it.url)); items = []; dest = carpeta; $('#sb-nueva', D).value = ''; ocupado = false; destinos(); lista(); G.repinta && G.repinta();
+        msg(T('Subido. Tu web lo publica en uno o dos minutos y los displays lo recogen solos.')); }
+      catch (e) { ocupado = false; lista(); msg(T('No se ha podido subir') + (e && e !== 'tiempo' ? ' · ' + String(e).slice(0, 90) : ''), 1); }
+      return; }
     ocupado = true; lista(); const api = 'https://api.github.com/repos/' + A.repo + '/', cab = { Authorization: 'Bearer ' + A.token, Accept: 'application/vnd.github+json' };
     const pide = async (m, u, cuerpo) => { const r = await fetch(api + u, { method: m, headers: cab, cache: 'no-store', body: cuerpo ? JSON.stringify(cuerpo) : undefined }); if (!r.ok) throw r.status; return r.json(); };
     try { msg(T('Preparando…')); const rama = A.rama || (await pide('GET', '')).default_branch, ref = await pide('GET', 'git/ref/heads/' + encodeURIComponent(rama)), base = await pide('GET', 'git/commits/' + ref.object.sha);

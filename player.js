@@ -7,10 +7,12 @@
    v1.1 · composiciones: una lista puede ser una serie de ESCENAS (escena.js) con textos, imágenes, zonas, reloj, el tiempo, noticias y QR;
    calendario (qué lista toca según la fecha, el día y la hora), orden fijo y duración por archivo.
    v1.2 · sin conexión: registra el service worker (sw.js) y le pide guardar las imágenes de la lista; si se cae la red, el display sigue con la última copia.
+   v1.4 · toda la variedad guardada: el display descarga UNA vez todas las imágenes de todas las listas (también de un origen privado) y después
+   las enseña desde su copia, sin volver a pedirlas; solo baja las nuevas o cambiadas (la «huella» de cada archivo en manifest.json).
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.3';
+  const VERSION = '1.4';
   const SC = document.currentScript, Q = new URLSearchParams(location.search);
   const BASE = new URL(SC.dataset.base || '../', location.href).href;
   const ID = (SC.dataset.playlist || Q.get('l') || 'demo').toLowerCase().replace(/[^a-z0-9_-]/g, '');
@@ -40,7 +42,7 @@
     'Aceptar y reproducir': ['Apply and play', 'Accepta i reprodueix'], 'Restablecer': ['Reset', 'Restableix'], 'Cerrar': ['Close', 'Tanca'], 'fundido': ['fade', 'fosa'], 'zoom': ['zoom', 'zoom'], 'desliza': ['slide', 'llisca'], 'cortina': ['wipe', 'cortina'], 'corte': ['cut', 'tall'],
     'Sin conexión: reintentando…': ['Offline: retrying…', 'Sense connexió: reintentant…'], 'Esta playlist no tiene imágenes todavía.': ['This playlist has no images yet.', 'Aquesta playlist encara no té imatges.'], 'No existe la playlist': ['Playlist not found', 'No existeix la playlist'],
     'es un proyecto hecho con': ['is a project made with', 'és un projecte fet amb'], 'imágenes': ['images', 'imatges'], 'Contenido privado de este display': ['Private content of this display', 'Contingut privat d’aquest display'], 'Estos ajustes se guardan solo en este display.': ['These settings are saved on this display only.', 'Aquests ajustos es desen només en aquest display.'],
-    'Directo': ['Live', 'Directe'], 'conectado': ['connected', 'connectat'], 'sin conexión': ['offline', 'sense connexió'] };
+    'Directo': ['Live', 'Directe'], 'conectado': ['connected', 'connectat'], 'sin conexión': ['offline', 'sense connexió'], 'imágenes guardadas en este display': ['images saved on this display', 'imatges desades en aquest display'], 'descargando': ['downloading', 'descarregant'] };
   const T = s => { const t = TX[s]; return !t || LANG === 'es' ? s : (LANG === 'ca' ? t[1] : LANG === 'en' ? t[0] : s); };
 
   /* ---------- utilidades ---------- */
@@ -52,7 +54,7 @@
   const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
   const num = (v, d, a, b) => { v = +v; return isFinite(v) ? Math.min(b, Math.max(a, v)) : d; };
   async function json(ruta) { const r = await fetch(DATOS + ruta + (ruta.includes('?') ? '&' : '?') + 't=' + Math.floor(Date.now() / 60000), { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); return r.json(); }
-  const url = f => DATOS + 'assets/' + f.split('/').map(encodeURIComponent).join('/');
+  const url = f => DATOS + 'assets/' + f.split('/').map(encodeURIComponent).join('/') + (MAN && MAN.huellas && MAN.huellas[f] ? '?v=' + encodeURIComponent(MAN.huellas[f]) : '');   // con huella, la copia guardada vale para siempre
 
   /* ---------- escenario ---------- */
   document.body.classList.add('ap'); const rot = +Q.get('rot') || 0; if (rot === 90 || rot === 270) document.body.classList.add('rot', 'rot-' + rot); else if (rot === 180) document.body.classList.add('rot-180');   // giro del display: ?rot=90 (derecha), 180 (boca abajo) o 270 (izquierda)
@@ -74,15 +76,20 @@
     const ac = Array.isArray(c.anunciosCada) ? c.anunciosCada : [4, 7]; c.anunciosCada = [num(ac[0], 4, 1, 99), num(ac[1], 7, 1, 99)].sort((a, b) => a - b);
     return c;
   }
-  /* ---------- sin conexión: el service worker guarda la app y las imágenes de la lista; si cae la red, el display sigue con la última copia ---------- */
-  const SW = !PREV && 'serviceWorker' in navigator && (location.protocol === 'https:' || /^(localhost|127\.)/.test(location.hostname)) && new URL(DATOS).origin === location.origin;
-  if (SW) { try { navigator.serviceWorker.register(BASE + 'sw.js').catch(() => {}); } catch (e) {} }
-  let copiado = '';
-  function copia() { if (!SW || !MAN || !cfg) return; const car = MAN.carpetas || {}, de = c => (car[c] || []).map(f => c + '/' + f), fs = new Set(pool.feed.concat(pool.ads));
-    if (cfg.fondo) (car.fondos || []).forEach(x => { if (x.replace(/\.[a-z0-9]+$/i, '') === cfg.fondo) fs.add('fondos/' + x); });
-    cfg.escenas.forEach(e => { if (e.fondo && e.fondo.t === 'img' && /^[\w .()\-\/]+$/.test(e.fondo.src || '')) fs.add(e.fondo.src); (e.piezas || []).forEach(z => { if (z.t === 'zona') (z.carp || []).forEach(c => de(c).forEach(f => fs.add(f))); else if (z.t === 'imagen' && /^[\w .()\-\/]+$/.test(z.src || '')) fs.add(z.src); }); });
-    const urls = [...fs].filter(f => !esVideo(f)).slice(0, 600).map(url).concat([location.href.split('#')[0]]), firma = urls.join('|'); if (firma === copiado) return; copiado = firma;
-    navigator.serviceWorker.ready.then(r => { r.active && r.active.postMessage({ t: 'pre', urls }); }).catch(() => {}); }
+  /* ---------- sin conexión: el service worker guarda la app y las imágenes; si cae la red, el display sigue con la última copia ----------
+     v1.4 · también con un origen privado (otra web): se guardan TODAS las imágenes de TODAS las listas, una sola vez; después se enseñan desde la copia
+     sin volver a pedirlas (ahorra peticiones y datos a la web privada) y, si la red falla a medias, se sigue en la siguiente vuelta */
+  const SW = !PREV && 'serviceWorker' in navigator && (location.protocol === 'https:' || /^(localhost|127\.)/.test(location.hostname));
+  if (SW) { try { navigator.serviceWorker.register(BASE + 'sw.js').catch(() => {}); navigator.storage && navigator.storage.persist && navigator.storage.persist().catch(() => {}); } catch (e) {}
+    try { navigator.serviceWorker.addEventListener('message', e => { const d = e.data || {}; if (d.t === 'pre-prog' && d.id === 'display') { PRE = d; if (document.body.classList.contains('con-panel') && borr) pinta(); } }); } catch (e) {} }
+  let copiado = '', PRE = { ok: 0, mal: 0, total: 0, fin: false };
+  function copia() { if (!SW || !MAN) return; const car = MAN.carpetas || {}, de = c => (car[c] || []).map(f => c + '/' + f), fs = new Set(), L = (LISTAS && LISTAS.playlists) || {}, ok = s => /^[\w .()\-\/]+$/.test(s || '') && String(s).indexOf('..') < 0;
+    Object.keys(L).map(k => L[k]).concat(cfg ? [cfg] : []).forEach(p => { if (!p || typeof p !== 'object') return;
+      [].concat(p.contenido || [], p.anuncios || []).forEach(c => de(c).forEach(f => fs.add(f)));
+      if (p.fondo) (car.fondos || []).forEach(x => { if (x.replace(/\.[a-z0-9]+$/i, '') === p.fondo) fs.add('fondos/' + x); });
+      (Array.isArray(p.escenas) ? p.escenas : []).forEach(e => { if (!e || typeof e !== 'object') return; if (e.fondo && e.fondo.t === 'img' && ok(e.fondo.src)) fs.add(e.fondo.src); (Array.isArray(e.piezas) ? e.piezas : []).forEach(z => { if (!z) return; if (z.t === 'zona') (z.carp || []).forEach(c => de(c).forEach(f => fs.add(f))); else if (z.t === 'imagen' && ok(z.src)) fs.add(z.src); }); }); });
+    const urls = [...fs].filter(f => !esVideo(f)).slice(0, 3000).map(url).concat([location.href.split('#')[0]]), firma = urls.join('|'); if (firma === copiado) return; copiado = firma;
+    navigator.serviceWorker.ready.then(r => { r.active && r.active.postMessage({ t: 'pre', id: 'display', urls, limpia: true }); }).catch(() => {}); }
   function aplica() {
     cfg = calcula(); const car = (MAN && MAN.carpetas) || {}, junta = l => (l || []).flatMap(c => (car[c] || []).map(f => c + '/' + f)).filter(f => !(cfg.archivos[f] && cfg.archivos[f].off));
     pool = { feed: junta(cfg.contenido), ads: junta(cfg.anuncios) };
@@ -235,7 +242,7 @@
       <h3>${T('Carpetas de contenido')}</h3><div class="lista">${con.map(c => chk(c, 'contenido')).join('')}</div>
       <h3>${T('Carpetas de anuncios')}</h3><div class="lista">${ads.map(c => chk(c, 'anuncios')).join('')}</div>
       <div class="acc"><button class="pri" data-a="ok">${T('Aceptar y reproducir')}</button><button data-a="reset">${T('Restablecer')}</button><button data-a="cerrar">${T('Cerrar')}</button></div>
-      <div class="firma">${T('Estos ajustes se guardan solo en este display.')}${ORIGEN ? '<br>🔒 ' + T('Contenido privado de este display') : ''}<br>${leeG('nombre') ? leeG('nombre').replace(/[<>&"]/g, '') + ' · ' : 'DISPLAY '}${DISP.toUpperCase()}${dir ? ' · ' + T('Directo') + ': ' + T(dir.up ? 'conectado' : 'sin conexión') : ''}<br>${window.AVCREDITO ? window.AVCREDITO.html('ADPOSTER', 'v' + VERSION, LANG, { sinEnlaces: true }) : 'ADPOSTER v' + VERSION + ' ' + new Date().getFullYear() + ' ' + T('es un proyecto hecho con') + ' by mediaservi.com'}</div>`; }
+      <div class="firma">${T('Estos ajustes se guardan solo en este display.')}${ORIGEN ? '<br>🔒 ' + T('Contenido privado de este display') : ''}${PRE.total ? '<br>💾 ' + PRE.ok + ' / ' + PRE.total + ' ' + T('imágenes guardadas en este display') + (PRE.fin ? '' : ' (' + T('descargando') + '…)') : ''}<br>${leeG('nombre') ? leeG('nombre').replace(/[<>&"]/g, '') + ' · ' : 'DISPLAY '}${DISP.toUpperCase()}${dir ? ' · ' + T('Directo') + ': ' + T(dir.up ? 'conectado' : 'sin conexión') : ''}<br>${window.AVCREDITO ? window.AVCREDITO.html('ADPOSTER', 'v' + VERSION, LANG, { sinEnlaces: true }) : 'ADPOSTER v' + VERSION + ' ' + new Date().getFullYear() + ' ' + T('es un proyecto hecho con') + ' by mediaservi.com'}</div>`; }
   function abre() { if (PREV || !cfg) return; if (ESC()) { const p = $('.panel'); p.innerHTML = `<div class="p-cab"><img src="${BASE}assets/logos/adposter-logo.svg" alt="ADPOSTER"><b></b></div><div class="acc"><button class="pri" data-a="cerrar">${T('Cerrar')}</button></div><div class="firma">${leeG('nombre') ? leeG('nombre').replace(/[<>&"]/g, '') + ' · ' : 'DISPLAY '}${DISP.toUpperCase()}${dir ? ' · ' + T('Directo') + ': ' + T(dir.up ? 'conectado' : 'sin conexión') : ''}<br>${window.AVCREDITO ? window.AVCREDITO.html('ADPOSTER', 'v' + VERSION, LANG, { sinEnlaces: true }) : 'ADPOSTER v' + VERSION}</div>`; p.querySelector('.p-cab b').textContent = cfg.nombre; document.body.classList.add('con-panel'); tPanel = Date.now(); p.querySelector('.pri').focus(); return; }
     borr = { segundos: cfg.segundos, fundido: { tipo: cfg.fundido.tipo, segundos: cfg.fundido.segundos }, contenido: cfg.contenido.slice(), anuncios: cfg.anuncios.slice() }; pinta(); document.body.classList.add('con-panel'); tPanel = Date.now(); const b = $('.panel .pri'); b && b.focus(); }
   function cierra() { document.body.classList.remove('con-panel'); }
@@ -265,7 +272,8 @@
     if (PREV && window.parent !== window) window.parent.postMessage({ adposter: 'listo', id: ID }, '*');
     if (!PREV && cfg.redirige && /^https?:\/\//i.test(cfg.redirige)) { location.replace(cfg.redirige); return; }
     bucle();
-    setInterval(async () => { await carga(false); if (!PREV && cfg.redirige && /^https?:\/\//i.test(cfg.redirige)) location.replace(cfg.redirige); }, PREV ? 3600000 : 300000);   // cada 5 minutos mira si hay contenido o ajustes nuevos
+    setInterval(async () => { await carga(false); if (!PREV && PRE.fin && PRE.ok < PRE.total) { copiado = ''; copia(); }   // si alguna imagen no se pudo guardar, se reintenta en la siguiente vuelta
+      if (!PREV && cfg.redirige && /^https?:\/\//i.test(cfg.redirige)) location.replace(cfg.redirige); }, PREV ? 3600000 : 300000);   // cada 5 minutos mira si hay contenido o ajustes nuevos
     if (!PREV) {
       setInterval(() => { if (document.body.classList.contains('con-panel') && Date.now() - tPanel > 90000) cierra();
         const lim = Math.max(180000, (cfg.segundos + cfg.segundosAnuncio + cfg.fundido.segundos) * 6000); if (Date.now() - ultimo > lim && navigator.onLine !== false) location.reload(); }, 15000);                 // si algo se atasca, se recupera solo
