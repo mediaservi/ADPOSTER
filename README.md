@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.12**
+**Versión actual: v1.13**
 
 ## Cómo funciona
 
@@ -70,13 +70,15 @@ En tablet y móvil las ventanas se apilan, con el lienzo arriba; en móvil apais
 
 - **Arrastrar y soltar:** una carpeta sobre el lienzo la añade a la lista; una lista sobre un display la lanza.
 - **Origen privado:** un display (y el gestor) puede leer sus listas e imágenes de otra web con la misma estructura, que solo conoce él (`?origen=https://…`).
+- **Previa local** (desde v1.13): con la herramienta `previa.py` de la carpeta de originales, el gestor y las pantallas funcionan en tu ordenador leyendo de tu carpeta, sin publicar nada y sin internet; «Guardar en este ordenador» guarda las listas en esa carpeta. Las pantallas de la misma red pueden leer de ahí.
 - **Imágenes preparadas solas:** lo que se sube a `entrada/` se convierte y se publica (ver [entrada/LEEME.md](entrada/LEEME.md)).
 - Interfaz en español, inglés y catalán.
 
 **Instalable y sin conexión** (nuevo en v1.2)
 
 - **Botón «Instalar»** en la cabecera del gestor: instala ADPOSTER como una aplicación en el móvil, la tableta, el ordenador o la tele. Es el botón común a la familia AVHUB.
-- **Los displays siguen mostrando sus carteles si se cae internet:** cada pantalla guarda una copia de la app, de sus listas y de las imágenes que le tocan. Al volver la conexión se pone al día sola.
+- **Los displays siguen mostrando sus carteles si se cae internet:** cada pantalla guarda una copia de la app, de sus listas y de **todas las imágenes de todas las listas** (también las de un origen privado). Al volver la conexión se pone al día sola.
+- **Cada imagen se descarga una sola vez** (desde v1.13): el índice lleva la huella de cada archivo y el display enseña su copia guardada sin volver a pedirla; solo baja las nuevas o las cambiadas. Ahorra datos y peticiones a la web que aloja los carteles (en Netlify, créditos). El panel del display dice cuántas tiene guardadas.
 - No se guardan los vídeos (pesan demasiado) ni lo que viene de fuera: el tiempo, las noticias, las webs incrustadas y el directo necesitan conexión.
 
 ### Cómo funciona el directo, y qué conviene saber
@@ -108,13 +110,23 @@ No hay servidor propio. El gestor, los displays y la página del público se hab
 | `assets/<carpeta>/` | Las imágenes y vídeos. Las carpetas `ads-…` o con «anuncios» en el nombre son anuncios; `fondos`, los fondos |
 | `assets/manifest.json` | El índice de archivos (se genera solo) |
 | `entrada/` | Donde se suben las imágenes originales para que se preparen solas |
-| `tools/preparar.py` | Convierte a WebP para FHD, copia los vídeos y regenera el índice |
+| `tools/preparar.py` | Convierte a WebP para FHD, copia los vídeos y regenera el índice (con la huella de cada archivo) |
 
 Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese archivo a la raíz. Los displays lo recogen solos. Las órdenes del directo no necesitan publicar nada.
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.12, beta)
+## Cambios de la versión actual (v1.13, beta)
+
+- **Toda la variedad guardada en cada display.** El reproductor (v1.4) descarga una vez todas las imágenes de todas las listas, también desde un origen privado (antes, solo las de su lista y solo si eran de la misma web), y las enseña desde su copia sin volver a pedirlas. Después solo baja las nuevas o cambiadas: el índice `assets/manifest.json` lleva ahora la huella de cada archivo (`huellas`) y cada imagen se pide con ella (`?v=…`).
+  - Las imágenes van a una caché propia que no se borra al actualizar la app; cuando ya está todo guardado, se quitan las versiones viejas y lo que ya no sale en ninguna lista.
+  - Si la red falla a media descarga, sigue en la siguiente vuelta (cada 5 minutos).
+  - El panel del display (OK del mando) dice cuántas imágenes tiene guardadas.
+  - Las imágenes de otra web se guardan con CORS (la cabecera `Access-Control-Allow-Origin` que ya pide el origen privado).
+- **Previa local:** si el gestor lo sirve la herramienta `previa.py` del ordenador, lee las carpetas y listas de la carpeta de la previa y el botón pasa a **Guardar en este ordenador**, que guarda `playlists.json` allí (con copia de la anterior).
+- `tools/preparar.py` escribe también las huellas en el índice de las muestras.
+
+### v1.12 (beta)
 
 - Logo nuevo de MSGAME en la barra de apps: «MS» en dos fichas moradas con la misma letra que GAME y sombra verde.
 
@@ -263,7 +275,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.12 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.13 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

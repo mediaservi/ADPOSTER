@@ -53,8 +53,10 @@ def manifiesto():
         if not os.path.isdir(d) or carpeta in NO: continue
         fs = [f for f in sorted(os.listdir(d)) if f.lower().endswith(EXT + VID) and not f.startswith('.')]
         if fs: carpetas[carpeta] = fs
-    cuerpo = json.dumps(carpetas, ensure_ascii=False, sort_keys=True)
-    m = {'version': hashlib.sha1(cuerpo.encode()).hexdigest()[:10], 'carpetas': carpetas}
+    # huella de cada archivo (v1.13): los displays guardan su copia y no la vuelven a pedir mientras la huella no cambie
+    huellas = {f'{c}/{f}': hashlib.sha1(open(os.path.join(ASSETS, c, f), 'rb').read()).hexdigest()[:10] for c, fs in carpetas.items() for f in fs}
+    cuerpo = json.dumps([carpetas, huellas], ensure_ascii=False, sort_keys=True)
+    m = {'version': hashlib.sha1(cuerpo.encode()).hexdigest()[:10], 'carpetas': carpetas, 'huellas': huellas}
     json.dump(m, open(os.path.join(ASSETS, 'manifest.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=0, separators=(',', ':'))
     print('manifest.json ·', m['version'], '·', {k: len(v) for k, v in carpetas.items()})
 
