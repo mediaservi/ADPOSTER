@@ -10,7 +10,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.13', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS_C = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'], TABS_E = ['piezas', 'escena', 'tiempos', 'directo', 'publicar'];
+  const VERSION = '1.14', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS_C = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'], TABS_E = ['piezas', 'escena', 'tiempos', 'directo', 'publicar'];
   const DEF = { nombre: '', fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7], fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true,
     horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '', formato: 'vertical', qr: { activo: false, modo: 'url', url: '', texto: '', pos: 'bd' }, cinta: { activo: false, texto: '', rss: '' }, publico: false, modo: 'carteles', escenas: [], orden: 'azar', secuencia: [], archivos: {} };
   const ESCM = p => !!p && p.modo === 'escenas', tabsDe = p => ESCM(p) ? TABS_E : TABS_C, X = () => window.ADG.ext || {};
@@ -182,17 +182,20 @@
       <div class="nota">${T(LOC() ? 'Previa local: las listas se guardan en la carpeta de la previa de este ordenador y las pantallas que leen de aquí las recogen solas en unos minutos. Para publicarlas, sube esa carpeta a tu web.' : PUEDE() ? 'Publicar sube las listas a tu web privada. Los displays las recogen solos en unos minutos. El directo no necesita publicar nada.' : 'Para publicar las listas: guarda el archivo y súbelo a la raíz de tu web. Los displays lo recogen solos en menos de 5 minutos. El directo no necesita publicar nada.')}</div>`; }
   };
   function pintaT() { const TABS = tabsDe(P()); if (!TABS.includes(tab)) tab = TABS[0]; $('#tabs').innerHTML = TABS.map(t => `<button type="button" role="tab" class="tab${t === tab ? ' on' : ''}" data-a="tab" data-v="${t}" aria-selected="${t === tab}">${T(NOMBRE_TAB[t])}</button>`).join(''); const c = $('#cuerpo'); c.dataset.tab = tab; pon('#cuerpo', PINTA[tab] ? PINTA[tab](P()) : ''); X().alPintar && X().alPintar(); }
-  function pintaFijo() { document.documentElement.lang = lang; $('#btn-idioma').textContent = lang.toUpperCase(); $('#zona-listas').setAttribute('aria-label', T('Listas')); $('#zona-tabs').setAttribute('aria-label', T('Ajustes')); $('.lienzo-zona').setAttribute('aria-label', T('Lienzo')); $('#suelta').textContent = T('Suelta aquí para añadirla a la lista');
-    $('#pie').innerHTML = window.AVCREDITO ? window.AVCREDITO.html('ADPOSTER', 'v' + VERSION, lang) : `ADPOSTER v${VERSION} ${new Date().getFullYear()} ${T('es un proyecto hecho con')} by <a href="https://mediaservi.com" target="_blank" rel="noopener">mediaservi.com</a>`;
-    $('#pie').insertAdjacentHTML('beforeend', `<button type="button" class="cand${ADM ? ' on' : ''}" data-a="candado" aria-pressed="${!!ADM}" aria-label="${T(ADM ? 'Acceso privado activo' : 'Acceso privado')}" title="${T(ADM ? 'Acceso privado activo' : 'Acceso privado')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${ADM ? 'M7 10V7a5 5 0 0 1 9.6-2' : 'M7 10V7a5 5 0 0 1 10 0v3'}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><rect x="4.5" y="10" width="15" height="11" rx="2.4" fill="currentColor"/></svg></button>`); }
+  function pintaFijo() { document.documentElement.lang = lang; { const bi = $('#btn-idioma'), NOM = { es: 'Español', en: 'English', ca: 'Català' }, sig = IDI[(IDI.indexOf(lang) + 1) % IDI.length], c = bi.querySelector('.cod'); if (c) c.textContent = lang.toUpperCase(); else bi.textContent = lang.toUpperCase(); bi.title = (NOM[lang] || lang) + ' → ' + (NOM[sig] || sig); bi.setAttribute('aria-label', bi.title); } $('#zona-listas').setAttribute('aria-label', T('Listas')); $('#zona-tabs').setAttribute('aria-label', T('Ajustes')); $('.lienzo-zona').setAttribute('aria-label', T('Lienzo')); $('#suelta').textContent = T('Suelta aquí para añadirla a la lista');
+    $('#pie-c').innerHTML = window.AVCREDITO ? window.AVCREDITO.html('ADPOSTER', 'v' + VERSION, lang) : `ADPOSTER v${VERSION} ${new Date().getFullYear()} ${T('es un proyecto hecho con')} by <a href="https://mediaservi.com" target="_blank" rel="noopener">mediaservi.com</a>`;
+    /* v1.14 · como en SCREENS: el pie lleva a la derecha instalar, la seta de fallos y, el último, el candado del acceso privado */
+    $('#pie-r').querySelectorAll('.cand').forEach(x => x.remove());
+    if (!PANEL) $('#pie-r').insertAdjacentHTML('beforeend', `<button type="button" class="cand${ADM ? ' on' : ''}" data-a="candado" aria-pressed="${!!ADM}" aria-label="${T(ADM ? 'Acceso privado activo' : 'Acceso privado')}" title="${T(ADM ? 'Acceso privado activo' : 'Acceso privado')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${ADM ? 'M7 10V7a5 5 0 0 1 9.6-2' : 'M7 10V7a5 5 0 0 1 10 0v3'}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><rect x="4.5" y="10" width="15" height="11" rx="2.4" fill="currentColor"/></svg></button>`); }
   const todo = () => { pintaFijo(); pintaD(); pintaL(); pintaBarra(); pintaT(); ajusta(); estado(); X().alLista && X().alLista(); };
   if (window.AVCREDITO) window.AVCREDITO.alCambiar(() => { if (B) pintaFijo(); });   // la línea de crédito es la común de AVHUB
   // seta de aviso de fallos, común a toda la familia (fallo.js): en la barra, del mismo tamaño que la tecla de idioma
-  if (window.AVFALLO) { const bi = $('#btn-idioma'); if (bi) { const bf = window.AVFALLO.boton({ app: 'ADPOSTER', version: 'v' + VERSION, idioma: () => lang }); bf.id = 'btn-fallo'; bi.before(bf);
-    const talla = () => { const h = bi.offsetHeight; if (h) bf.style.setProperty('--avf', h + 'px'); }; talla(); addEventListener('resize', talla); setTimeout(talla, 800); } }
+  const tamPie = () => Math.round(Math.max(28, Math.min(38, innerHeight * .034)));   // v1.14 · los botones comunes van en el pie, como en SCREENS
+  if (window.AVFALLO) { const pr = $('#pie-r'); if (pr) { const bf = window.AVFALLO.boton({ app: 'ADPOSTER', version: 'v' + VERSION, idioma: () => lang }); bf.id = 'btn-fallo'; pr.insertBefore(bf, pr.querySelector('.cand'));
+    const talla = () => bf.style.setProperty('--avf', tamPie() + 'px'); talla(); addEventListener('resize', talla); } }
   // botón «Instalar», común a toda la familia (instalar.js): instala el gestor como una app y lo deja listo para usarse sin conexión
-  if (window.AVINSTALA) { const bi = $('#btn-idioma'); if (bi) { const bn = window.AVINSTALA.boton({ app: 'ADPOSTER', idioma: () => lang, sw: 'sw.js' }); bn.id = 'btn-instala'; ($('#btn-fallo') || bi).before(bn);
-    const talla = () => { const h = bi.offsetHeight; if (h) bn.style.setProperty('--avi', h + 'px'); }; talla(); addEventListener('resize', talla); setTimeout(talla, 800); } }
+  if (window.AVINSTALA) { const pr = $('#pie-r'); if (pr) { const bn = window.AVINSTALA.boton({ app: 'ADPOSTER', idioma: () => lang, sw: 'sw.js' }); bn.id = 'btn-instala'; pr.insertBefore(bn, $('#btn-fallo') || pr.querySelector('.cand'));
+    const talla = () => bn.style.setProperty('--avi', tamPie() + 'px'); talla(); addEventListener('resize', talla); } }
 
   /* ---------- directo: mandar órdenes ---------- */
   function manda(o) { const fr = $('#previa'); if (fr.contentWindow && ['aviso', 'cinta', 'apaga', 'ident'].includes(o.t)) fr.contentWindow.postMessage({ adposter: 'orden', o }, '*');   // el lienzo enseña lo mismo que verán los displays
@@ -225,6 +228,9 @@
       if (LOC()) { estado(T('Guardando…')); fetch('playlists.json', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: txt, cache: 'no-store' }).then(r => r.ok ? r.json() : Promise.reject(r.status))
         .then(() => { PUB = Object.assign({ recarga: o.recarga, playlists: copia(B.playlists) }, raiz(o)); estado(T('Guardado en este ordenador')); })
         .catch(() => { estado(T('No se ha podido guardar')); baja(); }); return; }
+      /* v1.14 · desde el panel AVHUB ADMIN: publica el panel, con su llave (la página no la ve) */
+      if (PANELOK) { estado(T('Publicando…')); panelPide('publica', { txt }).then(() => { PUB = Object.assign({ recarga: o.recarga, playlists: copia(B.playlists) }, raiz(o)); estado(T('Publicado')); })
+        .catch(err => { estado(T('No se ha podido publicar') + (err && err !== 'tiempo' ? ' · ' + String(err).slice(0, 90) : '')); }); return; }
       if (!PUEDE()) return baja();
       /* acceso privado con llave: las listas se suben al repositorio de la web privada (que se vuelve a publicar sola); si falla, queda la descarga de siempre */
       estado(T('Publicando…')); const api = 'https://api.github.com/repos/' + ADM.repo + '/contents/playlists.json', cab = { Authorization: 'Bearer ' + ADM.token, Accept: 'application/vnd.github+json' }, b64 = btoa(Array.from(new TextEncoder().encode(txt), c => String.fromCharCode(c)).join(''));
@@ -280,15 +286,23 @@
   /* ---------- puente para los módulos de composición (editor.js, biblio.js, agenda.js) ---------- */
   window.ADG = { VERSION, get B() { return B; }, get PUB() { return PUB; }, get MAN() { return MAN; }, get sel() { return sel; }, get lang() { return lang; }, get tab() { return tab; }, get zoom() { return zoom; }, get DSP() { return DSP; }, get ORIG() { return ORIG; },
     P, T, TX, PINTA, ACC, GRUPOS, DEF, ESCM, $, esc, tecla, paso, medio, campo, reset, pon, lim, copia, lee, guarda, cambia, toca, pintaT, pintaL, pintaBarra, ajusta, estado, envia, previa, carpetas, esAds, completa, slug,
-    urlAsset: f => ORIG + 'assets/' + String(f).split('/').map(encodeURIComponent).join('/'), get adm() { return ADM; }, puede: () => PUEDE(), repinta: () => todo(), ext: {} };
+    urlAsset: f => ORIG + 'assets/' + String(f).split('/').map(encodeURIComponent).join('/'), get adm() { return ADM; }, puede: () => PUEDE(), repinta: () => todo(), ext: {},
+    get panelOk() { return PANELOK; }, panel: (tipo, datos) => panelPide(tipo, datos) };
 
   /* ---------- arranque ---------- */
   // ?origen=https://… abre el gestor sobre un origen privado (otra web con la misma estructura): lee de allí carpetas y listas, y la vista previa lo usa
   const URL_PRIV = /^(https:\/\/|http:\/\/(localhost|127\.0\.0\.1)[:\/])[^\s"'<>]+$/, ADM = (() => { const a = lee('admin'); return a && URL_PRIV.test(a.origen || '') ? a : null; })();
   /* v1.4 · con el acceso privado abierto, el gestor trabaja sobre la web privada sin tener que escribirla; ?origen=no enseña las muestras públicas sin cerrar el acceso */
   const ORIG = (() => { const p = new URLSearchParams(location.search).get('origen') || ''; return p === 'no' ? '' : URL_PRIV.test(p) ? p.replace(/\/*$/, '/') : ADM ? ADM.origen : ''; })();
-  const KB = ORIG ? 'gestor@' + ORIG : 'gestor', PUEDE = () => !!(ADM && ADM.repo && ADM.token && ORIG === ADM.origen);   /* el borrador de la web privada va aparte del de las muestras */
-  let LOCAL = null; const LOC = () => !!(LOCAL && LOCAL.escribe && !ORIG);   /* v1.13 · previa local: la herramienta del ordenador sirve la app y la carpeta de la previa, y deja guardar las listas */
+  const KB = ORIG ? 'gestor@' + ORIG : 'gestor', PUEDE = () => PANELOK || !!(ADM && ADM.repo && ADM.token && ORIG === ADM.origen);   /* el borrador de la web privada va aparte del de las muestras */
+  let LOCAL = null; const LOC = () => !!(LOCAL && LOCAL.escribe && !ORIG);
+  /* v1.14 · dentro del panel AVHUB ADMIN (?panel=1 en un marco del panel de Google): el panel da permiso para publicar y publica él */
+  const PANEL = new URLSearchParams(location.search).get('panel') === '1' && window.parent !== window, pendP = {}; let PANELOK = false, panelDe = '', nP = 0;
+  const panelPide = (tipo, datos) => new Promise((ok, no) => { if (!PANELOK) { no('panel'); return; } const id = ++nP; pendP[id] = { ok, no }; window.parent.postMessage(Object.assign({ adposter: tipo, id }, datos), panelDe || '*'); setTimeout(() => { if (pendP[id]) { delete pendP[id]; no('tiempo'); } }, 240000); });
+  if (PANEL) { addEventListener('message', e => { if (e.source !== window.parent) return; let h = ''; try { h = new URL(e.origin).hostname; } catch (x) {} if (!/\.googleusercontent\.com$/.test(h) && !/^(localhost|127\.0\.0\.1)$/.test(h)) return; const d = e.data || {};
+      if (d.avhub === 'adposter') { panelDe = e.origin; const era = PANELOK; PANELOK = !!d.puede; if (era !== PANELOK && B) todo(); }
+      else if (d.avhub === 'respuesta' && pendP[d.id]) { const f = pendP[d.id]; delete pendP[d.id]; d.ok ? f.ok(d.datos) : f.no(d.error || 'error'); } });
+    window.parent.postMessage({ adposter: 'panel-hola', v: VERSION }, '*'); }   /* v1.13 · previa local: la herramienta del ordenador sirve la app y la carpeta de la previa, y deja guardar las listas */
   const trae = u => fetch(ORIG + u + '?t=' + Date.now(), { cache: 'no-store' }).then(r => { if (!r.ok) throw r.status; return r.json(); });
   const local = () => !ORIG && location.protocol === 'http:' ? fetch('__local.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(j => j && j.adposter === 'local' ? j : null).catch(() => null) : Promise.resolve(null);
   Promise.all([trae('assets/manifest.json').catch(() => ({ carpetas: {} })), trae('playlists.json').catch(() => ({ recarga: 1, playlists: {} })), local()]).then(([m, l, lo]) => { LOCAL = lo;

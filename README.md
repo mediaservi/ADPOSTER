@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.13**
+**Versión actual: v1.14**
 
 ## Cómo funciona
 
@@ -116,7 +116,13 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.13, beta)
+## Cambios de la versión actual (v1.14)
+
+- **Cabecera y pie como en SCREENS** (la regla común de la familia): en la cabecera, las apps alrededor de AVHUB en el centro y, a la derecha, el idioma como botón de icono con su código; en el pie, el crédito en el centro y, a la derecha, **instalar**, la **seta de fallos** y, el último, el candado del acceso privado.
+- **Desde el panel AVHUB ADMIN:** dentro del panel (vista ADPOSTER), el gestor se abre ya sobre la web de carteles y **Publicar** y **Subir carteles** los hace el panel, con la llave de Netlify guardada solo en él: el gestor no pide llaves ni las ve. El panel publica en Netlify solo lo nuevo (el resto del sitio se reutiliza por su huella) y rehace el índice con las huellas.
+- La variante de prueba de la plantilla de bloques ya no lleva su rótulo en la cabecera.
+
+### v1.13 (beta)
 
 - **Toda la variedad guardada en cada display.** El reproductor (v1.4) descarga una vez todas las imágenes de todas las listas, también desde un origen privado (antes, solo las de su lista y solo si eran de la misma web), y las enseña desde su copia sin volver a pedirlas. Después solo baja las nuevas o cambiadas: el índice `assets/manifest.json` lleva ahora la huella de cada archivo (`huellas`) y cada imagen se pide con ella (`?v=…`).
   - Las imágenes van a una caché propia que no se borra al actualizar la app; cuando ya está todo guardado, se quitan las versiones viejas y lo que ya no sale en ninguna lista.
@@ -275,7 +281,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.13 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.14 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

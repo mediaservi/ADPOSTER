@@ -4,7 +4,6 @@
    más ancho, porque es donde se trabaja) y el panel de la pestaña elegida (S1B); abajo, las cinco pestañas como bloques grandes.
    Solo en escritorio y TV; en tablet y móvil se queda el gestor apilado de siempre.
    Se carga con ?blocks en la raíz (index.html), no desde esta carpeta: así las direcciones del kiosco que prepara el gestor no cambian. */
-html.bk .cab .marca::after { content: 'BLOCKS · beta 1'; margin-left: 12px; font: 800 11px/1 Inter, system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: #9a9aa5; border: 1px solid #34343c; border-radius: 99px; padding: 4px 9px; white-space: nowrap; }
 @media (min-width: 1024px) and (min-height: 521px) {
   :root { --bg: #0e0e11; }
   #zona-listas .fila .tecla { font-size: .78em; padding: 0 3px; }

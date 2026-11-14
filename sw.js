@@ -7,7 +7,7 @@
      todas de una vez («pre») y, cuando lo tiene todo, se quitan las versiones viejas. Las listas y el índice de la otra web: primero la red y, sin red, la copia.
    Para forzar una copia nueva de la app en todos los dispositivos, sube el número de CACHE (las imágenes se conservan).
    Licencia GPL-3.0 · mediaservi.com */
-const PREFIJO = 'adposter-', CACHE = PREFIJO + 'v9', CIMG = PREFIJO + 'imagenes';
+const PREFIJO = 'adposter-', CACHE = PREFIJO + 'v10', CIMG = PREFIJO + 'imagenes';
 const BASICO = ['./', 'index.html', 'p/', 'cine/', 'klub/', 'gestor.js', 'gestor.css', 'editor.js', 'gestion.js', 'subir.js', 'escena.js', 'escena.css', 'plantillas.js', 'player.js', 'player.css', 'directo.js', 'qr.js', 'credito.js', 'fallo.js', 'instalar.js', 'playlists.json', 'assets/manifest.json', 'manifest.json', 'assets/logos/adposter-logo.svg', 'assets/logos/adposter-icono.svg', 'assets/logos/adposter-192.png', 'assets/fonts/inter-latin-400-normal.woff2', 'assets/fonts/inter-latin-700-normal.woff2', 'assets/fonts/inter-latin-800-normal.woff2', 'assets/fonts/share-tech-mono-latin-400-normal.woff2'];   // lo mínimo para arrancar sin conexión desde la primera visita
 const FRESCO = /(\/|\.html?|\.json|\.js|\.css|\.webmanifest)$/i, TOPE = 6000;
 const clave = u => { const x = new URL(u, self.registration.scope); x.search = ''; x.hash = ''; return x.href; };
