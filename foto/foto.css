@@ -72,3 +72,15 @@
   .fo-centro { order: 0; position: sticky; top: 8px; height: calc(100dvh - 16px); } .fo-lienzo { flex: 1; height: auto; }
   .fo-lado { grid-column: 3; grid-row: 1; }   /* el gestor manda .lado a la columna 2 en apaisado: aquí va a la tercera */
 }
+/* v1.17 · herramientas de la tanda 2 */
+.fo-lienzo.pinta { cursor: crosshair; }
+.fo-color { width: 100%; min-width: 0; height: var(--alto); padding: 2px; border: 1px solid var(--linea); border-radius: 7px; background: #0b0a06; cursor: pointer; }
+.desl .fo-color + .fo-color, .desl .fo-color + span { grid-column: 3; }
+.fo-sec textarea.campo.area { min-height: 4.2em; }
+.fo-herr { scrollbar-width: none; }
+/* móvil apaisado: con las herramientas nuevas la columna no cabe; van en dos columnas de teclas algo menores */
+@media (max-width: 900px) and (orientation: landscape) {
+  .fo-herr { display: grid; grid-template-columns: repeat(2, 34px); grid-auto-rows: 34px; gap: 4px; align-content: start; }
+  .fo-herr .tecla { width: 34px; height: 34px; font-size: 16px; }
+  .fo-herr hr { grid-column: 1 / -1; width: 80%; }
+}

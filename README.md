@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.16**
+**Versión actual: v1.17**
 
 ## Cómo funciona
 
@@ -29,7 +29,7 @@ En tablet y móvil las ventanas se apilan, con el lienzo arriba; en móvil apais
 
 ## Funciones
 
-**FOTO, el editor de imagen** (nuevo en v1.16, primera tanda)
+**FOTO, el editor de imagen** (nuevo en v1.16; herramientas de retoque desde v1.17)
 
 - **Dónde:** `adposter.mediaservi.com/foto/`, o desde el gestor: al ver un cartel en grande, «✎ Editar en FOTO» lo abre en otra pestaña. También se abre una imagen soltándola, pegándola o eligiéndola.
 - **Capas** con visibilidad, opacidad y 16 modos de fusión; capa nueva, imagen como capa, duplicar, borrar, subir, bajar, combinar abajo y acoplar todo.
@@ -38,8 +38,15 @@ En tablet y móvil las ventanas se apilan, con el lienzo arriba; en móvil apais
 - **Ajustes:** brillo y contraste (con exposición y gamma), niveles, curvas, tono y saturación (con vividez), equilibrio de color y blanco y negro con virado. **Filtros:** desenfocar, enfocar, ruido y viñeta. Todos con vista previa en vivo.
 - **Botones mágicos de un toque**, cada uno con su intensidad: mejora automática, vividez, balance de blancos, quitar neblina, quitar ruido y enfocar.
 - **Exportar** en WebP, JPG o PNG (con transparencia) a la medida de cada pantalla (FHD vertical u horizontal, póster 2:3, cuadrada, 4K) llenando o entera. **Guardar copia en ADPOSTER** la deja en «Mis imágenes»; el original no se toca nunca y la copia se llama `…-editada`.
+- **Selecciones** (nuevo en v1.17): rectángulo o elipse (M), lazo (L), varita mágica con tolerancia, contigua o por color (W), con borde suave. Modo nuevo, añadir (Mayús), restar (Alt) o cruzar; invertir, todo y nada (Ctrl+A / Ctrl+D / Ctrl+Mayús+I), rellenar, vaciar (Supr) y pasar a capa nueva (Ctrl+J). **La selección limita** los ajustes, los filtros, los botones mágicos y los pinceles.
+- **Máscaras de capa** (nuevo en v1.17): añadir (desde la selección, si la hay), pintar en la máscara con el pincel o el borrador, aplicar y quitar.
+- **Pinceles** (nuevo en v1.17): pincel (B) y borrador (E) con tamaño, dureza y opacidad; **tampón de clonar** (S) y **pincel corrector** (J), que toma la textura del origen y el color del destino. El origen se marca con Alt + clic. `[` y `]` cambian el tamaño.
+- **Texto** (nuevo en v1.17, T): capas de texto que se siguen editando, con los 19 tipos de letra de la marca, tamaño, grosor, interlineado, alineación, color, contorno y sombra; se mueven arrastrando.
+- **Formas** (U: rectángulo, rectángulo redondeado, elipse, línea y flecha, con relleno y borde) y **degradados** (G: lineal o radial, de un color a otro o a transparente).
+- **Transformar capa** (nuevo en v1.17, Q o Ctrl+T): mover, escalar desde las esquinas (Mayús: libre) y girar con el tirador de arriba; Intro aplica y Esc cancela.
+- Con una herramienta elegida, sus opciones salen arriba del panel y la pestaña elegida (capas, historial…) debajo.
 - Todo ocurre en el navegador: la imagen no sale del equipo.
-- **Llega en las próximas tandas:** selecciones y máscaras, pincel, borrador, tampón, pincel corrector, texto, formas y degradados; quitar el fondo, borrar un objeto, ampliar ×2 o ×4, reparar fotos antiguas y colorear; abrir y guardar PSD.
+- **Llega en la próxima tanda:** quitar el fondo, borrar un objeto, ampliar ×2 o ×4, reparar fotos antiguas y colorear; abrir y guardar PSD; grupos de capas.
 
 **La lista de carteles a la vista** (nuevo en v1.15)
 
@@ -140,7 +147,13 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.16)
+## Cambios de la versión actual (v1.17)
+
+- **FOTO, segunda tanda:** selecciones (rectángulo, elipse, lazo, varita y por color) que limitan ajustes, filtros, magia y pinceles; máscaras de capa; pincel, borrador, tampón de clonar y pincel corrector; texto con los tipos de letra de la marca; formas; degradados y transformar capa, con sus atajos de teclado.
+- Las opciones de la herramienta y la pestaña elegida se ven a la vez en el panel de la derecha.
+- La aplicación sin conexión guarda también las herramientas nuevas de FOTO.
+
+### v1.16
 
 - **FOTO, el editor de imagen propio (primera tanda):** capas con modos de fusión, historial, recortar y enderezar, girar y voltear, tamaño, ajustes, filtros y seis botones mágicos, con exportación a la medida de cada pantalla y copia en «Mis imágenes». Se abre desde el cartel en grande del gestor («✎ Editar en FOTO») o en `/foto/`.
 - El gestor recibe la copia que guarda FOTO aunque esté en otra pestaña.
@@ -319,7 +332,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.16 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.17 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 
