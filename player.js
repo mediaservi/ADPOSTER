@@ -33,7 +33,7 @@
   if (!PREV) ['nombre', 'grupo', 'sede', 'canal'].forEach(k => { const v = Q.get(k); if (v !== null) guardaG(k, k === 'canal' ? (/^[a-z0-9]{6,40}$/i.test(v) ? v : '') : v.trim().slice(0, 32)); });
   const DEF = { nombre: ID.toUpperCase(), fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7],
     fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true, horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '',
-    formato: 'vertical', qr: { activo: false, modo: 'url', url: '', texto: '', pos: 'bd' }, cinta: { activo: false, texto: '', rss: '' }, publico: false, modo: 'carteles', escenas: [], orden: 'azar', secuencia: [], archivos: {} };
+    formato: 'vertical', qr: { activo: false, modo: 'url', url: '', texto: '', pos: 'bd' }, cinta: { activo: false, texto: '', rss: '' }, publico: false, modo: 'carteles', escenas: [], orden: 'azar', secuencia: [], archivos: {}, sueltos: [] };
   const TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'];
 
   /* ---------- idioma (es · en · ca) ---------- */
@@ -66,12 +66,12 @@
   const aviso = t => { const a = $('.aviso'); a.textContent = t || ''; a.classList.toggle('on', !!t); };
 
   /* ---------- ajustes: playlists.json ← ajustes de este display ← vista previa ---------- */
-  let MAN = null, LISTAS = null, cfg = null, previa = null, previaMedios = null, pool = { feed: [], ads: [] }, recarga = null, ultimo = Date.now(), gen = 0;
+  let MAN = null, LISTAS = null, cfg = null, previa = null, previaMedios = null, pool = { feed: [], ads: [] }, recarga = null, ultimo = Date.now(), gen = 0, diaA = '';
   function calcula() {
     const base = (LISTAS && LISTAS.playlists && LISTAS.playlists[ID]) || null, local = PREV ? null : lee('local');
     const c = Object.assign({}, DEF, base || {}, local || {}, previa || {}); c.existe = !!(base || previa);
     c.fundido = Object.assign({}, DEF.fundido, (base || {}).fundido, (local || {}).fundido, (previa || {}).fundido); c.horario = Object.assign({}, DEF.horario, (base || {}).horario, (previa || {}).horario); c.qr = Object.assign({}, DEF.qr, (base || {}).qr, (previa || {}).qr); c.cinta = Object.assign({}, DEF.cinta, (base || {}).cinta, (previa || {}).cinta); if (c.formato !== 'horizontal') c.formato = 'vertical';
-    c.modo = c.modo === 'escenas' ? 'escenas' : 'carteles'; c.escenas = Array.isArray(c.escenas) ? c.escenas.filter(e => e && typeof e === 'object') : []; c.archivos = c.archivos && typeof c.archivos === 'object' ? c.archivos : {}; c.secuencia = Array.isArray(c.secuencia) ? c.secuencia : [];
+    c.modo = c.modo === 'escenas' ? 'escenas' : 'carteles'; c.escenas = Array.isArray(c.escenas) ? c.escenas.filter(e => e && typeof e === 'object') : []; c.archivos = c.archivos && typeof c.archivos === 'object' ? c.archivos : {}; c.secuencia = Array.isArray(c.secuencia) ? c.secuencia : []; c.sueltos = Array.isArray(c.sueltos) ? c.sueltos.filter(x => typeof x === 'string') : [];   // v1.15 · carteles sueltos de cualquier carpeta o «m:clave»
     c.segundos = num(c.segundos, 8, 2, 600); c.segundosAnuncio = num(c.segundosAnuncio, c.segundos, 2, 600); c.fundido.segundos = num(c.fundido.segundos, 2.5, 0, 10); if (!TIPOS.includes(c.fundido.tipo)) c.fundido.tipo = 'fundido';
     const ac = Array.isArray(c.anunciosCada) ? c.anunciosCada : [4, 7]; c.anunciosCada = [num(ac[0], 4, 1, 99), num(ac[1], 7, 1, 99)].sort((a, b) => a - b);
     return c;
@@ -85,14 +85,17 @@
   let copiado = '', PRE = { ok: 0, mal: 0, total: 0, fin: false };
   function copia() { if (!SW || !MAN) return; const car = MAN.carpetas || {}, de = c => (car[c] || []).map(f => c + '/' + f), fs = new Set(), L = (LISTAS && LISTAS.playlists) || {}, ok = s => /^[\w .()\-\/]+$/.test(s || '') && String(s).indexOf('..') < 0;
     Object.keys(L).map(k => L[k]).concat(cfg ? [cfg] : []).forEach(p => { if (!p || typeof p !== 'object') return;
-      [].concat(p.contenido || [], p.anuncios || []).forEach(c => de(c).forEach(f => fs.add(f)));
+      [].concat(p.contenido || [], p.anuncios || []).forEach(c => de(c).forEach(f => fs.add(f))); (Array.isArray(p.sueltos) ? p.sueltos : []).forEach(f => { if (ok(f) && f.indexOf('/') > 0) fs.add(f); });
       if (p.fondo) (car.fondos || []).forEach(x => { if (x.replace(/\.[a-z0-9]+$/i, '') === p.fondo) fs.add('fondos/' + x); });
       (Array.isArray(p.escenas) ? p.escenas : []).forEach(e => { if (!e || typeof e !== 'object') return; if (e.fondo && e.fondo.t === 'img' && ok(e.fondo.src)) fs.add(e.fondo.src); (Array.isArray(e.piezas) ? e.piezas : []).forEach(z => { if (!z) return; if (z.t === 'zona') (z.carp || []).forEach(c => de(c).forEach(f => fs.add(f))); else if (z.t === 'imagen' && ok(z.src)) fs.add(z.src); }); }); });
     const urls = [...fs].filter(f => !esVideo(f)).slice(0, 3000).map(url).concat([location.href.split('#')[0]]), firma = urls.join('|'); if (firma === copiado) return; copiado = firma;
     navigator.serviceWorker.ready.then(r => { r.active && r.active.postMessage({ t: 'pre', id: 'display', urls, limpia: true }); }).catch(() => {}); }
   function aplica() {
-    cfg = calcula(); const car = (MAN && MAN.carpetas) || {}, junta = l => (l || []).flatMap(c => (car[c] || []).map(f => c + '/' + f)).filter(f => !(cfg.archivos[f] && cfg.archivos[f].off));
-    pool = { feed: junta(cfg.contenido), ads: junta(cfg.anuncios) };
+    cfg = calcula(); const car = (MAN && MAN.carpetas) || {}, h = hoyISO(); diaA = h;
+    /* v1.15 · un cartel sale si no está fuera y si hoy está entre sus fechas (desde / hasta, si las tiene); los sueltos se suman a los de las carpetas */
+    const sirve = f => { const a = cfg.archivos[f]; return !(a && (a.off || (a.desde && h < a.desde) || (a.hasta && h > a.hasta))); }, existe = f => { if (f.indexOf('m:') === 0) return !!urlE(f); const i = f.indexOf('/'); return i > 0 && (car[f.slice(0, i)] || []).includes(f.slice(i + 1)); };
+    const junta = (l, su) => [...new Set((l || []).flatMap(c => (car[c] || []).map(f => c + '/' + f)).concat((su || []).filter(existe)))].filter(sirve);
+    pool = { feed: junta(cfg.contenido, cfg.sueltos), ads: junta(cfg.anuncios) };
     const st = escena.style, hor = HOR();
     st.setProperty('--t', (cfg.fundido.tipo === 'corte' ? 0 : cfg.fundido.segundos) + 's'); st.setProperty('--dur', (cfg.segundos + cfg.fundido.segundos) + 's');
     escena.className = 't-' + cfg.fundido.tipo + (cfg.movimiento ? ' mov' : '') + (cfg.llenar && !hor ? ' llena' : '') + (cfg.brillo ? ' brillo' : '') + (hor ? ' horizontal' : '') + (hor && pool.feed.length && pool.ads.length && !ESC() ? ' dos' : '') + (ESC() ? ' modo-esc' : ''); if (!ESC()) limpiaEsc(); CAPAS.feed.forEach(c => c.classList.toggle('centro', cfg.alinea === 'centro'));
@@ -135,7 +138,7 @@
   addEventListener('resize', () => CAPAS.feed.forEach(encaja));
   const actual = { feed: '', ads: '' };
   async function paso(tipo) {
-    const f = saca(tipo); if (!f) return false; const u = url(f), pre = await precarga(u); if (!pre) { await espera(400); return false; } if (ESC()) return true;   // mientras cargaba, la lista ha pasado a ser una composición
+    const f = saca(tipo); if (!f) return false; const u = f.indexOf('m:') === 0 ? urlE(f) : url(f), pre = await precarga(u); if (!pre) { await espera(400); return false; } if (ESC()) return true;   // mientras cargaba, la lista ha pasado a ser una composición
     const g = gen, vid = pre.tagName === 'VIDEO', capas = CAPAS[tipo], n = turno[tipo] % 2, entra = capas[n], sale = capas[1 - n], caja = c => (tipo === 'feed' ? c.querySelector('.hoja') : c), cj = caja(entra), img = cj.querySelector('img'), viejo = cj.querySelector('video'); turno[tipo]++;
     if (viejo) { viejo.pause(); viejo.remove(); } if (vid) { img.style.display = 'none'; img.removeAttribute('src'); cj.appendChild(pre); const pl = pre.play(); pl && pl.catch && pl.catch(() => {}); } else { img.style.display = ''; img.src = u; }
     const w = vid ? pre.videoWidth : pre.naturalWidth, h = vid ? pre.videoHeight : pre.naturalHeight;
@@ -277,7 +280,7 @@
     if (!PREV) {
       setInterval(() => { if (document.body.classList.contains('con-panel') && Date.now() - tPanel > 90000) cierra();
         const lim = Math.max(180000, (cfg.segundos + cfg.segundosAnuncio + cfg.fundido.segundos) * 6000); if (Date.now() - ultimo > lim && navigator.onLine !== false) location.reload(); }, 15000);                 // si algo se atasca, se recupera solo
-      setInterval(estado, 20000); agenda(); setInterval(agenda, 30000); setInterval(() => { if (cfg && cfg.cinta.activo && cfg.cinta.rss) rss(); }, 600000);
+      setInterval(estado, 20000); agenda(); setInterval(agenda, 30000); setInterval(() => { if (cfg && diaA && hoyISO() !== diaA) aplica(); }, 60000); /* v1.15 · a medianoche entran y salen los carteles con fecha */ setInterval(() => { if (cfg && cfg.cinta.activo && cfg.cinta.rss) rss(); }, 600000);
       const despierta = () => { try { navigator.wakeLock && navigator.wakeLock.request('screen').catch(() => {}); } catch (e) {} }; despierta(); document.addEventListener('visibilitychange', () => { if (!document.hidden) despierta(); });
     }
   })();
