@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.14**
+**Versión actual: v1.15**
 
 ## Cómo funciona
 
@@ -22,12 +22,22 @@ El gestor (la página principal) prepara esa dirección con todo lo que es de ca
 |---|---|
 | **DISPLAYS** (izquierda, arriba) | El estado de cada pantalla **en directo**: encendida, apagada, fuera de horario o sin señal; qué lista tiene, en qué formato, y su grupo y sede. Aquí se elige el destino de las órdenes: todas, un grupo, una sede o una sola. |
 | **LISTAS** (izquierda, abajo) | Las listas de reproducción: crear, borrar y elegir la que se edita. Cada lista es de **carteles** (carpetas que rotan) o una **composición** de escenas. Desde aquí se abren la **biblioteca** y el **calendario**. |
-| **LIENZO** (centro) | En una lista de carteles, la vista previa en vivo, con **zoom**, desplazamiento y **guías que se arrastran**. En una composición, el **editor**: cada pieza se selecciona, se mueve, se escala y se gira con el ratón o el dedo, con imán, deshacer y la tira de escenas debajo. |
+| **LIENZO** (centro) | En una lista de carteles, la vista previa en vivo, con **zoom**, desplazamiento y **guías que se arrastran**, y debajo **la tira con todos los carteles** en el orden en que salen (desde v1.15). En una composición, el **editor**: cada pieza se selecciona, se mueve, se escala y se gira con el ratón o el dedo, con imán, deshacer y la tira de escenas debajo. |
 | **Pestañas** (derecha) | **CONTENIDO** · **DISEÑO** · **TIEMPOS** · **DIRECTO** · **PUBLICAR**. En una composición, las dos primeras son **PIEZAS** (añadir, propiedades y capas) y **ESCENA** (fondo, duración, temporada y transición). Con botón de restablecer. |
 
-En tablet y móvil las ventanas se apilan, con el lienzo arriba; en móvil apaisado el lienzo se queda a la izquierda.
+En tablet y móvil las ventanas se apilan, con el lienzo arriba; en móvil apaisado el lienzo se queda a la izquierda (y la tira de carteles pasa arriba de la columna de la derecha).
 
 ## Funciones
+
+**La lista de carteles a la vista** (nuevo en v1.15)
+
+- **Toda la lista debajo del lienzo**, como en los gestores de cartelería profesionales: cada cartel con su número, su duración y su estado, en el orden en que sale, y al final los anuncios con su ritmo.
+- **Tocar un cartel abre su ficha:** duración (− +), **fechas** (desde / hasta), dejarlo fuera, moverlo, verlo en grande y, si es suelto, quitarlo.
+- **Arrastrar un cartel** lo cambia de sitio (la lista pasa a orden fijo).
+- **Fechas por cartel:** el display solo lo enseña entre esas fechas (estreno y fin de cartelera); a medianoche entran y salen solos. En la tira, los caducados salen apagados (✕), los que están por llegar con ⏳ y los que tienen fecha con 📅.
+- **Carteles sueltos:** con «+» se añaden carteles de cualquier carpeta o de «Mis imágenes» sin meter la carpeta entera. También se puede añadir la carpeta entera desde ahí.
+- **Resumen:** cuántos carteles salen, cuánto dura una vuelta, el orden (al azar o fijo) y los avisos (caducados, por llegar, fuera y carpetas vacías).
+
 
 **Composición** (nuevo en v1.1)
 
@@ -97,6 +107,7 @@ No hay servidor propio. El gestor, los displays y la página del público se hab
 | `index.html`, `gestor.js`, `gestor.css` | El gestor |
 | `editor.js` | El editor de composiciones en el lienzo, las pestañas PIEZAS y ESCENA y la galería de plantillas |
 | `gestion.js` | La biblioteca de archivos y el calendario |
+| `lista.js` | La tira de carteles bajo el lienzo, la ficha de cada cartel y «+» para añadir carteles sueltos (v1.15) |
 | `escena.js`, `escena.css` | El motor que pinta las escenas; lo usan igual el editor y el reproductor |
 | `plantillas.js` | Las plantillas de composición |
 | `cine/`, `klub/`, `p/` | Las direcciones de reproducción (la URL que se da al kiosco) |
@@ -106,7 +117,7 @@ No hay servidor propio. El gestor, los displays y la página del público se hab
 | `instalar.js` | El botón «Instalar», común a la familia AVHUB |
 | `manifest.json`, `sw.js` | Lo que hace la app instalable y guarda la copia para usarla sin conexión |
 | `qr.js` | Generador de códigos QR (de terceros, licencia MIT: ver [assets/LICENCIAS-TERCEROS.md](assets/LICENCIAS-TERCEROS.md)) |
-| `playlists.json` | Los ajustes de cada lista, sus escenas, el calendario (`agenda`) y las imágenes propias (`medios`) |
+| `playlists.json` | Los ajustes de cada lista (también `sueltos` y, por cartel, `archivos` con `seg`, `off`, `desde` y `hasta`), sus escenas, el calendario (`agenda`) y las imágenes propias (`medios`) |
 | `assets/<carpeta>/` | Las imágenes y vídeos. Las carpetas `ads-…` o con «anuncios» en el nombre son anuncios; `fondos`, los fondos |
 | `assets/manifest.json` | El índice de archivos (se genera solo) |
 | `entrada/` | Donde se suben las imágenes originales para que se preparen solas |
@@ -116,7 +127,15 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.14)
+## Cambios de la versión actual (v1.15)
+
+- **Editor de listas de carteles mucho más directo:** debajo de la vista previa sale la tira con todos los carteles de la lista en su orden, con su duración y su estado, y los anuncios al final. Se ordena arrastrando y cada cartel tiene su ficha, sin abrir la biblioteca.
+- **Fechas en cada cartel** (desde / hasta): el reproductor solo lo enseña entre esas fechas y rehace la lista a medianoche.
+- **Carteles sueltos** de cualquier carpeta o de «Mis imágenes», con «+». El reproductor los suma a los de las carpetas, también en la copia sin conexión.
+- **Resumen y avisos:** carteles que salen, duración de una vuelta y lo que no está listo.
+- La biblioteca («Esta lista») y el contador de la ventana LISTAS cuentan también los sueltos.
+
+### v1.14
 
 - **Cabecera y pie como en SCREENS** (la regla común de la familia): en la cabecera, las apps alrededor de AVHUB en el centro y, a la derecha, el idioma como botón de icono con su código; en el pie, el crédito en el centro y, a la derecha, **instalar**, la **seta de fallos** y, el último, el candado del acceso privado.
 - **Desde el panel AVHUB ADMIN:** dentro del panel (vista ADPOSTER), el gestor se abre ya sobre la web de carteles y **Publicar** y **Subir carteles** los hace el panel, con la llave de Netlify guardada solo en él: el gestor no pide llaves ni las ve. El panel publica en Netlify solo lo nuevo (el resto del sitio se reutiliza por su huella) y rehace el índice con las huellas.
@@ -281,7 +300,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.14 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.15 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

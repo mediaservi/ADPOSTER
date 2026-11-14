@@ -363,3 +363,37 @@ dialog.sb { width: min(720px, calc(100vw - 24px)); }
 .pie-r { display: flex; align-items: center; justify-content: flex-end; gap: clamp(8px, .9vw, 14px); min-width: 0; }
 .pie-r .cand { position: static; transform: none; width: 1.6em; height: 1.6em; }
 @media (max-width: 900px) { .pie { grid-template-columns: minmax(0, 1fr) auto; text-align: left; } .pie-l { display: none; } }
+
+/* v1.15 · la lista de carteles a la vista: encima, el resumen (o la ficha del cartel elegido); debajo, la tira con todos los carteles en su orden */
+.tirac { flex: none; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.tirac[hidden] { display: none; }
+.tc-res, .tc-ficha { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+.tc-res .lcd { flex: none; padding: 0 12px; }
+.tc-res > .tecla { flex: none; }
+.tc-res .nota { flex: 1 1 240px; min-width: 0; }
+.tc-aviso { flex: none; padding: 3px 9px; border: 1px solid currentColor; border-radius: 999px; font: 400 clamp(10px, 1.3vh, 12px)/1.25 'Share Tech Mono', monospace; letter-spacing: .04em; text-transform: uppercase; }
+.tc-aviso.mal { color: #ff7a6b; } .tc-aviso.ojo { color: var(--ambar); } .tc-aviso.gris { color: var(--gris); }
+.tc-m { flex: none; width: calc(var(--alto) * .9); aspect-ratio: 9 / 16; padding: 0; border: 1px solid var(--linea); border-radius: 4px; overflow: hidden; background: #000; cursor: zoom-in; }
+.tc-m img, .tc-m video { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+.tc-m:focus-visible { outline: 2px solid var(--ambar); outline-offset: 1px; }
+.tc-n { flex: 1 1 130px; min-width: 0; display: flex; flex-direction: column; gap: 1px; line-height: 1.15; }
+.tc-n b { font-weight: 700; overflow-wrap: anywhere; }
+.tc-n small { color: var(--gris); font-size: .8em; overflow-wrap: anywhere; }
+.tc-g { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 5px; min-width: 0; }
+.tc-g .rd { flex: none; width: var(--alto); padding: 0; font-size: 1.15em; }
+.tc-g .lcd { flex: none; min-width: 4.6em; padding: 0 6px; }
+.tc-g > .tecla:not(.rd) { flex: none; }
+.tc-l { color: var(--gris); font-size: .78em; text-transform: uppercase; letter-spacing: .06em; }
+input.campo.tc-f { flex: none; width: 9.4em; padding: 0 6px; font-size: .95em; color-scheme: dark; }
+.mini.car .mm img, .mini.car .mm video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mini.car[draggable=true] { cursor: grab; } .mini.car.arr { opacity: .4; } .mini.car.sobre { outline: 2px solid var(--ambar); outline-offset: 1px; }
+.mini.car.off .mm, .mini.car.caduca .mm { opacity: .3; } .mini.car.caduca .mm { filter: grayscale(1); } .mini.car.pronto .mm { opacity: .6; }
+.mini.car .cm { position: absolute; right: 2px; top: 2px; min-width: 1.5em; padding: 1px 3px; border-radius: 4px; background: rgba(0, 0, 0, .78); color: #fff; font: 400 10px/1.3 Inter, sans-serif; font-style: normal; text-align: center; }
+.mini.car.caduca .cm { color: #ff7a6b; } .mini.car.pronto .cm { color: var(--ambar); }
+.mini.ads .mm { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: repeating-linear-gradient(-45deg, #1c1c1f 0 6px, #232326 6px 12px); color: #4cc9f0; font: 700 12px/1 'Share Tech Mono', monospace; }
+.mini.ads .mm small { font-size: 10px; color: var(--gris); }
+.mini.ads.vacio { opacity: .55; }
+.bf.pk { position: relative; } .bf.pk.on { border-color: var(--ambar); box-shadow: 0 0 10px rgba(255, 176, 0, .45); } .bf.pk.on .bf-m b { left: auto; right: 4px; } .bf.pk.ya { opacity: .45; cursor: default; box-shadow: none; }
+.tc-grande { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.tc-grande img, .tc-grande video { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; box-shadow: 0 6px 30px rgba(0, 0, 0, .6); }
+@media (max-width: 900px) and (orientation: landscape) { .consola > .tirac { grid-column: 2; } }   /* en el móvil apaisado la tira va arriba de la columna de la derecha (lista.js le pone el aspecto de ventana) */

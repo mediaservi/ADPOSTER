@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <!--
   ADPOSTER · CARTELERÍA DIGITAL — gestor de listas y displays. Apartado de AVHUB (mediaservi.com).
-  Versión v1.12. Cuatro ventanas: a la izquierda, fijas, DISPLAYS (cómo está cada pantalla, en directo) y LISTAS; en el centro el LIENZO,
+  Versión v1.15. Cuatro ventanas: a la izquierda, fijas, DISPLAYS (cómo está cada pantalla, en directo) y LISTAS; en el centro el LIENZO,
   con la vista previa en vivo, zoom y guías que se arrastran; a la derecha, las pestañas CONTENIDO · DISEÑO · TIEMPOS · DIRECTO · PUBLICAR.
   Los reproductores son las URL que se dan al kiosco: …/cine, …/klub y …/p/?l=nombre. La página del público es …/elige (se llega por QR).
   Una lista puede ser de carteles (carpetas que rotan) o una composición de escenas que se editan en el lienzo, pieza a pieza.
-  Módulos: gestor.js (este gestor), editor.js (composición en el lienzo y galería de plantillas), gestion.js (biblioteca y calendario), escena.js (pinta las escenas, también en el reproductor), plantillas.js, player.js (reproductor), directo.js (canal en tiempo real), qr.js (códigos QR, de terceros, MIT),
+  Módulos: gestor.js (este gestor), editor.js (composición en el lienzo y galería de plantillas), gestion.js (biblioteca y calendario), lista.js (la tira de carteles bajo el lienzo, v1.15), escena.js (pinta las escenas, también en el reproductor), plantillas.js, player.js (reproductor), directo.js (canal en tiempo real), qr.js (códigos QR, de terceros, MIT),
   playlists.json (ajustes) y assets/manifest.json (índice de imágenes y vídeos, lo genera tools/preparar.py).
   Licencia GPL-3.0 · mediaservi.com
 -->
@@ -19,10 +19,10 @@
   <link rel="icon" href="assets/logos/adposter-icono.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="assets/logos/adposter-180.png">
-  <link rel="stylesheet" href="escena.css?v=1.14">
-  <link rel="stylesheet" href="gestor.css?v=1.14">
+  <link rel="stylesheet" href="escena.css?v=1.15">
+  <link rel="stylesheet" href="gestor.css?v=1.15">
   <!-- v1.10 · BLOCKS beta: con ?blocks en la dirección, el mismo gestor se coloca en la plantilla de bloques fijos de AVHUB (blocks/adposter.css). Sin ?blocks no cambia nada -->
-  <script>if(/[?&]blocks\b/.test(location.search)){document.documentElement.classList.add('bk');document.write('<link rel="stylesheet" href="blocks/adposter.css?v=1.14">');}</script>
+  <script>if(/[?&]blocks\b/.test(location.search)){document.documentElement.classList.add('bk');document.write('<link rel="stylesheet" href="blocks/adposter.css?v=1.15">');}</script>
 </head>
 <body>
   <header class="cab">
@@ -39,6 +39,7 @@
       <div class="barra" id="barra"></div>
       <div class="lienzo" id="lienzo"><div class="mesa"><div class="display" id="display"><iframe id="previa" title="Vista previa" allow="fullscreen"></iframe><div class="guias" id="guias"></div><div class="ed" id="ed"><div class="ed-esc" id="ed-esc"></div><div class="ed-capa" id="ed-capa"></div></div></div></div><div class="suelta" id="suelta"></div></div>
       <div class="tira" id="tira" hidden></div>
+      <div class="tirac" id="tirac" hidden></div>
       <div class="estado" id="estado"><i></i><span></span></div>
     </section>
     <section class="zona lado" id="zona-tabs" aria-label="Ajustes"><div class="tabs" id="tabs" role="tablist"></div><div class="cuerpo" id="cuerpo" role="tabpanel"></div></section>
@@ -48,16 +49,17 @@
   <input type="file" id="archivo" accept="application/json,.json" hidden>
   <input type="file" id="sube-img" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" hidden>
   <noscript><p style="padding:2rem;color:#fff">ADPOSTER necesita JavaScript activado.</p></noscript>
-  <script src="credito.js?v=1.14"></script>
-  <script src="fallo.js?v=1.14"></script>
-  <script src="instalar.js?v=1.14"></script>
-  <script src="directo.js?v=1.14"></script>
-  <script src="qr.js?v=1.14"></script>
-  <script src="escena.js?v=1.14"></script>
-  <script src="plantillas.js?v=1.14"></script>
-  <script src="gestor.js?v=1.14"></script>
-  <script src="editor.js?v=1.14"></script>
-  <script src="gestion.js?v=1.14"></script>
-  <script src="subir.js?v=1.14"></script>
+  <script src="credito.js?v=1.15"></script>
+  <script src="fallo.js?v=1.15"></script>
+  <script src="instalar.js?v=1.15"></script>
+  <script src="directo.js?v=1.15"></script>
+  <script src="qr.js?v=1.15"></script>
+  <script src="escena.js?v=1.15"></script>
+  <script src="plantillas.js?v=1.15"></script>
+  <script src="gestor.js?v=1.15"></script>
+  <script src="editor.js?v=1.15"></script>
+  <script src="gestion.js?v=1.15"></script>
+  <script src="lista.js?v=1.15"></script>
+  <script src="subir.js?v=1.15"></script>
 </body>
 </html>
