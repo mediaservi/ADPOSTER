@@ -118,4 +118,6 @@
   document.addEventListener('input', e => { const t = e.target; if (!t.dataset || !t.dataset.ag) return; const r = R(); if (!r) return; r[t.dataset.ag] = t.dataset.ag === 'v' ? t.value.trim().slice(0, 32) : t.value; if (t.dataset.ag === 'desde' && r.hasta && r.desde > r.hasta) r.hasta = r.desde; G.toca(); if (t.type !== 'text') { clearTimeout(tCal); tCal = setTimeout(calPinta, t.type === 'date' ? 700 : 500); } });
 
   window.ADGEST = { elige: (tipo, cb) => biblio('elige', tipo, cb), pide, sube };
+  /* v1.16 · FOTO (el editor de imagen, en otra pestaña) guarda aquí su copia editada como una imagen más de «Mis imágenes» */
+  try { const bc = new BroadcastChannel('adposter-foto'); bc.onmessage = e => { const d = e.data || {}; if (d.t === 'guarda' && d.archivo) sube(d.archivo).then(k => { bc.postMessage({ t: 'ok', k }); if (k && bib && !$('#modal').hidden) bibPinta(); }); }; } catch (e) {}
 })();

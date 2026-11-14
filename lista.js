@@ -19,7 +19,7 @@
     'Toca un cartel para cambiar su duración o sus fechas, o dejarlo fuera; arrástralo para ordenar.': ['Tap a poster to change its duration or dates, or to leave it out; drag it to reorder.', 'Toca un cartell per canviar-ne la durada o les dates, o deixar-lo fora; arrossega’l per ordenar.'],
     'carteles añadidos': ['posters added', 'cartells afegits'], 'Carpeta añadida': ['Folder added', 'Carpeta afegida'], 'Quitar de la lista': ['Remove from the list', 'Treu de la llista'],
     'Lo pone la carpeta: para que no salga, déjalo fuera.': ['It comes from the folder: to stop it showing, leave it out.', 'Ve de la carpeta: perquè no surti, deixa’l fora.'], 'Subir imagen': ['Upload image', 'Puja una imatge'], 'Mis imágenes': ['My images', 'Les meves imatges'],
-    'Anuncios': ['Ads', 'Anuncis'], 'Sale hasta el': ['Shows until', 'Surt fins al'], 'Sale desde el': ['Shows from', 'Surt des del'], 'Caducó el': ['Expired on', 'Va caducar el']
+    'Anuncios': ['Ads', 'Anuncis'], 'Editar en FOTO': ['Edit in FOTO', 'Edita a FOTO'], 'Se guarda como copia: el original no se toca.': ['It is saved as a copy: the original is never changed.', 'Es desa com a còpia: l\u2019original no es toca.'], 'Sale hasta el': ['Shows until', 'Surt fins al'], 'Sale desde el': ['Shows from', 'Surt des del'], 'Caducó el': ['Expired on', 'Va caducar el']
   });
   const el = (t, c) => { const e = document.createElement(t); if (c) e.className = c; return e; };
   const hoy = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
@@ -93,7 +93,9 @@
     const d = m.querySelector('.bib-der'); d.scrollTop = st; }
 
   /* ---------- ver un cartel en grande ---------- */
-  function ver(f) { X.abreModal(X.cabModal(esc(nombre(f))) + `<div class="tc-grande">${esVideo(f) ? `<video src="${esc(urlDe(f))}" autoplay muted loop playsinline></video>` : `<img src="${esc(urlDe(f))}" alt="${esc(nombre(f))}">`}</div>`, 'm-ver'); }
+  function ver(f) { X.abreModal(X.cabModal(esc(nombre(f))) + `<div class="tc-grande">${esVideo(f) ? `<video src="${esc(urlDe(f))}" autoplay muted loop playsinline></video>` : `<img src="${esc(urlDe(f))}" alt="${esc(nombre(f))}">`}</div>` + (esVideo(f) ? '' : `<div class="tc-foto"><button type="button" class="tecla pri" data-a="carFoto" data-v="${esc(f)}">✎ ${T('Editar en FOTO')}</button><span>${T('Se guarda como copia: el original no se toca.')}</span></div>`), 'm-ver'); }
+  /* v1.16 · FOTO, el editor de imagen: se abre en otra pestaña con el cartel; lo editado vuelve como copia a «Mis imágenes» */
+  function abreFoto(f) { const q = propia(f) ? 'm=' + encodeURIComponent(f.slice(2)) : 'src=' + encodeURIComponent(new URL(urlDe(f), location.href).href); window.open('foto/?' + q + '&n=' + encodeURIComponent(propia(f) ? 'imagen' : nombre(f)), '_blank'); }
 
   Object.assign(G.ACC, {
     carSel(f) { elegido = elegido === f ? '' : f; pinta(); },
@@ -103,7 +105,7 @@
     carOff(f) { G.cambia(p => { const a = p.archivos[f] || (p.archivos[f] = {}); if (a.off) delete a.off; else a.off = true; if (!Object.keys(a).length) delete p.archivos[f]; }); },
     carMueve(d) { const f = elegido, L = todos(P()), i = L.indexOf(f), j = i + +d; if (i < 0 || j < 0 || j >= L.length) return; mueve(f, +d < 0 ? L[j] : L[j + 1] || ''); },
     carQuita(f) { if (!(P().sueltos || []).includes(f)) return; elegido = ''; G.cambia(p => { p.sueltos = p.sueltos.filter(x => x !== f); p.secuencia = (p.secuencia || []).filter(x => x !== f); delete p.archivos[f]; }); },
-    carVer(f) { ver(f); },
+    carVer(f) { ver(f); }, carFoto(f) { abreFoto(f); },
     carMas() { anade(); },
     pkCarp(c) { if (!pk) return; pk.carp = c; pkPinta(); },
     pkTog(f) { if (!pk) return; pk.sel.has(f) ? pk.sel.delete(f) : pk.sel.add(f); pkPinta(); },

@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.15**
+**Versión actual: v1.16**
 
 ## Cómo funciona
 
@@ -28,6 +28,18 @@ El gestor (la página principal) prepara esa dirección con todo lo que es de ca
 En tablet y móvil las ventanas se apilan, con el lienzo arriba; en móvil apaisado el lienzo se queda a la izquierda (y la tira de carteles pasa arriba de la columna de la derecha).
 
 ## Funciones
+
+**FOTO, el editor de imagen** (nuevo en v1.16, primera tanda)
+
+- **Dónde:** `adposter.mediaservi.com/foto/`, o desde el gestor: al ver un cartel en grande, «✎ Editar en FOTO» lo abre en otra pestaña. También se abre una imagen soltándola, pegándola o eligiéndola.
+- **Capas** con visibilidad, opacidad y 16 modos de fusión; capa nueva, imagen como capa, duplicar, borrar, subir, bajar, combinar abajo y acoplar todo.
+- **Historial** con deshacer y rehacer (Ctrl+Z / Ctrl+Y) y la lista de pasos para volver a cualquiera.
+- **Recortar** con proporciones (libre, original, 9:16, 16:9, 2:3, 3:2, 1:1, 4:5) y **enderezar**; girar 90°, voltear y cambiar el tamaño.
+- **Ajustes:** brillo y contraste (con exposición y gamma), niveles, curvas, tono y saturación (con vividez), equilibrio de color y blanco y negro con virado. **Filtros:** desenfocar, enfocar, ruido y viñeta. Todos con vista previa en vivo.
+- **Botones mágicos de un toque**, cada uno con su intensidad: mejora automática, vividez, balance de blancos, quitar neblina, quitar ruido y enfocar.
+- **Exportar** en WebP, JPG o PNG (con transparencia) a la medida de cada pantalla (FHD vertical u horizontal, póster 2:3, cuadrada, 4K) llenando o entera. **Guardar copia en ADPOSTER** la deja en «Mis imágenes»; el original no se toca nunca y la copia se llama `…-editada`.
+- Todo ocurre en el navegador: la imagen no sale del equipo.
+- **Llega en las próximas tandas:** selecciones y máscaras, pincel, borrador, tampón, pincel corrector, texto, formas y degradados; quitar el fondo, borrar un objeto, ampliar ×2 o ×4, reparar fotos antiguas y colorear; abrir y guardar PSD.
 
 **La lista de carteles a la vista** (nuevo en v1.15)
 
@@ -108,6 +120,7 @@ No hay servidor propio. El gestor, los displays y la página del público se hab
 | `editor.js` | El editor de composiciones en el lienzo, las pestañas PIEZAS y ESCENA y la galería de plantillas |
 | `gestion.js` | La biblioteca de archivos y el calendario |
 | `lista.js` | La tira de carteles bajo el lienzo, la ficha de cada cartel y «+» para añadir carteles sueltos (v1.15) |
+| `foto/` | FOTO, el editor de imagen (v1.16): `index.html`, `foto.js` (capas, historial, herramientas y paneles), `px.js` (ajustes, filtros y botones mágicos) y `foto.css` |
 | `escena.js`, `escena.css` | El motor que pinta las escenas; lo usan igual el editor y el reproductor |
 | `plantillas.js` | Las plantillas de composición |
 | `cine/`, `klub/`, `p/` | Las direcciones de reproducción (la URL que se da al kiosco) |
@@ -127,7 +140,13 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.15)
+## Cambios de la versión actual (v1.16)
+
+- **FOTO, el editor de imagen propio (primera tanda):** capas con modos de fusión, historial, recortar y enderezar, girar y voltear, tamaño, ajustes, filtros y seis botones mágicos, con exportación a la medida de cada pantalla y copia en «Mis imágenes». Se abre desde el cartel en grande del gestor («✎ Editar en FOTO») o en `/foto/`.
+- El gestor recibe la copia que guarda FOTO aunque esté en otra pestaña.
+- La aplicación sin conexión guarda también FOTO y la tira de carteles.
+
+### v1.15
 
 - **Editor de listas de carteles mucho más directo:** debajo de la vista previa sale la tira con todos los carteles de la lista en su orden, con su duración y su estado, y los anuncios al final. Se ordena arrastrando y cada cartel tiene su ficha, sin abrir la biblioteca.
 - **Fechas en cada cartel** (desde / hasta): el reproductor solo lo enseña entre esas fechas y rehace la lista a medianoche.
@@ -300,7 +319,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.15 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.16 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 
