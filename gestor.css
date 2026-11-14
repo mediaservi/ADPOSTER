@@ -397,3 +397,5 @@ input.campo.tc-f { flex: none; width: 9.4em; padding: 0 6px; font-size: .95em; c
 .tc-grande { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
 .tc-grande img, .tc-grande video { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; box-shadow: 0 6px 30px rgba(0, 0, 0, .6); }
 @media (max-width: 900px) and (orientation: landscape) { .consola > .tirac { grid-column: 2; } }   /* en el móvil apaisado la tira va arriba de la columna de la derecha (lista.js le pone el aspecto de ventana) */
+/* v1.16 · bajo el cartel en grande: abrirlo en FOTO, el editor de imagen */
+.tc-foto { flex: none; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 14px; padding-top: 10px; color: var(--gris); font-size: .92em; }
