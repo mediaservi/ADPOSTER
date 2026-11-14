@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.11**
+**Versión actual: v1.12**
 
 ## Cómo funciona
 
@@ -114,7 +114,11 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.11, beta)
+## Cambios de la versión actual (v1.12, beta)
+
+- Logo nuevo de MSGAME en la barra de apps: «MS» en dos fichas moradas con la misma letra que GAME y sombra verde.
+
+### v1.11 (beta)
 
 - Logo de MSGAME de la barra de apps con la calavera nueva: el ojo derecho es una cruceta de mando, como si guiñara.
 
@@ -259,7 +263,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.8 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.12 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 
