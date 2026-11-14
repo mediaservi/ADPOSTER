@@ -1,4 +1,4 @@
-/* ADPOSTER · FOTO, el editor de imagen (v1.16, tanda 1: núcleo) · GPL-3.0 · mediaservi.com
+/* ADPOSTER · FOTO, el editor de imagen (v1.17: núcleo de la tanda 1 y herramientas de la tanda 2) · GPL-3.0 · mediaservi.com
    · Abre una imagen (desde la biblioteca de ADPOSTER con ?src=…&n=…, soltándola, pegándola o eligiéndola).
    · Capas con visibilidad, opacidad y modo de fusión; añadir, duplicar, borrar, ordenar, combinar y acoplar.
    · Historial con deshacer y rehacer (las capas que no cambian se comparten entre pasos: ocupa poco).
@@ -8,7 +8,7 @@
      (el original no se toca nunca). Todo ocurre en el navegador: la imagen no sale del equipo. */
 (function () {
   'use strict';
-  const $ = s => document.querySelector(s), PX = window.ADPX, VERSION = '1.16';
+  const $ = s => document.querySelector(s), PX = window.ADPX, VERSION = '1.17';
   const lee = k => { try { return JSON.parse(localStorage.getItem('adposter:' + k)); } catch (e) { return null; } }, guarda = (k, v) => { try { localStorage.setItem('adposter:' + k, JSON.stringify(v)); } catch (e) {} };
   const IDI = ['es', 'en', 'ca']; let lang = lee('lang') || (IDI.includes((navigator.language || '').slice(0, 2)) ? navigator.language.slice(0, 2) : 'es');
   /* textos: español de base y [inglés, catalán] */
@@ -48,6 +48,8 @@
   const ctx = c => c.getContext('2d', { willReadFrequently: true });
   const MODOS = [['source-over', 'Normal'], ['multiply', 'Multiplicar'], ['screen', 'Trama'], ['overlay', 'Superponer'], ['soft-light', 'Luz suave'], ['hard-light', 'Luz fuerte'], ['darken', 'Oscurecer'], ['lighten', 'Aclarar'], ['color-dodge', 'Sobreexponer color'], ['color-burn', 'Subexponer color'], ['difference', 'Diferencia'], ['exclusion', 'Exclusión'], ['hue', 'Tono'], ['saturation', 'Saturación'], ['color', 'Color'], ['luminosity', 'Luminosidad']];
   const TOPE = 8192;   // lado máximo que se edita (los navegadores no dan lienzos más grandes de forma fiable)
+  /* v1.17 · las herramientas de la tanda 2 (herr.js) se enchufan aquí: EXT.herr[nombre] = { ic, n, tecla, down, move, up, panel, pinta } */
+  const EXT = { herr: {}, orden: [], tmp: null, sel: null };   // tmp: { i, cv, m } vista previa de un trazo; sel: máscara de selección (lienzo con alfa)
   /* ---------- documento: capas e historial ---------- */
   let D = null, act = 0, nId = 1, H = [], hi = -1, nombre = 'imagen', herr = 'mano', tab = 'capas', ses = null, rec = null;
   const V = { z: 1, x: 0, y: 0 };   // zoom y desplazamiento de la vista (en píxeles de pantalla)
@@ -58,11 +60,14 @@
   /* cada cambio deja la capa vieja intacta (la usa el historial) y trabaja sobre un lienzo nuevo */
   function cambiaCapa(i, cv, etq) { D.capas[i] = Object.assign({}, D.capas[i], { cv }); compone(); paso(etq); pinta(); pintaTab(); }
   function abreDoc(img, n) { const k = Math.min(1, TOPE / Math.max(img.width || img.naturalWidth, img.height || img.naturalHeight)), w = Math.round((img.width || img.naturalWidth) * k), h = Math.round((img.height || img.naturalHeight) * k), c = lienzo(w, h); c.getContext('2d').drawImage(img, 0, 0, w, h);
-    nombre = (n || 'imagen').replace(/\.[a-z0-9]+$/i, ''); D = { w, h, capas: [capa(c, T('Fondo'))] }; act = 0; H = []; hi = -1; paso(T('Abrir imagen')); cierraSes(); encaja(); compone(); pinta(); pintaTab(); $('#fo-vacio').hidden = true; estado(T('Abierta') + ' · ' + nombre + ' · ' + w + '×' + h); }
+    nombre = (n || 'imagen').replace(/\.[a-z0-9]+$/i, ''); EXT.sel = null; EXT.tmp = null; D = { w, h, capas: [capa(c, T('Fondo'))] }; act = 0; H = []; hi = -1; paso(T('Abrir imagen')); cierraSes(); encaja(); compone(); pinta(); pintaTab(); $('#fo-vacio').hidden = true; estado(T('Abierta') + ' · ' + nombre + ' · ' + w + '×' + h); }
   /* ---------- composición y vista ---------- */
   let comp = null, vista = $('#fo-vista'), vx = vista.getContext('2d'), dam = null;
   function compone() { if (!D) return; if (!comp || comp.width !== D.w || comp.height !== D.h) comp = lienzo(D.w, D.h); const x = comp.getContext('2d'); x.clearRect(0, 0, D.w, D.h);
-    D.capas.forEach((c, i) => { if (!c.vis) return; x.globalAlpha = c.op; x.globalCompositeOperation = c.modo; const pv = ses && ses.pv && i === act ? ses.pv : null; x.drawImage(pv || c.cv, 0, 0, D.w, D.h); }); x.globalAlpha = 1; x.globalCompositeOperation = 'source-over'; }
+    D.capas.forEach((c, i) => { if (!c.vis) return; dibujaCapa(x, c, i); }); x.globalAlpha = 1; x.globalCompositeOperation = 'source-over'; }
+  let tmpM = null; function dibujaCapa(x, c, i) { const T2 = EXT.tmp && EXT.tmp.i === i ? EXT.tmp : null, src = T2 && T2.cv ? T2.cv : ses && ses.pv && i === act ? ses.pv : c.cv, m = T2 && T2.m ? T2.m : c.mask;
+    x.globalAlpha = c.op; x.globalCompositeOperation = c.modo; if (!m) { x.drawImage(src, 0, 0, D.w, D.h); return; }
+    if (!tmpM || tmpM.width !== D.w || tmpM.height !== D.h) tmpM = lienzo(D.w, D.h); const q = tmpM.getContext('2d'); q.globalCompositeOperation = 'copy'; q.drawImage(src, 0, 0, D.w, D.h); q.globalCompositeOperation = 'destination-in'; q.drawImage(m, 0, 0); q.globalCompositeOperation = 'source-over'; x.drawImage(tmpM, 0, 0); }
   function damero() { if (dam) return dam; dam = vx.createPattern((() => { const c = lienzo(16, 16), q = c.getContext('2d'); q.fillStyle = '#3a3a3e'; q.fillRect(0, 0, 16, 16); q.fillStyle = '#2a2a2d'; q.fillRect(0, 0, 8, 8); q.fillRect(8, 8, 8, 8); return c; })(), 'repeat'); return dam; }
   function tamVista() { const r = $('#fo-lienzo').getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1), w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr)); if (vista.width !== w || vista.height !== h) { vista.width = w; vista.height = h; } return { w: r.width, h: r.height, dpr }; }
   function encaja() { if (!D) return; const t = tamVista(), m = 24; V.z = Math.min((t.w - m * 2) / D.w, (t.h - m * 2) / D.h, 4); V.x = (t.w - D.w * V.z) / 2; V.y = (t.h - D.h * V.z) / 2; pinta(); }
@@ -70,35 +75,42 @@
     vx.save(); vx.translate(V.x, V.y); vx.fillStyle = damero(); vx.fillRect(0, 0, D.w * V.z, D.h * V.z); vx.restore(); vx.imageSmoothingEnabled = V.z < 2; vx.imageSmoothingQuality = 'high';
     const mv = herr === 'mover' && arr && arr.tipo === 'mover' ? arr : null; if (mv) { vx.drawImage(compSin(), V.x, V.y, D.w * V.z, D.h * V.z); const c = D.capas[act]; vx.globalAlpha = c.op; vx.globalCompositeOperation = c.modo; vx.drawImage(c.cv, V.x + mv.dx * V.z, V.y + mv.dy * V.z, D.w * V.z, D.h * V.z); vx.globalAlpha = 1; vx.globalCompositeOperation = 'source-over'; }
     else vx.drawImage(comp, V.x, V.y, D.w * V.z, D.h * V.z);
-    vx.strokeStyle = 'rgba(0,0,0,.6)'; vx.lineWidth = 1; vx.strokeRect(V.x - .5, V.y - .5, D.w * V.z + 1, D.h * V.z + 1); pintaRec(); const zb = $('#fo-zoom'); if (zb) zb.textContent = Math.round(V.z * 100) + ' %'; }
-  let compSinCache = null; function compSin() { if (compSinCache) return compSinCache; const c = lienzo(D.w, D.h), x = c.getContext('2d'); D.capas.forEach((k, i) => { if (!k.vis || i === act) return; x.globalAlpha = k.op; x.globalCompositeOperation = k.modo; x.drawImage(k.cv, 0, 0); }); return (compSinCache = c); }
+    vx.strokeStyle = 'rgba(0,0,0,.6)'; vx.lineWidth = 1; vx.strokeRect(V.x - .5, V.y - .5, D.w * V.z + 1, D.h * V.z + 1); EXT.orden.forEach(k => { const h = EXT.herr[k]; if (h.siempre || k === herr) { try { h.pinta && h.pinta(vx, V); } catch (e) { console.warn(e); } } }); pintaRec(); const zb = $('#fo-zoom'); if (zb) zb.textContent = Math.round(V.z * 100) + ' %'; }
+  let compSinCache = null; function compSin() { if (compSinCache) return compSinCache; const c = lienzo(D.w, D.h), x = c.getContext('2d'); D.capas.forEach((k, i) => { if (!k.vis || i === act) return; dibujaCapa(x, k, i); }); return (compSinCache = c); }
   const aDoc = (cx, cy) => [(cx - V.x) / V.z, (cy - V.y) / V.z];
   function zoomEn(f, cx, cy) { const t = tamVista(); cx = cx == null ? t.w / 2 : cx; cy = cy == null ? t.h / 2 : cy; const [dx, dy] = aDoc(cx, cy); V.z = Math.min(32, Math.max(.02, V.z * f)); V.x = cx - dx * V.z; V.y = cy - dy * V.z; pinta(); }
   /* ---------- ratón, dedo y teclado sobre el lienzo ---------- */
   let arr = null; const lz = $('#fo-lienzo'), punteros = new Map();
   lz.addEventListener('pointerdown', e => { if (!D) return; lz.setPointerCapture(e.pointerId); punteros.set(e.pointerId, [e.clientX, e.clientY]); const r = lz.getBoundingClientRect(), cx = e.clientX - r.left, cy = e.clientY - r.top;
     if (punteros.size === 2) { const [a, b] = [...punteros.values()]; arr = { tipo: 'pinza', d0: Math.hypot(a[0] - b[0], a[1] - b[1]), z0: V.z, x0: V.x, y0: V.y, m: [(a[0] + b[0]) / 2 - r.left, (a[1] + b[1]) / 2 - r.top] }; return; }
+    if (EXT.herr[herr] && EXT.herr[herr].down && !(e.button === 1 || espacio)) { const [x, y] = aDoc(cx, cy); arr = { tipo: 'ext', h: EXT.herr[herr] }; arr.h.down(x, y, e); return; }
     if (herr === 'mano' || e.button === 1 || espacio) { arr = { tipo: 'mano', x: e.clientX, y: e.clientY, vx: V.x, vy: V.y }; lz.classList.add('arrastra'); }
     else if (herr === 'mover') { compSinCache = null; arr = { tipo: 'mover', x: e.clientX, y: e.clientY, dx: 0, dy: 0 }; }
     else if (herr === 'recortar' && rec) { const [x, y] = aDoc(cx, cy), h = asa(cx, cy); arr = { tipo: 'rec', h, x0: x, y0: y, r0: Object.assign({}, rec) }; if (!h && !(x > rec.x && x < rec.x + rec.w && y > rec.y && y < rec.y + rec.h)) { arr.h = 'nuevo'; rec.x = x; rec.y = y; rec.w = 1; rec.h = 1; arr.r0 = Object.assign({}, rec); } } });
-  lz.addEventListener('pointermove', e => { if (!punteros.has(e.pointerId)) return; punteros.set(e.pointerId, [e.clientX, e.clientY]); if (!arr) return; const r = lz.getBoundingClientRect();
+  lz.addEventListener('pointermove', e => { if (EXT.herr[herr] && EXT.herr[herr].hover && D) { const r = lz.getBoundingClientRect(), [x, y] = aDoc(e.clientX - r.left, e.clientY - r.top); EXT.herr[herr].hover(x, y); }
+    if (!punteros.has(e.pointerId)) return; punteros.set(e.pointerId, [e.clientX, e.clientY]); if (!arr) return; const r = lz.getBoundingClientRect();
     if (arr.tipo === 'pinza' && punteros.size >= 2) { const [a, b] = [...punteros.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]), k = Math.min(32, Math.max(.02, arr.z0 * d / Math.max(1, arr.d0))), m = [(a[0] + b[0]) / 2 - r.left, (a[1] + b[1]) / 2 - r.top]; V.x = m[0] - (arr.m[0] - arr.x0) * k / arr.z0; V.y = m[1] - (arr.m[1] - arr.y0) * k / arr.z0; V.z = k; pinta(); }
+    else if (arr.tipo === 'ext') { const [x, y] = aDoc(e.clientX - r.left, e.clientY - r.top); arr.h.move && arr.h.move(x, y, e); }
     else if (arr.tipo === 'mano') { V.x = arr.vx + e.clientX - arr.x; V.y = arr.vy + e.clientY - arr.y; pinta(); }
     else if (arr.tipo === 'mover') { arr.dx = Math.round((e.clientX - arr.x) / V.z); arr.dy = Math.round((e.clientY - arr.y) / V.z); pinta(); }
     else if (arr.tipo === 'rec') { const [x, y] = aDoc(e.clientX - r.left, e.clientY - r.top); mueveRec(arr, x, y); pinta(); } });
   const suelta = e => { punteros.delete(e.pointerId); if (!arr) return; const a = arr; if (punteros.size && a.tipo === 'pinza') return; arr = null; lz.classList.remove('arrastra');
+    if (a.tipo === 'ext') { const r = lz.getBoundingClientRect(), [x, y] = aDoc(e.clientX - r.left, e.clientY - r.top); a.h.up && a.h.up(x, y, e); return; }
     if (a.tipo === 'mover' && (a.dx || a.dy)) { const c = D.capas[act], n = lienzo(D.w, D.h); n.getContext('2d').drawImage(c.cv, a.dx, a.dy); compSinCache = null; cambiaCapa(act, n, T('Mover')); } else pinta(); };
   lz.addEventListener('pointerup', suelta); lz.addEventListener('pointercancel', suelta);
   lz.addEventListener('wheel', e => { if (!D) return; e.preventDefault(); const r = lz.getBoundingClientRect(); if (e.ctrlKey || e.metaKey || !e.deltaX) zoomEn(Math.exp(-e.deltaY * (e.ctrlKey ? .01 : .0018)), e.clientX - r.left, e.clientY - r.top); else { V.x -= e.deltaX; V.y -= e.deltaY; pinta(); } }, { passive: false });
   let espacio = false;
   addEventListener('keydown', e => { const enCampo = /INPUT|SELECT|TEXTAREA/.test((document.activeElement || {}).tagName || ''); if (e.code === 'Space' && !enCampo) { espacio = true; lz.classList.add('mano'); e.preventDefault(); }
     if (enCampo) return; const m = e.ctrlKey || e.metaKey;
+    if (D && EXT.tecla && EXT.tecla(e)) { e.preventDefault(); return; }
+    if (D && !m && !e.altKey && e.key.length === 1) { const k = e.key.toLowerCase(), t = { h: 'mano', v: 'mover', c: 'recortar' }[k] || EXT.orden.find(n => EXT.herr[n].tecla === k); if (t) { ponHerr(t); return; } }
     if (m && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? rehaz() : deshaz(); } else if (m && e.key.toLowerCase() === 'y') { e.preventDefault(); rehaz(); }
     else if (m && (e.key === '0')) { e.preventDefault(); encaja(); } else if (m && (e.key === '+' || e.key === '=')) { e.preventDefault(); zoomEn(1.25); } else if (m && e.key === '-') { e.preventDefault(); zoomEn(.8); }
     else if (e.key === 'Enter' && (ses || rec)) { e.preventDefault(); ses ? aplicaSes() : aplicaRec(); } else if (e.key === 'Escape' && (ses || rec)) { e.preventDefault(); cierraSes(); quitaRec(); pintaTab(); } });
   addEventListener('keyup', e => { if (e.code === 'Space') { espacio = false; lz.classList.toggle('mano', herr === 'mano'); } });
   addEventListener('resize', () => { if (D) pinta(); });
   const deshaz = () => { if (hi > 0) vuelve(hi - 1); }, rehaz = () => { if (hi < H.length - 1) vuelve(hi + 1); };
+  function ponHerr(v) { const ant = EXT.herr[herr]; if (ant && ant.sale) ant.sale(); herr = v; cierraSes(); if (v === 'recortar' && D) abreRec(); else quitaRec(); const nu = EXT.herr[v]; if (nu && nu.entra) nu.entra(); pintaTab(); pinta(); }
   /* ---------- recortar y enderezar ---------- */
   const PROP = [['libre', 'Libre', 0], ['orig', 'Original', -1], ['916', '9:16', 9 / 16], ['169', '16:9', 16 / 9], ['23', '2:3', 2 / 3], ['32', '3:2', 3 / 2], ['11', '1:1', 1], ['45', '4:5', 4 / 5]];
   function abreRec() { rec = { x: 0, y: 0, w: D.w, h: D.h, p: 'libre', ang: 0 }; pinta(); }
@@ -144,10 +156,13 @@
   const PREV = 1400;   // lado de la vista previa (rápida); al aplicar se calcula a tamaño completo
   function abreSes(k) { if (!D) return; cierraSes(); quitaRec(); const o = OPS[k], c = D.capas[act].cv, kk = Math.min(1, PREV / Math.max(c.width, c.height)), pc = kk < 1 ? PX.escala(c, Math.round(c.width * kk), Math.round(c.height * kk)) : c;
     ses = { k, o, p: Object.fromEntries(o.p.map(q => [q[0], q[q.length === 4 ? 3 : 4]])), src: ctx(pc).getImageData(0, 0, pc.width, pc.height), kk, pv: null }; previa(); pintaTab(); }
-  let prT = 0; function previa() { clearTimeout(prT); prT = setTimeout(() => { if (!ses) return; const p = escalaP(ses.p, ses.kk), im = ses.o.f(ses.src, p), c = lienzo(im.width, im.height); c.getContext('2d').putImageData(im, 0, 0); ses.pv = c; compone(); pinta(); }, 40); }
+    /* mezcla el resultado con el original según la selección (con su borde suave) */
+  function conSel(orig, res) { if (!EXT.sel) return res; const w = res.width, h = res.height, m = lienzo(w, h), q = ctx(m); q.drawImage(EXT.sel, 0, 0, w, h); const a = q.getImageData(0, 0, w, h).data, o = orig.data, d = res.data;
+    for (let i = 0; i < d.length; i += 4) { const k = a[i + 3] / 255; if (k >= 1) continue; d[i] = o[i] + (d[i] - o[i]) * k; d[i + 1] = o[i + 1] + (d[i + 1] - o[i + 1]) * k; d[i + 2] = o[i + 2] + (d[i + 2] - o[i + 2]) * k; d[i + 3] = o[i + 3] + (d[i + 3] - o[i + 3]) * k; } return res; }
+  let prT = 0; function previa() { clearTimeout(prT); prT = setTimeout(() => { if (!ses) return; const p = escalaP(ses.p, ses.kk), im = conSel(ses.src, ses.o.f(ses.src, p)), c = lienzo(im.width, im.height); c.getContext('2d').putImageData(im, 0, 0); ses.pv = c; compone(); pinta(); }, 40); }
   const escalaP = (p, k) => { const q = Object.assign({}, p); ((ses && ses.o.esc) || []).forEach(n => { q[n] = p[n] * k; }); if ('mono' in q) q.mono = !!+q.mono; return q; };
   function cierraSes() { if (!ses) return; ses = null; compone(); pinta(); }
-  function aplicaSes() { if (!ses) return; const s = ses; espera(true); setTimeout(() => { try { const c = D.capas[act].cv, im = s.o.f(ctx(c).getImageData(0, 0, c.width, c.height), s.p.mono != null ? Object.assign({}, s.p, { mono: !!+s.p.mono }) : s.p), n = lienzo(im.width, im.height); n.getContext('2d').putImageData(im, 0, 0); ses = null; cambiaCapa(act, n, T(s.o.n)); estado(T(s.o.n) + ' · ' + T('Hecho')); } catch (e) { console.warn(e); estado(String(e.message || e)); } espera(false); }, 30); }
+  function aplicaSes() { if (!ses) return; const s = ses; espera(true); setTimeout(() => { try { const c = D.capas[act].cv, im0 = ctx(c).getImageData(0, 0, c.width, c.height), im = conSel(im0, s.o.f(im0, s.p.mono != null ? Object.assign({}, s.p, { mono: !!+s.p.mono }) : s.p)), n = lienzo(im.width, im.height); n.getContext('2d').putImageData(im, 0, 0); ses = null; cambiaCapa(act, n, T(s.o.n)); estado(T(s.o.n) + ' · ' + T('Hecho')); } catch (e) { console.warn(e); estado(String(e.message || e)); } espera(false); }, 30); }
   /* ---------- capas ---------- */
   function nuevaCapa(cv, n) { const c = capa(cv || lienzo(D.w, D.h), n || T('Capa') + ' ' + (D.capas.length + 1)); D.capas.splice(act + 1, 0, c); act++; compone(); paso(T('Nueva capa')); pinta(); pintaTab(); }
   function capaImagen(img, n) { const c = lienzo(D.w, D.h), k = Math.min(1, D.w / img.width, D.h / img.height), w = img.width * k, h = img.height * k; c.getContext('2d').drawImage(img, (D.w - w) / 2, (D.h - h) / 2, w, h); nuevaCapa(c, (n || T('Imagen')).replace(/\.[a-z0-9]+$/i, '')); }
@@ -181,26 +196,27 @@
   function estado(t) { const s = $('#fo-estado span'); if (s) s.textContent = t || ''; }
   function espera(on) { let e = $('#fo-espera'); if (!e) { e = document.createElement('div'); e.id = 'fo-espera'; e.className = 'fo-espera'; lz.appendChild(e); } e.textContent = T('Procesando…'); e.hidden = !on; }
   const tecla = (a, txt, x) => '<button type="button" class="tecla' + (x && x.cls ? ' ' + x.cls : '') + '" data-a="' + a + '"' + (x && x.v != null ? ' data-v="' + esc(x.v) + '"' : '') + (x && x.dis ? ' disabled' : '') + (x && x.t ? ' title="' + esc(x.t) + '" aria-label="' + esc(x.t) + '"' : '') + '>' + txt + '</button>';
-  function pintaHerr() { const H2 = [['mano', '✋', 'Mano'], ['mover', '✥', 'Mover capa'], ['recortar', '⛶', 'Recortar']];
-    $('#fo-herr').innerHTML = H2.map(h => tecla('herr', h[1], { v: h[0], t: T(h[2]), cls: herr === h[0] ? 'on' : '' })).join('') + '<hr>' + tecla('gira', '↺', { v: -1, t: T('Girar a la izquierda'), dis: !D }) + tecla('gira', '↻', { v: 1, t: T('Girar a la derecha'), dis: !D }) + tecla('voltea', '⇋', { v: 1, t: T('Voltear en horizontal'), dis: !D }) + tecla('voltea', '⇵', { v: 0, t: T('Voltear en vertical'), dis: !D });
-    lz.classList.toggle('mano', herr === 'mano'); lz.classList.toggle('mover', herr === 'mover'); lz.classList.toggle('recorta', herr === 'recortar'); }
+  function pintaHerr() { const H2 = [['mano', '✋', 'Mano'], ['mover', '✥', 'Mover capa'], ['recortar', '⛶', 'Recortar']].concat(EXT.orden.filter(k => EXT.herr[k].ic).map(k => [k, EXT.herr[k].ic, EXT.herr[k].n]));
+    $('#fo-herr').innerHTML = H2.map(h => tecla('herr', h[1], { v: h[0], t: T(h[2]) + (EXT.herr[h[0]] && EXT.herr[h[0]].tecla ? ' (' + EXT.herr[h[0]].tecla.toUpperCase() + ')' : ''), cls: herr === h[0] ? 'on' : '' })).join('') + '<hr>' + tecla('gira', '↺', { v: -1, t: T('Girar a la izquierda'), dis: !D }) + tecla('gira', '↻', { v: 1, t: T('Girar a la derecha'), dis: !D }) + tecla('voltea', '⇋', { v: 1, t: T('Voltear en horizontal'), dis: !D }) + tecla('voltea', '⇵', { v: 0, t: T('Voltear en vertical'), dis: !D });
+    lz.classList.toggle('mano', herr === 'mano'); lz.classList.toggle('mover', herr === 'mover'); lz.classList.toggle('recorta', herr === 'recortar'); lz.classList.toggle('pinta', !!(EXT.herr[herr] && EXT.herr[herr].cursor)); }
   function pintaBarra() { $('#fo-barra').innerHTML = '<div class="fila">' + tecla('abre', '📂 ' + T('Abrir')) + tecla('deshaz', '↶', { t: T('Deshacer'), dis: hi <= 0 }) + tecla('rehaz', '↷', { t: T('Rehacer'), dis: hi >= H.length - 1 }) + '</div><div class="fila" style="justify-content:flex-end">' + tecla('zoom', '−', { v: .8, t: T('Zoom') + ' −' }) + '<span class="tecla zoom" id="fo-zoom">' + Math.round(V.z * 100) + ' %</span>' + tecla('zoom', '+', { v: 1.25, t: T('Zoom') + ' +' }) + tecla('encaja', T('Ajustar')) + '</div>'; }
   const TABS = [['capas', 'Capas'], ['ajustes', 'Ajustes'], ['magia', 'Magia'], ['exportar', 'Exportar'], ['hist', 'Historial']];
   function pintaTab() { pintaBarra(); pintaHerr(); $('#fo-tabs').innerHTML = TABS.map(t => '<button type="button" class="tab' + (tab === t[0] ? ' on' : '') + '" role="tab" aria-selected="' + (tab === t[0]) + '" data-a="tab" data-v="' + t[0] + '">' + T(t[1]) + '</button>').join('');
     const C = $('#fo-cuerpo'); if (!D) { C.innerHTML = '<div class="fo-sec"><p class="fo-nota">' + T('Todo ocurre en tu navegador: la imagen no sale de tu equipo y el original no se toca.') + '</p></div>'; return; }
     if (herr === 'recortar' && rec) { C.innerHTML = panelRec(); return; }
+    const ex = EXT.herr[herr] && EXT.herr[herr].panel && !ses ? EXT.herr[herr].panel() : '';   /* las opciones de la herramienta arriba y la pestaña elegida debajo */
     if (ses) { C.innerHTML = panelSes(); return; }
-    C.innerHTML = tab === 'capas' ? panelCapas() : tab === 'ajustes' ? panelAjustes() : tab === 'magia' ? panelMagia() : tab === 'exportar' ? panelExp() : panelHist(); if (tab === 'capas') miniaturas(); }
+    C.innerHTML = ex + (tab === 'capas' ? panelCapas() : tab === 'ajustes' ? panelAjustes() : tab === 'magia' ? panelMagia() : tab === 'exportar' ? panelExp() : panelHist()); if (tab === 'capas') miniaturas(); }
   const desl = (id, et, mn, mx, v, st) => '<div class="desl"><label for="' + id + '">' + T(et) + '</label><input type="range" id="' + id + '" min="' + mn + '" max="' + mx + '" step="' + (st || 1) + '" value="' + v + '"><output for="' + id + '">' + (+v).toFixed(st && st < 1 ? (st < .1 ? 2 : 1) : 0) + '</output></div>';
   const selec = (id, et, ops, v) => '<div class="desl"><label for="' + id + '">' + T(et) + '</label><select class="fo-sel" id="' + id + '" style="grid-column:2/-1">' + ops.map(o => '<option value="' + esc(o[0]) + '"' + (String(o[0]) === String(v) ? ' selected' : '') + '>' + esc(T(o[1])) + '</option>').join('') + '</select></div>';
   function panelSes() { const o = ses.o; return '<div class="fo-sec"><h3>' + esc((o.ic ? o.ic + ' ' : '') + T(o.n)) + '</h3>' + o.p.map(q => Array.isArray(q[2]) ? selec('ps-' + q[0], q[1], q[2], ses.p[q[0]]) : desl('ps-' + q[0], q[1], q[2], q[3], ses.p[q[0]], q[5])).join('') +
     '<div class="fo-acc">' + tecla('ses-cancela', T('Cancelar')) + tecla('ses-aplica', T('Aplicar'), { cls: 'pri' }) + '</div>' + tecla('ses-reset', T('Restablecer'), { cls: 'reset' }) + '</div>'; }
   function panelRec() { return '<div class="fo-sec"><h3>' + T('Recortar') + '</h3>' + selec('rc-p', 'Proporción', PROP.map(p => [p[0], p[1]]), rec.p) + desl('rc-a', 'Enderezar', -45, 45, rec.ang || 0, .5) + '<div class="fo-acc">' + tecla('rec-cancela', T('Cancelar')) + tecla('rec-aplica', T('Aplicar'), { cls: 'pri' }) + '</div></div>'; }
-  function panelCapas() { const L = D.capas.map((c, i) => ({ c, i })).reverse(); return '<div class="fo-sec"><h3>' + T('Capas') + '<span>' + D.w + '×' + D.h + '</span></h3><div class="fo-capas">' + L.map(({ c, i }) => '<div class="fo-cp' + (i === act ? ' on' : '') + '" data-a="capa" data-v="' + i + '">' + tecla('ojo', c.vis ? '👁' : '◌', { v: i, cls: 'ojo' + (c.vis ? '' : ' off'), t: c.n }) + '<canvas data-mini="' + i + '" width="92" height="68"></canvas><span class="nom">' + esc(c.n) + '<small>' + Math.round(c.op * 100) + ' % · ' + esc(T((MODOS.find(m => m[0] === c.modo) || MODOS[0])[1])) + '</small></span></div>').join('') + '</div>' +
+  function panelCapas() { const L = D.capas.map((c, i) => ({ c, i })).reverse(); return '<div class="fo-sec fo-sec-capas"><h3>' + T('Capas') + '<span>' + D.w + '×' + D.h + '</span></h3><div class="fo-capas">' + L.map(({ c, i }) => '<div class="fo-cp' + (i === act ? ' on' : '') + '" data-a="capa" data-v="' + i + '">' + tecla('ojo', c.vis ? '👁' : '◌', { v: i, cls: 'ojo' + (c.vis ? '' : ' off'), t: c.n }) + '<canvas data-mini="' + i + '" width="92" height="68"></canvas><span class="nom">' + esc(c.n) + '<small>' + Math.round(c.op * 100) + ' % · ' + esc(T((MODOS.find(m => m[0] === c.modo) || MODOS[0])[1])) + '</small></span></div>').join('') + '</div>' +
     desl('cp-op', 'Opacidad', 0, 100, Math.round(D.capas[act].op * 100)) + selec('cp-modo', 'Fusión', MODOS, D.capas[act].modo) +
-    '<div class="fo-rej">' + tecla('cp-nueva', '＋ ' + T('Capa nueva')) + tecla('cp-img', '🖼 ' + T('Imagen como capa')) + tecla('cp-dup', '⧉ ' + T('Duplicar')) + tecla('cp-borra', '🗑 ' + T('Borrar'), { dis: D.capas.length < 2 }) + tecla('cp-sube', '▲ ' + T('Subir'), { dis: act >= D.capas.length - 1 }) + tecla('cp-baja', '▼ ' + T('Bajar'), { dis: act <= 0 }) + tecla('cp-comb', '⤓ ' + T('Combinar abajo'), { dis: act <= 0 }) + tecla('cp-acopla', '▤ ' + T('Acoplar todo'), { dis: D.capas.length < 2 }) + '</div></div>'; }
+    '<div class="fo-rej">' + tecla('cp-nueva', '＋ ' + T('Capa nueva')) + tecla('cp-img', '🖼 ' + T('Imagen como capa')) + tecla('cp-dup', '⧉ ' + T('Duplicar')) + tecla('cp-borra', '🗑 ' + T('Borrar'), { dis: D.capas.length < 2 }) + tecla('cp-sube', '▲ ' + T('Subir'), { dis: act >= D.capas.length - 1 }) + tecla('cp-baja', '▼ ' + T('Bajar'), { dis: act <= 0 }) + tecla('cp-comb', '⤓ ' + T('Combinar abajo'), { dis: act <= 0 }) + tecla('cp-acopla', '▤ ' + T('Acoplar todo'), { dis: D.capas.length < 2 }) + '</div>' + (EXT.capasExtra ? EXT.capasExtra() : '') + '</div>'; }
   function miniaturas() { document.querySelectorAll('canvas[data-mini]').forEach(m => { const c = D.capas[+m.dataset.mini].cv, q = m.getContext('2d'), k = Math.min(m.width / c.width, m.height / c.height); q.clearRect(0, 0, m.width, m.height); q.drawImage(c, (m.width - c.width * k) / 2, (m.height - c.height * k) / 2, c.width * k, c.height * k); }); }
-  function pintaCapas() { if (tab === 'capas' && !ses && !rec) { $('#fo-cuerpo').innerHTML = panelCapas(); miniaturas(); } }
+  function pintaCapas() { if (tab !== 'capas' || ses || rec) return; const C = $('#fo-cuerpo'); if (EXT.herr[herr] && EXT.herr[herr].panel) { const s = C.querySelector('.fo-sec-capas'); if (s) { s.outerHTML = panelCapas(); miniaturas(); } return; } C.innerHTML = panelCapas(); miniaturas(); }
   function panelAjustes() { return '<div class="fo-sec"><h3>' + T('Ajustes') + '</h3><div class="fo-rej">' + ['bc', 'niveles', 'curvas', 'hsl', 'equilibrio', 'bn'].map(k => tecla('ses', T(OPS[k].n), { v: k })).join('') + '</div></div>' +
     '<div class="fo-sec"><h3>' + T('Filtros') + '</h3><div class="fo-rej">' + ['desenfoca', 'enfoca', 'ruido', 'vineta'].map(k => tecla('ses', T(OPS[k].n), { v: k })).join('') + '</div></div>' +
     '<div class="fo-sec"><h3>' + T('Tamaño de la imagen') + '</h3><div class="fo-acc"><label class="desl" style="grid-template-columns:auto 1fr"><span>' + T('Ancho') + '</span><input class="campo" id="tm-w" type="number" min="1" max="' + TOPE + '" value="' + D.w + '"></label><label class="desl" style="grid-template-columns:auto 1fr"><span>' + T('Alto') + '</span><input class="campo" id="tm-h" type="number" min="1" max="' + TOPE + '" value="' + D.h + '"></label></div>' + tecla('tam', T('Cambiar tamaño')) + '</div>'; }
@@ -216,7 +232,8 @@
     if (a === 'tab') { tab = v; cierraSes(); pintaTab(); }
     else if (a === 'abre') $('#fo-abre').click();
     else if (a === 'deshaz') deshaz(); else if (a === 'rehaz') rehaz(); else if (a === 'encaja') encaja(); else if (a === 'zoom') zoomEn(+v);
-    else if (a === 'herr') { herr = v; cierraSes(); if (v === 'recortar' && D) abreRec(); else quitaRec(); pintaTab(); pinta(); }
+    else if (a === 'herr') { ponHerr(v); return; }
+    else if (a === 'herr-viejo') { herr = v; cierraSes(); if (v === 'recortar' && D) abreRec(); else quitaRec(); pintaTab(); pinta(); }
     else if (a === 'gira' && D) giraDoc(+v); else if (a === 'voltea' && D) volteaDoc(v === '1');
     else if (a === 'ses') abreSes(v); else if (a === 'ses-cancela') { cierraSes(); pintaTab(); } else if (a === 'ses-aplica') aplicaSes();
     else if (a === 'ses-reset' && ses) { ses.p = Object.fromEntries(ses.o.p.map(q => [q[0], q[q.length === 4 ? 3 : 4]])); previa(); pintaTab(); }
@@ -250,5 +267,6 @@
   pintaFijo(); pintaTab(); vacio();
   /* abrir lo que llega en la dirección: ?src=… (de la biblioteca de ADPOSTER) y ?n=nombre */
   { const q = new URLSearchParams(location.search), s = q.get('src'), mk = q.get('m'); if (mk) { try { const d = window.opener && window.opener.ADG && window.opener.ADG.B.medios[mk]; if (d) abreUrl(d, q.get('n') || 'imagen'); } catch (e) {} } else if (s) { try { const u = new URL(s, location.href); if (u.origin === location.origin || /^(data|blob|https):$/.test(u.protocol)) abreUrl(u.href, q.get('n')); } catch (e) {} } }
+  window.ADFOTO_ = { EXT, T, TX, esc, tecla, desl, selec, lienzo, ctx, $, PX, pinta, compone, paso, cambiaCapa, nuevaCapa, pintaTab, pintaCapas, estado, espera, aDoc, capa, guarda, lee, get D() { return D; }, set D(v) { D = v; }, get act() { return act; }, set act(v) { act = v; }, get herr() { return herr; }, get V() { return V; }, get lang() { return lang; }, pon: ponHerr, get nId() { return nId++; } };
   window.ADFOTO = { get doc() { return D; }, get act() { return act; }, abreDoc, abreSes, aplicaSes, deshaz, rehaz, get hist() { return H.length; }, salida, VERSION };
 })();
