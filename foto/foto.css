@@ -78,10 +78,10 @@
 .desl .fo-color + .fo-color, .desl .fo-color + span { grid-column: 3; }
 .fo-sec textarea.campo.area { min-height: 4.2em; }
 .fo-herr { scrollbar-width: none; }
-/* móvil apaisado: con las herramientas nuevas la columna no cabe; van en dos columnas de teclas algo menores */
+/* móvil apaisado: con las herramientas nuevas la columna no cabe; van en tres columnas de teclas algo menores (v1.19: con dos, girar y voltear quedaban por debajo de la pantalla) */
 @media (max-width: 900px) and (orientation: landscape) {
-  .fo-herr { display: grid; grid-template-columns: repeat(2, 34px); grid-auto-rows: 34px; gap: 4px; align-content: start; }
-  .fo-herr .tecla { width: 34px; height: 34px; font-size: 16px; }
+  .fo-herr { display: grid; grid-template-columns: repeat(3, 32px); grid-auto-rows: auto; gap: 3px; align-content: start; }
+  .fo-herr .tecla { width: 32px; height: 32px; font-size: 15px; }
   .fo-herr hr { grid-column: 1 / -1; width: 80%; }
 }
 /* v1.18 · grupos de capas y casillas de la IA */
@@ -94,3 +94,8 @@
 .fo-chk { display: flex; align-items: center; gap: 8px; color: var(--gris); font-size: .92em; cursor: pointer; }
 .fo-chk input { width: 18px; height: 18px; accent-color: var(--ambar); }
 .fo-acc .tecla { min-width: 0; white-space: normal; line-height: 1.15; text-align: center; justify-content: center; padding-block: 4px; }   /* textos largos (inglés, catalán): en dos líneas, nunca cortados */
+/* v1.19 · móvil apaisado estrecho: cada pestaña con el ancho de su nombre (EXPORTAR e HISTORIAL se cortaban); si no caben, pasan a una segunda fila */
+@media (max-width: 900px) and (orientation: landscape) {
+  .fo-lado .tabs { display: flex; flex-wrap: wrap; }
+  .fo-lado .tabs .tab { flex: 1 1 auto; padding: 0 3px; }
+}
