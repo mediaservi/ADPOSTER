@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.17**
+**Versión actual: v1.18**
 
 ## Cómo funciona
 
@@ -46,7 +46,15 @@ En tablet y móvil las ventanas se apilan, con el lienzo arriba; en móvil apais
 - **Transformar capa** (nuevo en v1.17, Q o Ctrl+T): mover, escalar desde las esquinas (Mayús: libre) y girar con el tirador de arriba; Intro aplica y Esc cancela.
 - Con una herramienta elegida, sus opciones salen arriba del panel y la pestaña elegida (capas, historial…) debajo.
 - Todo ocurre en el navegador: la imagen no sale del equipo.
-- **Llega en la próxima tanda:** quitar el fondo, borrar un objeto, ampliar ×2 o ×4, reparar fotos antiguas y colorear; abrir y guardar PSD; grupos de capas.
+- **Grupos de capas** (nuevo en v1.18): «Agrupar con la de abajo» junta capas en una carpeta con su ojo, su opacidad y su fusión; se abre y se cierra, y «Desagrupar» la deshace.
+- **Con IA, en el navegador** (nuevo en v1.18), en la pestaña MAGIA:
+  - **Quitar el fondo:** lo oculta con una máscara de capa (se retoca con el pincel o el borrador pintando en la máscara); el control «Borde» lo hace más suave o más duro.
+  - **Borrar un objeto** (O): se pinta encima y «Borrar lo pintado» lo rellena con lo que tiene alrededor.
+  - **Ampliar ×2 o ×4** sin perder detalle (con una limpieza suave del ruido), todas las capas a la vez y hasta 8192 px de lado.
+  - **Reparar foto antigua:** quita arañazos y motas (respeta lo que no tiene forma de arañazo), el grano y aviva el color desvaído, cada cosa con su control. Si un arañazo cruza un texto, ese trozo de texto también puede irse: baja «Arañazos».
+  - **Colorear** fotos en blanco y negro, con su intensidad.
+  - Cada modelo se descarga solo la primera vez que se usa y queda guardado en el navegador; va con WebGPU si el navegador lo tiene y, si no, con el procesador (ampliar una foto grande puede tardar unos minutos).
+- **PSD** (nuevo en v1.18): se abren con sus capas, máscaras, opacidades, fusiones y grupos (soltándolos, eligiéndolos o como capas encima de lo abierto), y se guardan igual desde EXPORTAR (formato «PSD (con capas)», a tamaño original).
 
 **La lista de carteles a la vista** (nuevo en v1.15)
 
@@ -147,7 +155,15 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.17)
+## Cambios de la versión actual (v1.18)
+
+- **FOTO, tercera tanda:** con IA en el navegador, quitar el fondo (como máscara de capa), borrar un objeto pintándolo, ampliar ×2 o ×4, reparar fotos antiguas (arañazos, motas, grano y color) y colorear; abrir y guardar PSD con capas y grupos; grupos de capas.
+- Al deshacer un cambio de tamaño (ampliar, recortar), la imagen se vuelve a encajar en la vista.
+- Los botones con textos largos (inglés y catalán) pasan a dos líneas en vez de cortarse.
+- Modelos y librerías, todos de licencia libre para uso comercial: U²-Net (Apache-2.0), MI-GAN (MIT), waifu2x (MIT), DeOldify (MIT), onnxruntime-web (MIT) y ag-psd (MIT). El detalle está en `assets/ia/LEEME.md`.
+
+### v1.17
+
 
 - **FOTO, segunda tanda:** selecciones (rectángulo, elipse, lazo, varita y por color) que limitan ajustes, filtros, magia y pinceles; máscaras de capa; pincel, borrador, tampón de clonar y pincel corrector; texto con los tipos de letra de la marca; formas; degradados y transformar capa, con sus atajos de teclado.
 - Las opciones de la herramienta y la pestaña elegida se ven a la vez en el panel de la derecha.
@@ -332,7 +348,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.17 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.18 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

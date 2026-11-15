@@ -84,3 +84,13 @@
   .fo-herr .tecla { width: 34px; height: 34px; font-size: 16px; }
   .fo-herr hr { grid-column: 1 / -1; width: 80%; }
 }
+/* v1.18 · grupos de capas y casillas de la IA */
+.fo-gr { display: grid; grid-template-columns: 30px 30px minmax(0, 1fr); align-items: center; gap: 6px; padding: 4px 6px; border: 1px dashed var(--linea); border-radius: 7px; background: #1a1a1d; cursor: pointer; }
+.fo-gr .ojo { width: 30px; height: 30px; min-height: 0; padding: 0; display: grid; place-items: center; font-size: 15px; }
+.fo-gr .ojo.off { opacity: .4; }
+.fo-gr .nom { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ambar); }
+.fo-gr .nom small { display: block; color: var(--gris); font: 400 .82em 'Share Tech Mono', monospace; }
+.fo-cp.en-gr { margin-left: 16px; border-left: 2px solid #5a3d00; }
+.fo-chk { display: flex; align-items: center; gap: 8px; color: var(--gris); font-size: .92em; cursor: pointer; }
+.fo-chk input { width: 18px; height: 18px; accent-color: var(--ambar); }
+.fo-acc .tecla { min-width: 0; white-space: normal; line-height: 1.15; text-align: center; justify-content: center; padding-block: 4px; }   /* textos largos (inglés, catalán): en dos líneas, nunca cortados */
