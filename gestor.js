@@ -10,7 +10,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.19', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS_C = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'], TABS_E = ['piezas', 'escena', 'tiempos', 'directo', 'publicar'];
+  const VERSION = '1.20', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS_C = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'], TABS_E = ['piezas', 'escena', 'tiempos', 'directo', 'publicar'];
   const DEF = { nombre: '', fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7], fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true,
     horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '', formato: 'vertical', qr: { activo: false, modo: 'url', url: '', texto: '', pos: 'bd' }, cinta: { activo: false, texto: '', rss: '' }, publico: false, modo: 'carteles', escenas: [], orden: 'azar', secuencia: [], archivos: {}, sueltos: [] };
   const ESCM = p => !!p && p.modo === 'escenas', tabsDe = p => ESCM(p) ? TABS_E : TABS_C, X = () => window.ADG.ext || {};
@@ -24,7 +24,7 @@
 
   /* ---------- idioma ---------- */
   const IDI = ['es', 'en', 'ca']; let lang = lee('lang') || (IDI.includes((navigator.language || '').slice(0, 2)) ? navigator.language.slice(0, 2) : 'es');
-  const TX = { 'Listas': ['Lists', 'Llistes'], 'Nueva': ['New', 'Nova'], 'nueva lista': ['new list', 'nova llista'], 'Borrar': ['Delete', 'Esborra'], 'Fondo': ['Background', 'Fons'], 'sin fondo': ['no background', 'sense fons'],
+  const TX = { 'Listas': ['Lists', 'Llistes'], 'Nueva': ['New', 'Nova'], 'nueva lista': ['new list', 'nova llista'], 'Borrar': ['Delete', 'Esborra'], '¿Seguro?': ['Sure?', 'Segur?'], 'Fondo': ['Background', 'Fons'], 'sin fondo': ['no background', 'sense fons'],
     'Carpetas de contenido': ['Content folders', 'Carpetes de contingut'], 'Carpetas de anuncios': ['Ad folders', "Carpetes d'anuncis"], 'URL para el kiosco': ['URL for the kiosk', 'URL per al quiosc'], 'Giro del display': ['Display rotation', 'Gir del display'], 'Copiar': ['Copy', 'Copia'], 'Copiada': ['Copied', 'Copiada'], 'Abrir': ['Open', 'Obre'],
     'Duración': ['Duration', 'Durada'], 'póster': ['poster', 'pòster'], 'anuncio': ['ad', 'anunci'], 'Transición': ['Transition', 'Transició'], 'fundido': ['fade', 'fosa'], 'zoom': ['zoom', 'zoom'], 'desliza': ['slide', 'llisca'], 'cortina': ['wipe', 'cortina'], 'corte': ['cut', 'tall'],
     'Un anuncio cada': ['One ad every', 'Un anunci cada'], 'mín': ['min', 'mín'], 'máx': ['max', 'màx'], 'Efectos': ['Effects', 'Efectes'], 'Movimiento': ['Motion', 'Moviment'], 'Llenar': ['Fill', 'Omple'], 'Brillo': ['Shine', 'Brillantor'], 'Abajo': ['Bottom', 'A baix'], 'Centro': ['Centre', 'Centre'],
@@ -208,7 +208,8 @@
   const ACC = {
     sel(v) { if (!B.playlists[v]) return; sel = v; guarda('sel', sel); X().alSalir && X().alSalir(); pintaL(); pintaBarra(); pintaT(); ajusta(); previa(); X().alLista && X().alLista(true); },
     nueva() { const n = ($('#nueva').value || '').trim(); const id = n.normalize('NFKD').replace(/[^\w\s-]/g, '').trim().toLowerCase().replace(/[\s_]+/g, '-').replace(/[^a-z0-9-]/g, '').slice(0, 24); if (!id) { $('#nueva').focus(); return; } if (!B.playlists[id]) { B.playlists[id] = completa(copia(P())); B.playlists[id].nombre = n.toUpperCase(); B.playlists[id].publico = false; } guarda(KB, B); ACC.sel(id); estado(); },
-    borra() { if (Object.keys(B.playlists).length < 2) return; delete B.playlists[sel]; guarda(KB, B); ACC.sel(Object.keys(B.playlists)[0]); estado(); },
+    borra() { if (Object.keys(B.playlists).length < 2) return; const bt = document.querySelector('[data-a="borra"]'); if (bt && !bt.dataset.seguro) { bt.dataset.seguro = '1'; bt.textContent = T('¿Seguro?'); setTimeout(() => { if (bt.isConnected) { delete bt.dataset.seguro; bt.textContent = T('Borrar'); } }, 3000); return; }   /* v1.20 · borrar una lista pide un segundo toque */
+      delete B.playlists[sel]; guarda(KB, B); ACC.sel(Object.keys(B.playlists)[0]); estado(); },
     fondo(v) { cambia(p => { p.fondo = v; }); }, contenido(v) { cambia(p => alterna(p.contenido, v)); }, anuncios(v) { cambia(p => alterna(p.anuncios, v)); },
     segundos(v) { cambia(p => { p.segundos = lim(p.segundos + +v, 2, 120); }); }, segundosAnuncio(v) { cambia(p => { p.segundosAnuncio = lim(p.segundosAnuncio + +v, 2, 120); }); },
     tipo(v) { cambia(p => { p.fundido.tipo = v; }); }, fseg(v) { cambia(p => { p.fundido.segundos = Math.round(lim(p.fundido.segundos + v * .5, 0, 8) * 10) / 10; }); },

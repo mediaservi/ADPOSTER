@@ -399,3 +399,20 @@ input.campo.tc-f { flex: none; width: 9.4em; padding: 0 6px; font-size: .95em; c
 @media (max-width: 900px) and (orientation: landscape) { .consola > .tirac { grid-column: 2; } }   /* en el móvil apaisado la tira va arriba de la columna de la derecha (lista.js le pone el aspecto de ventana) */
 /* v1.16 · bajo el cartel en grande: abrirlo en FOTO, el editor de imagen */
 .tc-foto { flex: none; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 14px; padding-top: 10px; color: var(--gris); font-size: .92em; }
+/* v1.20 · móvil: la fila de la familia AVHUB vuelve, bajo la cabecera y centrada; «Movimiento» y demás palabras largas no se parten a media palabra; el nombre de carpeta se lee entero */
+@media (max-width: 900px) {
+  .cab .fam { display: flex; grid-column: 1 / -1; justify-self: center; flex-wrap: wrap; justify-content: center; gap: 8px 18px; padding-top: 6px; }
+  .cab .fam img { height: 16px; } .cab .fam .av img { height: 22px; }
+}
+@media (max-width: 420px) {
+  .rej.tres .tecla span { overflow-wrap: normal; word-break: normal; hyphens: manual; }
+  .rej.tres .tecla { font-size: 13px !important; padding-left: 4px; padding-right: 4px; gap: .3em; }
+}
+@media (max-width: 420px) {
+  .cuerpo > .fila > .lcd { flex: 1 1 3.6em; min-width: 3.6em; }   /* v1.20 · «Un anuncio cada»: los cuatro mandos y las dos cifras en una sola fila */
+  .cuerpo > .fila > .tecla { padding-left: 4px; padding-right: 4px; }
+  .cuerpo > .fila { column-gap: 5px; }
+  .cuerpo > .fila > .tecla.col { flex: 1 1 0; width: auto; min-width: 30px; max-width: var(--alto); }
+  .cuerpo > .fila > .tecla { gap: .3em; } .cuerpo > .fila > .tecla > span { overflow-wrap: normal; word-break: keep-all; }
+  .cuerpo > .fila:has(> .tecla:nth-child(3):last-child) > .tecla:not(.rd) { font-size: 13px; }
+}
