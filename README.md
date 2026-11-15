@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.18**
+**Versión actual: v1.19**
 
 ## Cómo funciona
 
@@ -135,7 +135,7 @@ No hay servidor propio. El gestor, los displays y la página del público se hab
 | `editor.js` | El editor de composiciones en el lienzo, las pestañas PIEZAS y ESCENA y la galería de plantillas |
 | `gestion.js` | La biblioteca de archivos y el calendario |
 | `lista.js` | La tira de carteles bajo el lienzo, la ficha de cada cartel y «+» para añadir carteles sueltos (v1.15) |
-| `foto/` | FOTO, el editor de imagen (v1.16): `index.html`, `foto.js` (capas, historial, herramientas y paneles), `px.js` (ajustes, filtros y botones mágicos) y `foto.css` |
+| `foto/` | FOTO, el editor de imagen (v1.16; guía en `foto/LEEME.md`): `index.html`, `foto.js` (capas, historial, herramientas y paneles), `px.js` (ajustes, filtros y botones mágicos) y `foto.css` |
 | `escena.js`, `escena.css` | El motor que pinta las escenas; lo usan igual el editor y el reproductor |
 | `plantillas.js` | Las plantillas de composición |
 | `cine/`, `klub/`, `p/` | Las direcciones de reproducción (la URL que se da al kiosco) |
@@ -155,7 +155,13 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.18)
+## Cambios de la versión actual (v1.19)
+
+- **Guía de FOTO** en [`foto/LEEME.md`](foto/LEEME.md): cómo abrir, la pantalla, cada herramienta con su tecla, las pestañas, la IA, sin conexión y los archivos.
+- **FOTO en el móvil apaisado:** las herramientas van en tres columnas. Con dos, girar y voltear quedaban por debajo de la pantalla.
+- Revisión completa de FOTO (todas las pestañas, herramientas, ajustes, filtros, botones mágicos, IA, PSD y grupos) en TV, ordenador, tableta horizontal y vertical, y móvil vertical y apaisado, en español, inglés y catalán: nada cortado ni fuera de la pantalla.
+
+### v1.18
 
 - **FOTO, tercera tanda:** con IA en el navegador, quitar el fondo (como máscara de capa), borrar un objeto pintándolo, ampliar ×2 o ×4, reparar fotos antiguas (arañazos, motas, grano y color) y colorear; abrir y guardar PSD con capas y grupos; grupos de capas.
 - Al deshacer un cambio de tamaño (ampliar, recortar), la imagen se vuelve a encajar en la vista.
@@ -348,7 +354,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.18 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.19 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 
