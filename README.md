@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.19**
+**Versión actual: v1.20**
 
 ## Cómo funciona
 
@@ -155,7 +155,17 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.19)
+## Cambios de la versión actual (v1.20)
+
+Correcciones de la auditoría en el móvil en vertical:
+
+- **Aviso legal:** se abre por el principio (antes salía desplazado hasta abajo).
+- **Fila de la familia AVHUB** bajo la cabecera en el móvil (screens, systems, AVHUB, vjshow y msgame), centrada.
+- **DISEÑO → EFECTOS:** «Movimiento» ya no se parte a media palabra.
+- **TIEMPOS → «Un anuncio cada»** y **DIRECTO → «Aviso a toda pantalla»:** todos los mandos en una sola fila; ya no baja un «+» o un color solo a otra línea.
+- **Borrar una lista** pide un segundo toque («¿Seguro?») antes de borrarla.
+
+### v1.19
 
 - **Guía de FOTO** en [`foto/LEEME.md`](foto/LEEME.md): cómo abrir, la pantalla, cada herramienta con su tecla, las pestañas, la IA, sin conexión y los archivos.
 - **FOTO en el móvil apaisado:** las herramientas van en tres columnas. Con dos, girar y voltear quedaban por debajo de la pantalla.
@@ -354,7 +364,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.19 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.20 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 
