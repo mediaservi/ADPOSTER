@@ -7,11 +7,13 @@
      todas de una vez («pre») y, cuando lo tiene todo, se quitan las versiones viejas. Las listas y el índice de la otra web: primero la red y, sin red, la copia.
    Para forzar una copia nueva de la app en todos los dispositivos, sube el número de CACHE (las imágenes se conservan).
    Licencia GPL-3.0 · mediaservi.com */
-const PREFIJO = 'adposter-', CACHE = PREFIJO + 'v14', CIMG = PREFIJO + 'imagenes';
+const PREFIJO = 'adposter-', CACHE = PREFIJO + 'v15', CIMG = PREFIJO + 'imagenes';
 const BASICO = ['./', 'index.html', 'p/', 'cine/', 'klub/', 'gestor.js', 'gestor.css', 'editor.js', 'gestion.js', 'lista.js', 'subir.js', 'foto/', 'foto/foto.js', 'foto/foto.css', 'foto/px.js', 'foto/herr.js', 'foto/ia.js', 'escena.js', 'escena.css', 'plantillas.js', 'player.js', 'player.css', 'directo.js', 'qr.js', 'credito.js', 'fallo.js', 'instalar.js', 'playlists.json', 'assets/manifest.json', 'manifest.json', 'assets/logos/adposter-logo.svg', 'assets/logos/adposter-icono.svg', 'assets/logos/adposter-192.png', 'assets/fonts/inter-latin-400-normal.woff2', 'assets/fonts/inter-latin-700-normal.woff2', 'assets/fonts/inter-latin-800-normal.woff2', 'assets/fonts/share-tech-mono-latin-400-normal.woff2'];   // lo mínimo para arrancar sin conexión desde la primera visita
 const FRESCO = /(\/|\.html?|\.json|\.js|\.css|\.webmanifest)$/i, TOPE = 6000;
 const clave = u => { const x = new URL(u, self.registration.scope); x.search = ''; x.hash = ''; return x.href; };
 const vale = r => r && r.status === 200 && r.type !== 'opaque';
+/* sin caché (18-11-2026): lo de la propia app se pide siempre al servidor revalidando, sin pasar por la copia del navegador (GitHub Pages sirve con 10 minutos de caducidad y no admite cabeceras propias) */
+const pide = req => (new URL(req.url).origin === self.location.origin ? fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' }) : fetch(req));
 const IMG = /\/assets\/.+\.(webp|jpe?g|png|gif|avif)$/i, DATO = /\/(assets\/manifest|playlists)\.json$/i, DIA = 864e5;
 const sirve = u => u.origin === self.location.origin || u.protocol === 'https:' || /^(localhost|127\.0\.0\.1)$/.test(u.hostname);
 
@@ -19,12 +21,12 @@ self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.o
 self.addEventListener('activate', e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.indexOf(PREFIJO) === 0 && k !== CACHE && k !== CIMG).map(k => caches.delete(k)))).then(() => self.clients.claim())));
 
 async function fresco(req) { const c = await caches.open(CACHE), k = clave(req.url), ya = await c.match(k);
-  const red = fetch(req).then(r => { if (vale(r)) c.put(k, r.clone()).catch(() => {}); return r; });
+  const red = pide(req).then(r => { if (vale(r)) c.put(k, r.clone()).catch(() => {}); return r; });
   if (!ya) return red;                                                    // nunca se ha guardado: no queda otra que esperar a la red
   red.catch(() => {});
   return Promise.race([red, new Promise((_, no) => setTimeout(no, TOPE))]).catch(() => ya); }   // sin red o red lenta: la copia guardada
 async function guardado(req) { const c = await caches.open(CACHE), ya = await c.match(req.url);
-  const red = fetch(req).then(async r => { if (vale(r)) { const viejas = await c.keys(clave(req.url), { ignoreSearch: true }); await Promise.all(viejas.filter(q => q.url !== req.url && clave(q.url) === clave(req.url)).map(q => c.delete(q))); await c.put(req.url, r.clone()); } return r; });
+  const red = pide(req).then(async r => { if (vale(r)) { const viejas = await c.keys(clave(req.url), { ignoreSearch: true }); await Promise.all(viejas.filter(q => q.url !== req.url && clave(q.url) === clave(req.url)).map(q => c.delete(q))); await c.put(req.url, r.clone()); } return r; });
   if (ya) { red.catch(() => {}); return ya; }
   return red.catch(async () => (await c.match(clave(req.url), { ignoreSearch: true })) || Response.error()); }
 

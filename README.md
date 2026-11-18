@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.20**
+**Versión actual: v1.21**
 
 ## Cómo funciona
 
@@ -155,7 +155,10 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.20)
+## Cambios de la versión actual (v1.21)
+- **Sin caché** (pedido por Josep, 18-11-2026): las páginas llevan las etiquetas equivalentes a `Cache-Control: no-cache, no-store, must-revalidate` y el service worker pide siempre al servidor lo de la propia app, revalidando, sin pasar por la copia del navegador. Sin conexión sigue funcionando con la copia guardada (los carteles descargados en cada pantalla no cambian: siguen guardados).
+
+### v1.20
 
 Correcciones de la auditoría en el móvil en vertical:
 
