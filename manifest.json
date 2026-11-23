@@ -1,0 +1,32 @@
+{
+  "name": "ADPOSTER",
+  "short_name": "ADPOSTER",
+  "description": "Cartelería digital para cualquier pantalla: compón, programa y controla tus displays",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#121213",
+  "theme_color": "#232325",
+  "icons": [
+    {
+      "src": "assets/logos/adposter-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/logos/adposter-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/logos/adposter-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

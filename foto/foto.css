@@ -1,0 +1,101 @@
+/* ADPOSTER · FOTO, el editor de imagen (v1.16) · estilo RACK DIGITAL de la familia AVHUB · GPL-3.0 · mediaservi.com */
+.fo-tit { font: 900 clamp(15px, 2.4vh, 22px)/1 Inter, system-ui, sans-serif; letter-spacing: .32em; color: var(--ambar); text-shadow: 0 0 10px rgba(255, 176, 0, .45); padding: 4px 10px 4px 14px; border: 1px solid #5a3d00; border-radius: 6px; background: #0b0a06; box-shadow: inset 0 2px 6px #000; }
+.fo-consola { flex: 1; min-height: 0; display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(300px, 25vw); gap: clamp(8px, 1vw, 14px); padding: clamp(8px, 1.2vh, 14px) clamp(10px, 1.4vw, 22px); }
+.fo-consola > * { min-width: 0; min-height: 0; }
+/* herramientas: una columna de teclas cuadradas con su icono grabado */
+.fo-herr { display: flex; flex-direction: column; gap: 6px; padding: 6px; border: 1px solid var(--linea); border-radius: 12px; background: linear-gradient(180deg, #2b2b2f, #202023); overflow: auto; }
+.fo-herr .tecla { width: clamp(40px, 5.2vh, 52px); height: clamp(40px, 5.2vh, 52px); min-height: 0; padding: 0; display: grid; place-items: center; font-size: clamp(17px, 2.4vh, 22px); line-height: 1; }
+.fo-herr .tecla.on { color: var(--ambar); box-shadow: inset 0 2px 5px rgba(0, 0, 0, .65), inset 0 -2px 0 var(--ambar); }
+.fo-herr hr { width: 70%; border: 0; border-top: 1px solid #3a3a40; margin: 2px auto; }
+/* lienzo: damero para lo transparente, zoom y desplazamiento */
+.fo-centro { overflow: hidden; }
+.fo-barra .tecla { gap: .4em; }
+.fo-barra .zoom { min-width: 4.6em; justify-content: center; font: 400 1em 'Share Tech Mono', monospace; color: var(--ambar); }
+.fo-lienzo { position: relative; flex: 1; min-height: 0; border-radius: 9px; overflow: hidden; background: #0d0d0f; box-shadow: inset 0 2px 10px #000; touch-action: none; }
+.fo-lienzo canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.fo-lienzo.mano { cursor: grab; } .fo-lienzo.mano.arrastra { cursor: grabbing; } .fo-lienzo.mover { cursor: move; } .fo-lienzo.recorta { cursor: crosshair; } .fo-lienzo.cuenta { cursor: copy; }
+.fo-lienzo.sobre { outline: 3px dashed var(--ambar); outline-offset: -6px; }
+.fo-capa { position: absolute; inset: 0; pointer-events: none; }
+.fo-capa .rec { position: absolute; box-sizing: border-box; border: 1px solid #fff; outline: 1px solid rgba(0, 0, 0, .7); box-shadow: 0 0 0 9999px rgba(0, 0, 0, .55); pointer-events: auto; cursor: move; }
+.fo-capa .rec i { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; background: var(--ambar); border: 1px solid #000; border-radius: 2px; }
+.fo-capa .rec .ter { position: absolute; inset: 0; background-image: linear-gradient(rgba(255, 255, 255, .35) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .35) 1px, transparent 1px); background-size: 33.333% 33.333%; background-position: -1px -1px; pointer-events: none; }
+.fo-vacio { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; color: var(--gris); pointer-events: none; }
+.fo-vacio[hidden] { display: none; }
+.fo-vacio div { display: grid; gap: 14px; justify-items: center; pointer-events: auto; max-width: 30em; }
+.fo-vacio b { font: 900 clamp(18px, 3vh, 28px)/1.1 Inter, system-ui, sans-serif; color: var(--txt); }
+/* paneles de la derecha */
+.fo-lado .tabs { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.fo-sec { flex: none; display: grid; gap: 8px; padding: 10px; border: 1px solid var(--linea); border-radius: 9px; background: #1f1f22; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05); }
+.fo-sec h3 { margin: 0; font: 400 clamp(10px, 1.35vh, 12.5px) 'Share Tech Mono', monospace; letter-spacing: .16em; text-transform: uppercase; color: var(--gris); display: flex; justify-content: space-between; gap: 8px; }
+.fo-rej { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.fo-rej .tecla { justify-content: center; text-align: center; min-width: 0; white-space: normal; line-height: 1.15; padding-block: 4px; }
+.fo-rej3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.desl { display: grid; grid-template-columns: minmax(6.5em, auto) minmax(0, 1fr) 3.4em; align-items: center; gap: 8px; }
+.desl label { color: var(--gris); font-size: .92em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.desl input[type=range] { width: 100%; min-width: 0; accent-color: var(--ambar); height: 26px; }
+.desl output { font: 400 .95em 'Share Tech Mono', monospace; color: var(--ambar); text-align: right; }
+.fo-sel { width: 100%; min-height: var(--alto); padding: 0 8px; border: 1px solid var(--linea); border-radius: 7px; background: #0b0a06; color: var(--ambar); font: 400 1em 'Share Tech Mono', monospace; color-scheme: dark; }
+.fo-acc { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.fo-nota { margin: 0; color: var(--gris); font-size: .9em; line-height: 1.35; }
+/* capas */
+.fo-capas { display: grid; gap: 4px; }
+.fo-cp { display: grid; grid-template-columns: 30px 46px minmax(0, 1fr); align-items: center; gap: 8px; padding: 5px 6px; border: 1px solid var(--linea); border-radius: 7px; background: #161618; cursor: pointer; }
+.fo-cp.on { border-color: var(--ambar); background: #241d0d; }
+.fo-cp .ojo { width: 30px; height: 30px; min-height: 0; padding: 0; display: grid; place-items: center; font-size: 15px; }
+.fo-cp .ojo.off { opacity: .4; }
+.fo-cp canvas { width: 46px; height: 34px; border-radius: 4px; background: repeating-conic-gradient(#3a3a3e 0 25%, #2a2a2d 0 50%) 0 0 / 10px 10px; object-fit: contain; }
+.fo-cp .nom { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fo-cp .nom small { display: block; color: var(--gris); font: 400 .82em 'Share Tech Mono', monospace; }
+.fo-hist { display: grid; gap: 3px; }
+.fo-hist button { text-align: left; justify-content: flex-start; }
+.fo-hist button.fut { opacity: .45; }
+.fo-hist button.act { color: var(--ambar); box-shadow: inset 0 -2px 0 var(--ambar); }
+.fo-magia .tecla { min-height: calc(var(--alto) * 1.25); }
+.fo-magia .tecla span { font-size: 1.25em; }
+/* trabajando */
+.fo-espera { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(10, 10, 12, .55); color: var(--ambar); font: 400 1.1em 'Share Tech Mono', monospace; letter-spacing: .14em; text-transform: uppercase; z-index: 3; }
+.fo-espera[hidden] { display: none; }
+@media (max-width: 1180px) and (min-width: 901px) { .fo-consola { grid-template-columns: auto minmax(0, 1fr) minmax(280px, 34vw); } .cab .centro { display: block; } }
+@media (max-width: 900px) {
+  body.foto { height: auto; min-height: 100dvh; overflow: auto; }
+  .fo-consola { grid-template-columns: minmax(0, 1fr); }
+  .fo-herr { flex-direction: row; flex-wrap: wrap; justify-content: center; order: 0; }
+  .fo-herr hr { width: 1px; height: 28px; margin: auto 2px; border: 0; border-left: 1px solid #3a3a40; }
+  .fo-centro { order: -1; } .fo-lienzo { flex: none; height: min(58vh, 120vw); }
+  .fo-lado, .fo-lado .cuerpo { overflow: visible; }
+  .cab .centro { display: block; }
+}
+@media (max-width: 900px) and (orientation: landscape) {
+  .fo-consola { grid-template-columns: auto minmax(0, 46fr) minmax(0, 54fr); align-items: start; }
+  .fo-herr { flex-direction: column; flex-wrap: nowrap; order: 0; position: sticky; top: 8px; max-height: calc(100dvh - 16px); }
+  .fo-herr hr { width: 70%; height: 0; border-left: 0; border-top: 1px solid #3a3a40; margin: 2px auto; }
+  .fo-centro { order: 0; position: sticky; top: 8px; height: calc(100dvh - 16px); } .fo-lienzo { flex: 1; height: auto; }
+  .fo-lado { grid-column: 3; grid-row: 1; }   /* el gestor manda .lado a la columna 2 en apaisado: aquí va a la tercera */
+}
+/* v1.17 · herramientas de la tanda 2 */
+.fo-lienzo.pinta { cursor: crosshair; }
+.fo-color { width: 100%; min-width: 0; height: var(--alto); padding: 2px; border: 1px solid var(--linea); border-radius: 7px; background: #0b0a06; cursor: pointer; }
+.desl .fo-color + .fo-color, .desl .fo-color + span { grid-column: 3; }
+.fo-sec textarea.campo.area { min-height: 4.2em; }
+.fo-herr { scrollbar-width: none; }
+/* móvil apaisado: con las herramientas nuevas la columna no cabe; van en tres columnas de teclas algo menores (v1.19: con dos, girar y voltear quedaban por debajo de la pantalla) */
+@media (max-width: 900px) and (orientation: landscape) {
+  .fo-herr { display: grid; grid-template-columns: repeat(3, 32px); grid-auto-rows: auto; gap: 3px; align-content: start; }
+  .fo-herr .tecla { width: 32px; height: 32px; font-size: 15px; }
+  .fo-herr hr { grid-column: 1 / -1; width: 80%; }
+}
+/* v1.18 · grupos de capas y casillas de la IA */
+.fo-gr { display: grid; grid-template-columns: 30px 30px minmax(0, 1fr); align-items: center; gap: 6px; padding: 4px 6px; border: 1px dashed var(--linea); border-radius: 7px; background: #1a1a1d; cursor: pointer; }
+.fo-gr .ojo { width: 30px; height: 30px; min-height: 0; padding: 0; display: grid; place-items: center; font-size: 15px; }
+.fo-gr .ojo.off { opacity: .4; }
+.fo-gr .nom { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ambar); }
+.fo-gr .nom small { display: block; color: var(--gris); font: 400 .82em 'Share Tech Mono', monospace; }
+.fo-cp.en-gr { margin-left: 16px; border-left: 2px solid #5a3d00; }
+.fo-chk { display: flex; align-items: center; gap: 8px; color: var(--gris); font-size: .92em; cursor: pointer; }
+.fo-chk input { width: 18px; height: 18px; accent-color: var(--ambar); }
+.fo-acc .tecla { min-width: 0; white-space: normal; line-height: 1.15; text-align: center; justify-content: center; padding-block: 4px; }   /* textos largos (inglés, catalán): en dos líneas, nunca cortados */
+/* v1.19 · móvil apaisado estrecho: cada pestaña con el ancho de su nombre (EXPORTAR e HISTORIAL se cortaban); si no caben, pasan a una segunda fila */
+@media (max-width: 900px) and (orientation: landscape) {
+  .fo-lado .tabs { display: flex; flex-wrap: wrap; }
+  .fo-lado .tabs .tab { flex: 1 1 auto; padding: 0 3px; }
+}

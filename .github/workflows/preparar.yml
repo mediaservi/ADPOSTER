@@ -1,0 +1,36 @@
+# ADPOSTER · al subir imágenes a «entrada/» las convierte a WebP para FHD, las mueve a «assets/» y actualiza el índice.
+# También regenera el índice si se añade o se borra algo directamente en «assets/».
+name: Preparar imágenes
+on:
+  push:
+    branches: [main, beta]
+    paths: ['entrada/**', 'assets/**']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: preparar-${{ github.ref }}
+jobs:
+  preparar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install --quiet pillow
+      - name: Convertir y actualizar el índice
+        run: |
+          if [ -n "$(find entrada -type f ! -name 'LEEME.md' 2>/dev/null | head -1)" ]; then
+            python3 tools/preparar.py entrada
+            find entrada -type f ! -name 'LEEME.md' -delete
+            find entrada -mindepth 1 -type d -empty -delete
+          else
+            python3 tools/preparar.py
+          fi
+      - name: Guardar los cambios
+        run: |
+          git config user.name "adposter"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || (git commit -m "Imágenes preparadas e índice actualizado" && git push)

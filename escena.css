@@ -1,0 +1,100 @@
+/* ADPOSTER · composiciones: estilos de las escenas y de sus piezas. Los usan igual el reproductor (player.js) y el editor del gestor (editor.js),
+   así lo que se compone es exactamente lo que sale en la pantalla. Las medidas van en «u» = una centésima del lado corto del display (--u).
+   Tipos de letra propios (assets/fonts, SIL OFL 1.1). Licencia GPL-3.0 · mediaservi.com */
+@font-face{font-family:'Inter';font-weight:400;font-display:swap;src:url(assets/fonts/inter-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Inter';font-weight:700;font-display:swap;src:url(assets/fonts/inter-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Inter';font-weight:800 900;font-display:swap;src:url(assets/fonts/inter-latin-800-normal.woff2) format('woff2')}
+@font-face{font-family:'Montserrat';font-weight:400 600;font-display:swap;src:url(assets/fonts/montserrat-500.woff2) format('woff2')}
+@font-face{font-family:'Montserrat';font-weight:700 900;font-display:swap;src:url(assets/fonts/montserrat-800.woff2) format('woff2')}
+@font-face{font-family:'Poppins';font-weight:100 900;font-display:swap;src:url(assets/fonts/poppins-900.woff2) format('woff2')}
+@font-face{font-family:'Bebas Neue';font-weight:100 900;font-display:swap;src:url(assets/fonts/bebas-neue-400.woff2) format('woff2')}
+@font-face{font-family:'Anton';font-weight:100 900;font-display:swap;src:url(assets/fonts/anton-400.woff2) format('woff2')}
+@font-face{font-family:'Oswald';font-weight:100 900;font-display:swap;src:url(assets/fonts/oswald-700.woff2) format('woff2')}
+@font-face{font-family:'League Gothic';font-weight:100 900;font-display:swap;src:url(assets/fonts/league-gothic-400.woff2) format('woff2')}
+@font-face{font-family:'Archivo Black';font-weight:100 900;font-display:swap;src:url(assets/fonts/archivo-black-400.woff2) format('woff2')}
+@font-face{font-family:'Playfair Display';font-style:normal;font-weight:100 900;font-display:swap;src:url(assets/fonts/playfair-display-700.woff2) format('woff2')}
+@font-face{font-family:'Playfair Display';font-style:italic;font-weight:100 900;font-display:swap;src:url(assets/fonts/playfair-display-400i.woff2) format('woff2')}
+@font-face{font-family:'Abril Fatface';font-weight:100 900;font-display:swap;src:url(assets/fonts/abril-fatface-400.woff2) format('woff2')}
+@font-face{font-family:'Cinzel';font-weight:100 900;font-display:swap;src:url(assets/fonts/cinzel-700.woff2) format('woff2')}
+@font-face{font-family:'Marcellus';font-weight:100 900;font-display:swap;src:url(assets/fonts/marcellus-400.woff2) format('woff2')}
+@font-face{font-family:'Alfa Slab One';font-weight:100 900;font-display:swap;src:url(assets/fonts/alfa-slab-one-400.woff2) format('woff2')}
+@font-face{font-family:'Fredoka';font-weight:100 900;font-display:swap;src:url(assets/fonts/fredoka-700.woff2) format('woff2')}
+@font-face{font-family:'Righteous';font-weight:100 900;font-display:swap;src:url(assets/fonts/righteous-400.woff2) format('woff2')}
+@font-face{font-family:'Pacifico';font-weight:100 900;font-display:swap;src:url(assets/fonts/pacifico-400.woff2) format('woff2')}
+@font-face{font-family:'Caveat';font-weight:100 900;font-display:swap;src:url(assets/fonts/caveat-700.woff2) format('woff2')}
+@font-face{font-family:'Courier Prime';font-weight:100 900;font-display:swap;src:url(assets/fonts/courier-prime-700.woff2) format('woff2')}
+@font-face{font-family:'Share Tech Mono';font-weight:100 900;font-display:swap;src:url(assets/fonts/share-tech-mono-latin-400-normal.woff2) format('woff2')}
+
+.esc{position:absolute;inset:0;overflow:hidden;background:#000;color:#fff;--u:10px;font-family:Inter,system-ui,Arial,sans-serif;font-synthesis:style;contain:strict}
+.esc .f-img{position:absolute;inset:0;background:center/cover no-repeat}
+.esc .f-osc{position:absolute;inset:0;background:#000}
+.esc .f-tr{position:absolute;inset:0;pointer-events:none}
+.pz{position:absolute;box-sizing:border-box;transform-origin:50% 50%}
+.pz > .in{position:absolute;inset:0;box-sizing:border-box;overflow:hidden}
+.pz.oculta{display:none}
+
+/* texto */
+.pz-texto > .in{display:flex;overflow:visible}
+.pz-texto .tx{width:100%;white-space:pre-wrap;overflow-wrap:break-word;line-height:1.08}
+.pz-texto .in.v-arr{align-items:flex-start}.pz-texto .in.v-cen{align-items:center}.pz-texto .in.v-aba{align-items:flex-end}
+
+/* imagen, vídeo y zona de carpeta */
+.pz-imagen img,.pz-video video,.pz-zona img,.pz-zona video{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover}
+.pz .contener img,.pz .contener video{object-fit:contain}
+.pz-zona .z{position:absolute;inset:0;opacity:0;transition:opacity var(--zt,1.2s) ease}
+.pz-zona .z.on{opacity:1}
+.pz .vacio{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u) * 1);text-align:center;padding:calc(var(--u) * 1.5);box-sizing:border-box;
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.07) 0 calc(var(--u) * 1.2),rgba(255,255,255,.02) calc(var(--u) * 1.2) calc(var(--u) * 2.4));border:max(1px,calc(var(--u) * .18)) dashed rgba(255,255,255,.45);
+  color:rgba(255,255,255,.85);font:700 calc(var(--u) * 2.1)/1.2 Inter,Arial,sans-serif;letter-spacing:.06em;text-transform:uppercase;overflow:hidden}
+.pz .vacio small{font-weight:400;font-size:.72em;letter-spacing:.02em;text-transform:none;opacity:.8;overflow-wrap:anywhere}
+
+/* reloj */
+.pz-reloj > .in,.pz-fecha > .in{display:flex;align-items:center;justify-content:center;overflow:visible}
+.pz-reloj .tx,.pz-fecha .tx{white-space:nowrap;line-height:1;font-variant-numeric:tabular-nums}
+.pz-fecha .tx{white-space:pre-wrap;text-align:center;line-height:1.05}
+.pz-reloj svg{width:100%;height:100%;display:block}
+
+/* el tiempo */
+.pz-tiempo > .in{display:flex;align-items:center;justify-content:center;gap:4%;overflow:visible}
+.pz-tiempo .ahora{display:flex;align-items:center;gap:.25em;min-width:0}
+.pz-tiempo .ico{width:1.7em;height:1.7em;flex:none}
+.pz-tiempo .ico svg{width:100%;height:100%;display:block}
+.pz-tiempo .gr{font-weight:800;line-height:1;white-space:nowrap}
+.pz-tiempo .lug{font-size:.34em;line-height:1.15;opacity:.85;font-weight:400;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.pz-tiempo .cred{font-size:.18em;line-height:1.1;opacity:.55;font-weight:400;letter-spacing:.04em;margin-top:.25em;white-space:nowrap}
+.pz-tiempo .dias{display:flex;gap:.5em;font-size:.36em;line-height:1.2}
+.pz-tiempo .dias div{display:flex;flex-direction:column;align-items:center;gap:.1em;white-space:nowrap}
+.pz-tiempo .dias .ico{width:1.7em;height:1.7em}
+.pz-tiempo .dias b{font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.pz-tiempo.col > .in{flex-direction:column;gap:3%}
+
+/* noticias RSS */
+.pz-rss > .in{display:flex;align-items:center}
+.pz-rss .cinta{white-space:nowrap;display:inline-block;padding-left:100%;animation:pz-cinta var(--ct,30s) linear infinite;will-change:transform}
+@keyframes pz-cinta{to{transform:translateX(-100%)}}
+.pz-rss ul{list-style:none;margin:0;padding:0;width:100%;display:flex;flex-direction:column;justify-content:space-evenly;height:100%}
+.pz-rss li{line-height:1.15;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;padding-left:1em;position:relative}
+.pz-rss li::before{content:'';position:absolute;left:0;top:.38em;width:.42em;height:.42em;border-radius:50%;background:currentColor;opacity:.7}
+.pz-rss .uno{width:100%;line-height:1.15;animation:pz-uno .7s ease both}
+@keyframes pz-uno{from{opacity:0;transform:translateY(18%)}}
+
+/* código QR, forma y página web */
+.pz-qr > .in{display:flex;align-items:center;justify-content:center}
+.pz-qr svg{width:100%;height:100%;display:block}
+.pz-web iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
+
+/* entrada de las piezas cuando la escena aparece en el reproductor */
+.esc.entra .pz[data-an="aparece"] > .in{animation:pz-ap .9s ease both}
+.esc.entra .pz[data-an="sube"] > .in{animation:pz-su .9s cubic-bezier(.2,.8,.2,1) both}
+.esc.entra .pz[data-an="baja"] > .in{animation:pz-ba .9s cubic-bezier(.2,.8,.2,1) both}
+.esc.entra .pz[data-an="izquierda"] > .in{animation:pz-iz .9s cubic-bezier(.2,.8,.2,1) both}
+.esc.entra .pz[data-an="derecha"] > .in{animation:pz-de .9s cubic-bezier(.2,.8,.2,1) both}
+.esc.entra .pz[data-an="zoom"] > .in{animation:pz-zo .9s cubic-bezier(.2,.8,.2,1) both}
+.esc.entra .pz > .in{animation-delay:var(--ret,0s) !important}
+@keyframes pz-ap{from{opacity:0}}
+@keyframes pz-su{from{opacity:0;transform:translateY(calc(var(--u) * 6))}}
+@keyframes pz-ba{from{opacity:0;transform:translateY(calc(var(--u) * -6))}}
+@keyframes pz-iz{from{opacity:0;transform:translateX(calc(var(--u) * -8))}}
+@keyframes pz-de{from{opacity:0;transform:translateX(calc(var(--u) * 8))}}
+@keyframes pz-zo{from{opacity:0;transform:scale(.82)}}
+@media (prefers-reduced-motion:reduce){.esc.entra .pz > .in{animation:none !important}}
