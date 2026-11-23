@@ -6,6 +6,11 @@ Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin p
 
 **Versión actual: v1.22**
 
+
+## Icono
+
+Icono de pestaña y de app (noviembre 2026) en el estilo de placa de la familia AVHUB: placa con degradado negro a morado, filete negro y sombra verde, con el isotipo de la app. El logo de la cabecera no cambia.
+
 ## Cómo funciona
 
 1. Cada **lista** tiene su dirección: `adposter.mediaservi.com/cine`, `adposter.mediaservi.com/klub` o `adposter.mediaservi.com/p/?l=nombre`.
