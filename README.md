@@ -162,6 +162,7 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
 ## Cambios de la versión actual (v1.23, borrador)
+- **Direcciones de carpeta sin la barra final (24-11-2026):** con la app ya visitada o instalada, abrir una dirección como `/p` daba «No se puede acceder a este sitio web» (ERR_FAILED), porque el service worker entregaba tal cual la respuesta redirigida por el servidor. Ahora devuelve una redirección limpia; caché renovada (`adposter-v18`).
 
 Versión de prueba (mockup funcional) para que la usen perfiles muy distintos, desde quien pone su primera pantalla hasta quien instala muchas. Todo lo de la v1.22 sigue igual.
 

@@ -7,7 +7,7 @@
      todas de una vez («pre») y, cuando lo tiene todo, se quitan las versiones viejas. Las listas y el índice de la otra web: primero la red y, sin red, la copia.
    Para forzar una copia nueva de la app en todos los dispositivos, sube el número de CACHE (las imágenes se conservan).
    Licencia GPL-3.0 · mediaservi.com */
-const PREFIJO = 'adposter-', CACHE = PREFIJO + 'v17', CIMG = PREFIJO + 'imagenes';
+const PREFIJO = 'adposter-', CACHE = PREFIJO + 'v18', CIMG = PREFIJO + 'imagenes';
 const BASICO = ['./', 'index.html', 'p/', 'cine/', 'klub/', 'gestor.js', 'gestor.css', 'editor.js', 'gestion.js', 'lista.js', 'subir.js', 'pantallas.js', 'foto/', 'foto/foto.js', 'foto/foto.css', 'foto/px.js', 'foto/herr.js', 'foto/ia.js', 'escena.js', 'escena.css', 'plantillas.js', 'player.js', 'player.css', 'directo.js', 'qr.js', 'credito.js', 'fallo.js', 'instalar.js', 'playlists.json', 'assets/manifest.json', 'manifest.json', 'assets/logos/adposter-logo.svg', 'assets/logos/adposter-icono.svg', 'assets/logos/adposter-192.png', 'assets/fonts/inter-latin-400-normal.woff2', 'assets/fonts/inter-latin-700-normal.woff2', 'assets/fonts/inter-latin-800-normal.woff2', 'assets/fonts/share-tech-mono-latin-400-normal.woff2'];   // lo mínimo para arrancar sin conexión desde la primera visita
 const FRESCO = /(\/|\.html?|\.json|\.js|\.css|\.webmanifest)$/i, TOPE = 6000;
 const clave = u => { const x = new URL(u, self.registration.scope); x.search = ''; x.hash = ''; return x.href; };
@@ -40,11 +40,13 @@ async function imagen(req) { const c = await caches.open(CIMG), u = new URL(req.
   const otra = await c.match(clave(req.url), { ignoreSearch: true }); if (otra) return otra;                                   // sin red: la versión anterior de esa imagen
   return fetch(req); }                                                                                                        // última opción: como la pide la página, sin guardarla
 
+/* 24-11-2026 · una navegación que el servidor redirige (carpeta sin la barra final) recibe una redirección limpia: una respuesta ya redirigida no se puede entregar a una navegación (ERR_FAILED) */
+const limpia = p => Promise.resolve(p).then(r => (r && r.redirected ? Response.redirect(r.url, 302) : r));
 self.addEventListener('fetch', e => { const r = e.request; if (r.method !== 'GET' || r.headers.has('range')) return; const u = new URL(r.url);
   if (/\/assets\/ia\//.test(u.pathname)) return;   // los modelos de IA de FOTO los guarda FOTO en su propia caché (pesan mucho y no caducan con cada versión)
   if (IMG.test(u.pathname) && sirve(u)) { e.respondWith(imagen(r)); return; }
   if (u.origin !== self.location.origin) { if (DATO.test(u.pathname) && sirve(u)) e.respondWith(fresco(r)); return; }       // listas e índice de un origen privado
-  e.respondWith(r.mode === 'navigate' || FRESCO.test(u.pathname) ? fresco(r) : guardado(r)); });
+  e.respondWith(r.mode === 'navigate' ? limpia(fresco(r)) : FRESCO.test(u.pathname) ? fresco(r) : guardado(r)); });
 
 /* la página pide guardar lo que ha cargado (y lo que vaya a necesitar) para tenerlo sin conexión */
 self.addEventListener('message', e => { const d = e.data || {}, puerto = e.ports && e.ports[0], quien = e.source; if (d.t !== 'pre' || !Array.isArray(d.urls)) return;
