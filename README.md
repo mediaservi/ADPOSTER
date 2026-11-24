@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.23** (borrador de prueba)
+**Versión actual: v1.24**
 
 
 ## Icono
@@ -161,10 +161,12 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.23, borrador)
+## Cambios de la versión actual (v1.24)
+- **Calendario: aviso al salir con reglas sin guardar.** Una regla nueva sigue naciendo en borrador y no se aplica hasta pulsar «Guardar la regla»; ahora, si cierras el calendario con reglas en borrador, un aviso te lo recuerda y deja elegir **Guardar y salir**, **Salir sin guardar** (se quedan en borrador) o **Seguir aquí**. En español, inglés y catalán.
 - **Direcciones de carpeta sin la barra final (24-11-2026):** con la app ya visitada o instalada, abrir una dirección como `/p` daba «No se puede acceder a este sitio web» (ERR_FAILED), porque el service worker entregaba tal cual la respuesta redirigida por el servidor. Ahora devuelve una redirección limpia; caché renovada (`adposter-v18`).
 
-Versión de prueba (mockup funcional) para que la usen perfiles muy distintos, desde quien pone su primera pantalla hasta quien instala muchas. Todo lo de la v1.22 sigue igual.
+## Cambios de la v1.23
+Pensada para usos muy distintos, desde quien pone su primera pantalla hasta quien instala muchas. Todo lo de la v1.22 sigue igual.
 
 **Dos modos: SIMPLE y PRO**
 - **Conmutador SIMPLE · PRO** junto al logo, el mismo de SCREENS y SYSTEMS (en el móvil, una burbuja). Quien entra por primera vez empieza en SIMPLE; quien ya tenía listas, en PRO.
@@ -466,7 +468,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.23 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.24 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

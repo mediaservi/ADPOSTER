@@ -307,9 +307,9 @@
     else if (t.dataset.pz === 'url' && PZ() && PZ().t === 'qr') { const z = PZ(), u = G.qrUrl(t.value); antes(); z.url = u; t.value = u; hecho(); } } });
 
   /* ---------- ventana flotante y galería de plantillas ---------- */
-  let galModo = 'nueva', galCat = '', galM = [], alCerrar = null;
-  function abreModal(html, cls, cierra) { const m = $('#modal'); m.className = 'modal ' + (cls || ''); m.innerHTML = '<div class="m-caja" role="dialog" aria-modal="true">' + html + '</div>'; m.hidden = false; alCerrar = cierra || null; const f = m.querySelector('[data-foco]') || m.querySelector('button'); f && f.focus({ preventScroll: true }); }
-  function cierraModal() { const m = $('#modal'); if (m.hidden) return; galM.forEach(x => x.destruye()); galM = []; m.hidden = true; m.textContent = ''; const f = alCerrar; alCerrar = null; f && f(); }
+  let galModo = 'nueva', galCat = '', galM = [], alCerrar = null, antesCerrar = null;   /* v1.24 · antesCerrar: la ventana puede pedir confirmación antes de cerrarse */
+  function abreModal(html, cls, cierra, antes) { antesCerrar = antes || null; const m = $('#modal'); m.className = 'modal ' + (cls || ''); m.innerHTML = '<div class="m-caja" role="dialog" aria-modal="true">' + html + '</div>'; m.hidden = false; alCerrar = cierra || null; const f = m.querySelector('[data-foco]') || m.querySelector('button'); f && f.focus({ preventScroll: true }); }
+  function cierraModal(forzar) { const m = $('#modal'); if (m.hidden) return; if (forzar !== true && antesCerrar && antesCerrar() === false) return; antesCerrar = null; galM.forEach(x => x.destruye()); galM = []; m.hidden = true; m.textContent = ''; const f = alCerrar; alCerrar = null; f && f(); }
   $('#modal').addEventListener('pointerdown', e => { if (e.target === $('#modal')) cierraModal(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden) { e.stopPropagation(); cierraModal(); } }, true);
   const cabModal = t => `<div class="m-cab"><h2>${t}</h2><button type="button" class="tecla rd" data-a="modalCierra" aria-label="${T('Cerrar')}" title="${T('Cerrar')}">✕</button></div>`;

@@ -696,3 +696,10 @@ html.md-simple.alarma .tecla.emer-bt { background: linear-gradient(180deg, #d837
   #zona-listas .tecla { min-height: calc(var(--alto) * .82); }
   .izq { grid-template-rows: minmax(0, .8fr) auto; }
 }
+
+/* ======================= v1.24 ======================= */
+/* calendario: aviso al salir con reglas en borrador */
+.cal-sale { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 8px; padding: 8px 10px; border-radius: 8px; background: #2a1d10; box-shadow: inset 0 0 0 1px var(--ambar), inset 0 1px 4px #000; color: #ffd9a0; }
+.cal-sale span { flex: 1 1 260px; min-width: 0; line-height: 1.3; }
+.cal-sale .tecla { flex: 0 0 auto; }
+@media (max-width: 640px) { .cal-sale .tecla { flex: 1 1 100%; } }
