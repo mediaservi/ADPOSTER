@@ -98,3 +98,38 @@
 @keyframes pz-de{from{opacity:0;transform:translateX(calc(var(--u) * 8))}}
 @keyframes pz-zo{from{opacity:0;transform:scale(.82)}}
 @media (prefers-reduced-motion:reduce){.esc.entra .pz > .in{animation:none !important}}
+
+/* v1.23 · TURNOS: título, número grande, puesto e historial */
+.pz-turno > .in{display:grid;grid-template-rows:14% 44% 16% 1fr;padding:calc(var(--u) * 1.2) calc(var(--u) * 2)}
+.pz-turno > .in.sin-h{grid-template-rows:16% 56% 22% 0}
+.pz-turno .sb{position:relative;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.pz-turno .sb .tx{white-space:nowrap;line-height:1;font-variant-numeric:tabular-nums}
+.pz-turno .tu-t .tx{letter-spacing:.14em;opacity:.8;font-weight:700}
+.pz-turno .tu-n .tx{font-weight:900;letter-spacing:.02em}
+.pz-turno .tu-h{min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:.25em;border-top:calc(var(--u) * .25) solid rgba(255,255,255,.18);padding-top:.3em}
+.pz-turno .tu-r{display:flex;justify-content:space-between;gap:1em;opacity:.72;white-space:nowrap}
+.pz-turno .tu-r b{font-variant-numeric:tabular-nums}
+@keyframes pz-llama{0%,100%{transform:scale(1)}10%,30%,50%{transform:scale(1.06);filter:brightness(1.5)}20%,40%{transform:scale(1);filter:none}}
+.pz-turno.llama > .in{animation:pz-llama 6s ease-in-out both}
+/* v1.23 · PEDIDOS LISTOS: dos columnas */
+.pz-pedidos > .in{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u) * 1.4);padding:calc(var(--u) * 1.4)}
+.pz-pedidos .pe-c{display:flex;flex-direction:column;min-height:0;border-radius:calc(var(--u) * 1.2);overflow:hidden;background:rgba(255,255,255,.05)}
+.pz-pedidos .pe-h{flex:none;padding:.5em .6em;text-align:center;font-weight:900;letter-spacing:.12em;color:#1a1205;background:#ffb000}
+.pz-pedidos .pe-l .pe-h{background:#22c55e;color:#04210f}
+.pz-pedidos .pe-b{flex:1;min-height:0;display:grid;align-content:start;gap:.18em .3em;padding:.25em .35em;overflow:hidden}
+.pz-pedidos .pe-n{text-align:center;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.2;white-space:nowrap}
+.pz-pedidos .pe-p .pe-n{opacity:.6}
+.pz-pedidos .pe-l .pe-n{color:#7dffaf}
+@keyframes pz-nuevo{0%,100%{transform:none}15%,45%,75%{transform:scale(1.25);color:#fff;text-shadow:0 0 .4em #22c55e}}
+.pz-pedidos .pe-n.nuevo{animation:pz-nuevo 4s ease-in-out both}
+/* v1.23 · LISTA DE PRECIOS: nombre, puntos guía y precio */
+.pz-precios > .in{display:flex}
+.pz-precios .pr{flex:1;min-width:0;display:grid;align-content:space-evenly;column-gap:1.4em;overflow:hidden}
+.pz-precios .pr-f{display:flex;align-items:baseline;gap:.35em;min-width:0;line-height:1.18;white-space:nowrap;overflow:hidden}
+.pz-precios .pr-n{flex:none}
+.pz-precios .pr-f i{flex:1;min-width:.6em;border-bottom:.12em dotted currentColor;opacity:.4;transform:translateY(-.22em)}
+.pz-precios .pr-p{flex:none;font-weight:800;font-variant-numeric:tabular-nums}
+/* v1.23 · lista táctil: las piezas con destino se pueden tocar */
+.tactil .pz[data-ir]{cursor:pointer;pointer-events:auto}
+/* v1.23 · datos de ejemplo del editor: marca visible (no salen en las pantallas) */
+.ejemplo::after { content: attr(data-ej); position: absolute; top: 3px; right: 3px; z-index: 3; padding: 1px 5px; border-radius: 3px; background: #2f7de8; color: #fff; font: 800 10px/1.3 Inter, Arial, sans-serif; letter-spacing: .08em; pointer-events: none; }

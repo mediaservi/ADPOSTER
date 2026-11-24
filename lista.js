@@ -1,4 +1,4 @@
-/* ADPOSTER · v1.15 · la lista de carteles a la vista, .
+/* ADPOSTER · v1.15 · la lista de carteles a la vista, bajo el lienzo.
    Debajo del lienzo, la tira con todos los carteles en el orden en que salen, con su duración y sus fechas, y los anuncios al final con su ritmo.
    · Tocar un cartel lo elige: encima de la tira salen su duración (− +), sus fechas (desde y hasta), dejarlo fuera, moverlo, verlo en grande y quitarlo.
    · Arrastrar un cartel lo cambia de sitio (la lista pasa a orden fijo). «+» añade carteles sueltos de cualquier carpeta o de «Mis imágenes».
@@ -12,14 +12,14 @@
   Object.assign(TX, {
     'Añadir carteles': ['Add posters', 'Afegeix cartells'], 'Añadir': ['Add', 'Afegeix'], 'Toda la carpeta': ['Whole folder', 'Tota la carpeta'], 'ya está en la lista': ['already in the list', 'ja és a la llista'],
     'Elige los carteles que quieras y pulsa «Añadir». Con «Toda la carpeta» entra la carpeta entera, también lo que le añadas más adelante.': ['Pick the posters you want and press “Add”. “Whole folder” brings in the whole folder, including anything you add to it later.', 'Tria els cartells que vulguis i prem «Afegeix». Amb «Tota la carpeta» hi entra la carpeta sencera, també el que hi afegeixis més endavant.'],
-    'Desde': ['From', 'Des de'], 'Hasta': ['Until', 'Fins a'], 'Duración': ['Duration', 'Durada'], 'Fuera': ['Out', 'Fora'], 'Ver': ['View', 'Mostra'], 'Cerrar la ficha': ['Close', 'Tanca la fitxa'],
+    'Desde': ['From', 'Des de'], 'Días': ['Days', 'Dies'], 'Horas': ['Hours', 'Hores'], 'Hasta': ['Until', 'Fins a'], 'Duración': ['Duration', 'Durada'], 'Fuera': ['Out', 'Fora'], 'Ver': ['View', 'Mostra'], 'Cerrar la ficha': ['Close', 'Tanca la fitxa'],
     'caducado': ['expired', 'caducat'], 'caducados': ['expired', 'caducats'], 'aún no': ['not yet', 'encara no'], 'por llegar': ['upcoming', 'per arribar'], 'fuera': ['left out', 'fora'],
     'sin anuncios': ['no ads', 'sense anuncis'], 'cada': ['every', 'cada'], 'vídeos': ['videos', 'vídeos'], 'vídeo': ['video', 'vídeo'], 'carpeta vacía': ['empty folder', 'carpeta buida'], 'Imagen propia': ['Own image', 'Imatge pròpia'],
     'Suelto': ['Single', 'Solt'], 'De la carpeta': ['From folder', 'De la carpeta'], 'Esta lista aún no tiene carteles: añádelos con «+».': ['This list has no posters yet: add them with “+”.', 'Aquesta llista encara no té cartells: afegeix-los amb «+».'],
     'Toca un cartel para cambiar su duración o sus fechas, o dejarlo fuera; arrástralo para ordenar.': ['Tap a poster to change its duration or dates, or to leave it out; drag it to reorder.', 'Toca un cartell per canviar-ne la durada o les dates, o deixar-lo fora; arrossega’l per ordenar.'],
     'carteles añadidos': ['posters added', 'cartells afegits'], 'Carpeta añadida': ['Folder added', 'Carpeta afegida'], 'Quitar de la lista': ['Remove from the list', 'Treu de la llista'],
     'Lo pone la carpeta: para que no salga, déjalo fuera.': ['It comes from the folder: to stop it showing, leave it out.', 'Ve de la carpeta: perquè no surti, deixa’l fora.'], 'Subir imagen': ['Upload image', 'Puja una imatge'], 'Mis imágenes': ['My images', 'Les meves imatges'],
-    'Anuncios': ['Ads', 'Anuncis'], 'Editar en FOTO': ['Edit in FOTO', 'Edita a FOTO'], 'Se guarda como copia: el original no se toca.': ['It is saved as a copy: the original is never changed.', 'Es desa com a còpia: l\u2019original no es toca.'], 'Sale hasta el': ['Shows until', 'Surt fins al'], 'Sale desde el': ['Shows from', 'Surt des del'], 'Caducó el': ['Expired on', 'Va caducar el']
+    'Anuncios': ['Ads', 'Anuncis'], 'Editar en FOTO': ['Edit in FOTO', 'Edita a FOTO'], 'Se guarda como copia: el original no se toca.': ['It is saved as a copy: the original is never changed.', 'Es desa com a còpia: l\u2019original no es toca.'], 'Sale hasta el': ['Shows until', 'Surt fins al'], 'Sale desde el': ['Shows from', 'Surt des del'], 'Caducó el': ['Expired on', 'Va caducar el'], 'Anuncio': ['Ad', 'Anunci'], 'Que salga como anuncio entre los carteles': ['Show it as an ad between posters', 'Que surti com a anunci entre els cartells'], 'A todos': ['To all', 'A tots'], 'Pone estas fechas, días y horas a todos los carteles de la lista': ['Applies these dates, days and hours to every poster in the list', 'Posa aquestes dates, dies i hores a tots els cartells de la llista'], 'Puesto en todos los carteles': ['Applied to every poster', 'Posat a tots els cartells'], 'Ahora es un anuncio': ['Now it is an ad', 'Ara és un anunci']
   });
   const el = (t, c) => { const e = document.createElement(t); if (c) e.className = c; return e; };
   const hoy = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
@@ -28,7 +28,7 @@
   const esVideo = f => /\.(mp4|webm|m4v|mov)(\?|$)/i.test(f || ''), propia = f => String(f).indexOf('m:') === 0;
   const urlDe = f => propia(f) ? (G.B.medios[f.slice(2)] || '') : G.urlAsset(f);
   const existe = f => { if (propia(f)) return !!G.B.medios[f.slice(2)]; const i = f.indexOf('/'); return i > 0 && (G.MAN.carpetas[f.slice(0, i)] || []).includes(f.slice(i + 1)); };
-  const nombre = f => propia(f) ? T('Imagen propia') : f.replace(/^.*\//, '').replace(/\.[a-z0-9]+$/i, '');
+  const nombre = f => propia(f) ? ((G.B.mnom && G.B.mnom[f.slice(2)]) || T('Imagen propia')) : f.replace(/^.*\//, '').replace(/\.[a-z0-9]+$/i, '');
   const deCarpetas = p => (p.contenido || []).flatMap(c => (G.MAN.carpetas[c] || []).map(f => c + '/' + f));
   /* la lista entera, en el orden en que sale: la secuencia fijada y, detrás, lo demás (carpetas y sueltos) */
   const todos = p => { const u = [...new Set(deCarpetas(p).concat((p.sueltos || []).filter(existe)))], hay = new Set(u), sq = (p.secuencia || []).filter(f => hay.has(f)), ya = new Set(sq); return sq.concat(u.filter(f => !ya.has(f))); };
@@ -48,8 +48,10 @@
         <button type="button" class="tc-m" data-a="carVer" data-v="${esc(f)}" aria-label="${T('Ver')}" title="${T('Ver')}">${mini(f, urlDe(f))}</button>
         <div class="tc-n"><b>${esc(nombre(f))}</b><small>${esc(suelto ? T('Suelto') + ' · ' + ori : T('De la carpeta') + ' ' + ori)}</small></div>
         <div class="tc-g"><span class="tc-l">${T('Duración')}</span><button type="button" class="tecla rd" data-a="carSeg" data-v="-1" aria-label="−">−</button><span class="lcd">${esVideo(f) ? T('vídeo') : (s || p.segundos) + ' s'}</span><button type="button" class="tecla rd" data-a="carSeg" data-v="1" aria-label="+"${esVideo(f) ? ' disabled' : ''}>+</button></div>
-        <div class="tc-g"><label class="tc-l" for="tc-desde">${T('Desde')}</label><input type="date" class="campo tc-f" id="tc-desde" data-cf="desde" value="${esc(a.desde || '')}"><label class="tc-l" for="tc-hasta">${T('Hasta')}</label><input type="date" class="campo tc-f" id="tc-hasta" data-cf="hasta" value="${esc(a.hasta || '')}"${a.desde ? ` min="${esc(a.desde)}"` : ''}></div>
+        <div class="tc-g"><label class="tc-l" for="tc-desde">${T('Desde')}</label>${G.campoFecha('tc-desde', a.desde, ' data-cf="desde"').replace('class="campo', 'class="campo tc-f')}<label class="tc-l" for="tc-hasta">${T('Hasta')}</label>${G.campoFecha('tc-hasta', a.hasta, ' data-cf="hasta"').replace('class="campo', 'class="campo tc-f')}</div>
+        <div class="tc-g tc-dh"><span class="tc-l">${T('Días')}</span><span class="fila dias">${['L', 'M', 'X', 'J', 'V', 'S', 'D'].map((d, k) => { const on = !Array.isArray(a.dias) || !a.dias.length || a.dias.includes(k + 1); return `<button type="button" class="tecla${on ? ' on' : ''}" data-a="carDia" data-v="${k + 1}" aria-pressed="${on}">${T(d)}</button>`; }).join('')}</span><span class="tc-l">${T('Horas')}</span>${G.campoHora('tc-hini', a.hIni, ' data-cf="hIni" aria-label="' + T('Desde') + '"')}${G.campoHora('tc-hfin', a.hFin, ' data-cf="hFin" aria-label="' + T('Hasta') + '"')}</div>
         <div class="tc-g">${tecla('carOff', f, T('Fuera'), !!a.off)}<button type="button" class="tecla rd" data-a="carMueve" data-v="-1" aria-label="${T('Mover antes')}" title="${T('Mover antes')}"${i > 0 ? '' : ' disabled'}>◀</button><button type="button" class="tecla rd" data-a="carMueve" data-v="1" aria-label="${T('Mover después')}" title="${T('Mover después')}"${i < L.length - 1 ? '' : ' disabled'}>▶</button>
+          ${propia(f) && suelto ? tecla('carAd', f, T('Anuncio'), false, '', ' title="' + T('Que salga como anuncio entre los carteles') + '"') : ''}<button type="button" class="tecla" data-a="carTodos" title="${T('Pone estas fechas, días y horas a todos los carteles de la lista')}">${T('A todos')}</button>
           <button type="button" class="tecla reset" data-a="carQuita" data-v="${esc(f)}"${suelto ? '' : ` disabled title="${T('Lo pone la carpeta: para que no salga, déjalo fuera.')}"`}>${T('Quitar')}</button><button type="button" class="tecla rd" data-a="carCierra" aria-label="${T('Cerrar la ficha')}" title="${T('Cerrar la ficha')}">✕</button></div></div>`; }
     else { const est = L.map(f => estadoDe(p, f)), salen = L.filter((f, k) => est[k] === 'si'), vids = salen.filter(esVideo).length, ciclo = salen.filter(f => !esVideo(f)).reduce((n, f) => n + (segDe(p, f) || p.segundos), 0);
       const cuenta = k => est.filter(e => e === k).length, vacias = (p.contenido || []).filter(c => !(car[c] || []).length), avisos = [];
@@ -57,8 +59,8 @@
       vacias.forEach(c => avisos.push(['mal', T('carpeta vacía') + ' · ' + c]));
       cab = `<div class="tc-res"><div class="lcd">${salen.length} <small>${T('carteles')}</small> ${mm(ciclo)}${vids ? ' + ' + vids + ' <small>' + T(vids > 1 ? 'vídeos' : 'vídeo') + '</small>' : ''} <small>${T('un ciclo')}</small></div>${tecla('carOrden', 'azar', T('Al azar'), p.orden !== 'fijo')}${tecla('carOrden', 'fijo', T('Fijo'), p.orden === 'fijo')}
         ${avisos.map(([c, x]) => `<span class="tc-aviso ${c}">${esc(x)}</span>`).join('')}<span class="nota">${L.length ? T('Toca un cartel para cambiar su duración o sus fechas, o dejarlo fuera; arrástralo para ordenar.') : T('Esta lista aún no tiene carteles: añádelos con «+».')}</span></div>`; }
-    const ads = (p.anuncios || []).flatMap(c => (car[c] || []).map(f => c + '/' + f)).filter(f => estadoDe(p, f) === 'si').length, cada = (p.anunciosCada || [4, 7]).join('–');
-    t.innerHTML = cab + `<div class="tira" role="list">${L.map((f, i) => { const e = estadoDe(p, f), a = p.archivos[f] || {}, s = segDe(p, f), marca = e === 'off' ? '◌' : e === 'caduca' ? '✕' : e === 'pronto' ? '⏳' : a.desde || a.hasta ? '📅' : '';
+    const ads = (p.anuncios || []).flatMap(c => (car[c] || []).map(f => c + '/' + f)).concat((p.adsS || []).filter(existe)).filter(f => estadoDe(p, f) === 'si').length, cada = (p.anunciosCada || [4, 7]).join('–');
+    t.innerHTML = cab + `<div class="tira" role="list">${L.map((f, i) => { const e = estadoDe(p, f), a = p.archivos[f] || {}, s = segDe(p, f), marca = e === 'off' ? '◌' : e === 'caduca' ? '✕' : e === 'pronto' ? '⏳' : a.hIni || (a.dias && a.dias.length) ? '⏰' : a.desde || a.hasta ? '📅' : '';
         const tit = nombre(f) + (e === 'caduca' ? ' · ' + T('Caducó el') + ' ' + fecha(a.hasta) : e === 'pronto' ? ' · ' + T('Sale desde el') + ' ' + fecha(a.desde) : a.hasta ? ' · ' + T('Sale hasta el') + ' ' + fecha(a.hasta) : '');
         return `<button type="button" role="listitem" class="mini car${e !== 'si' ? ' ' + e : ''}${f === elegido ? ' on' : ''}" data-a="carSel" data-v="${esc(f)}" draggable="true" title="${esc(tit)}" aria-pressed="${f === elegido}"><span class="mm">${mini(f, urlDe(f))}${marca ? `<i class="cm">${marca}</i>` : ''}</span><span class="mn">${i + 1} · ${esVideo(f) ? '▶' : (s || p.segundos) + ' s'}</span></button>`; }).join('')}
       <button type="button" class="mini mas car" data-a="carMas" title="${T('Añadir carteles')}" aria-label="${T('Añadir carteles')}"><span class="mm">+</span><span class="mn">${T('Añadir')}</span></button>
@@ -76,8 +78,8 @@
     t0.addEventListener('dragover', e => { if (!arr) return; const c = e.target.closest && e.target.closest('.mini.car[draggable]'); t0.querySelectorAll('.mini.sobre').forEach(x => { if (x !== c) x.classList.remove('sobre'); }); if (c && c.dataset.v !== arr) { e.preventDefault(); c.classList.add('sobre'); } });
     t0.addEventListener('drop', e => { if (!arr) return; const c = e.target.closest && e.target.closest('.mini.car[draggable]'); if (!c || c.dataset.v === arr) return; e.preventDefault(); const L = todos(P()), a = L.indexOf(arr), b = L.indexOf(c.dataset.v), f = arr; arr = ''; mueve(f, a < b ? L[b + 1] || '' : c.dataset.v); });
     /* las fechas: al elegirlas se guardan; «hasta» nunca antes que «desde» */
-    t0.addEventListener('change', e => { const i = e.target; if (!i.dataset || !i.dataset.cf || !elegido) return; const f = elegido, k = i.dataset.cf, v = /^\d{4}-\d{2}-\d{2}$/.test(i.value) ? i.value : '';
-      G.cambia(p => { const a = p.archivos[f] || (p.archivos[f] = {}); if (v) a[k] = v; else delete a[k]; if (a.desde && a.hasta && a.hasta < a.desde) { if (k === 'desde') a.hasta = a.desde; else a.desde = a.hasta; } if (!Object.keys(a).length) delete p.archivos[f]; }); });
+    t0.addEventListener('change', e => { const i = e.target; if (!i.dataset || !i.dataset.cf || !elegido) return; const f = elegido, k = i.dataset.cf, v = G.valor(i); if (v === null) return;   /* v1.23 · fechas dd/mm/aaaa y horas 24 h, y también horas por cartel */
+      setTimeout(() => G.cambia(p => { const a = p.archivos[f] || (p.archivos[f] = {}); if (v) a[k] = v; else delete a[k]; if (a.desde && a.hasta && a.hasta < a.desde) { if (k === 'desde') a.hasta = a.desde; else a.desde = a.hasta; } if (!Object.keys(a).length) delete p.archivos[f]; }), 0); });   // v1.23 · después de que el foco pase al campo siguiente (Tab de «Desde» a «Hasta» ya no se pierde)
   }
 
   /* ---------- «+»: carteles sueltos de cualquier carpeta o de «Mis imágenes» ---------- */
@@ -95,16 +97,21 @@
   /* ---------- ver un cartel en grande ---------- */
   function ver(f) { X.abreModal(X.cabModal(esc(nombre(f))) + `<div class="tc-grande">${esVideo(f) ? `<video src="${esc(urlDe(f))}" autoplay muted loop playsinline></video>` : `<img src="${esc(urlDe(f))}" alt="${esc(nombre(f))}">`}</div>` + (esVideo(f) ? '' : `<div class="tc-foto"><button type="button" class="tecla pri" data-a="carFoto" data-v="${esc(f)}">✎ ${T('Editar en FOTO')}</button><span>${T('Se guarda como copia: el original no se toca.')}</span></div>`), 'm-ver'); }
   /* v1.16 · FOTO, el editor de imagen: se abre en otra pestaña con el cartel; lo editado vuelve como copia a «Mis imágenes» */
-  function abreFoto(f) { const q = propia(f) ? 'm=' + encodeURIComponent(f.slice(2)) : 'src=' + encodeURIComponent(new URL(urlDe(f), location.href).href); window.open('foto/?' + q + '&n=' + encodeURIComponent(propia(f) ? 'imagen' : nombre(f)), '_blank'); }
+  function abreFoto(f) { const q = propia(f) ? 'm=' + encodeURIComponent(f.slice(2)) : 'src=' + encodeURIComponent(new URL(urlDe(f), location.href).href); window.open('foto/?' + q + '&n=' + encodeURIComponent(nombre(f)) + '&de=' + encodeURIComponent(f), '_blank'); }
 
   Object.assign(G.ACC, {
     carSel(f) { elegido = elegido === f ? '' : f; pinta(); },
     carCierra() { elegido = ''; pinta(); const b = $('#tirac .mini.car'); b && b.focus({ preventScroll: true }); },
     carOrden(v) { G.cambia(p => { p.orden = v === 'fijo' ? 'fijo' : 'azar'; if (p.orden === 'fijo' && !p.secuencia.length) p.secuencia = todos(p); }); },
     carSeg(d) { const f = elegido; if (!f || esVideo(f)) return; G.cambia(p => { const a = p.archivos[f] || (p.archivos[f] = {}), act = +a.seg || 0, n = act ? act + +d : (+d > 0 ? p.segundos + 1 : p.segundos - 1); if (n < 2 || n === p.segundos) delete a.seg; else a.seg = lim(n, 2, 600); if (!Object.keys(a).length) delete p.archivos[f]; }); },
+    carDia(v) { const f = elegido; if (!f) return; G.cambia(p => { const a = p.archivos[f] || (p.archivos[f] = {}), d = Array.isArray(a.dias) && a.dias.length ? a.dias.slice() : [1, 2, 3, 4, 5, 6, 7], i = d.indexOf(+v); i < 0 ? d.push(+v) : d.splice(i, 1); if (!d.length) return; if (d.length === 7) delete a.dias; else a.dias = d.sort(); if (!Object.keys(a).length) delete p.archivos[f]; }); },
     carOff(f) { G.cambia(p => { const a = p.archivos[f] || (p.archivos[f] = {}); if (a.off) delete a.off; else a.off = true; if (!Object.keys(a).length) delete p.archivos[f]; }); },
     carMueve(d) { const f = elegido, L = todos(P()), i = L.indexOf(f), j = i + +d; if (i < 0 || j < 0 || j >= L.length) return; mueve(f, +d < 0 ? L[j] : L[j + 1] || ''); },
     carQuita(f) { if (!(P().sueltos || []).includes(f)) return; elegido = ''; G.cambia(p => { p.sueltos = p.sueltos.filter(x => x !== f); p.secuencia = (p.secuencia || []).filter(x => x !== f); delete p.archivos[f]; }); },
+    /* v1.23 · «A todos»: las fechas, los días y las horas de este cartel pasan a todos los de la lista (campañas en un paso) */
+    carTodos() { const f = elegido; if (!f) return; G.cambia(p => { const a = p.archivos[f] || {}, L = todos(p); L.forEach(x => { if (x === f) return; const b = p.archivos[x] || (p.archivos[x] = {}); ['desde', 'hasta', 'dias', 'hIni', 'hFin'].forEach(k => { if (a[k] != null) b[k] = Array.isArray(a[k]) ? a[k].slice() : a[k]; else delete b[k]; }); if (!Object.keys(b).length) delete p.archivos[x]; }); }); G.estado(T('Puesto en todos los carteles')); },
+    /* v1.23 · una imagen propia puede ser anuncio (sale entre tandas de carteles, como los de las carpetas de anuncios) */
+    carAd(f) { if (!propia(f)) return; elegido = ''; G.cambia(p => { p.sueltos = (p.sueltos || []).filter(x => x !== f); p.secuencia = (p.secuencia || []).filter(x => x !== f); if (!(p.adsS || (p.adsS = [])).includes(f)) p.adsS.push(f); }); G.estado(T('Ahora es un anuncio')); },
     carVer(f) { ver(f); }, carFoto(f) { abreFoto(f); },
     carMas() { anade(); },
     pkCarp(c) { if (!pk) return; pk.carp = c; pkPinta(); },
@@ -115,7 +122,7 @@
   });
   /* en el móvil apaisado el lienzo ocupa toda la altura a la izquierda: la tira pasa arriba de la columna de la derecha, para no comerse el lienzo */
   const apaisado = matchMedia('(max-width: 900px) and (orientation: landscape)');
-  const coloca = () => { const t = $('#tirac'), c = document.querySelector('.consola'), z = document.querySelector('.lienzo-zona'); if (!t || !c || !z) return; t.classList.toggle('zona', apaisado.matches); if (apaisado.matches) { if (t.parentNode !== c) c.insertBefore(t, document.querySelector('.consola > .izq')); } else if (t.parentNode !== z) z.insertBefore(t, $('#estado')); };
+  const coloca = () => { const t = $('#tirac'), c = document.querySelector('.consola'), z = document.querySelector('.lienzo-zona'); if (!t || !c || !z) return; t.classList.toggle('zona', apaisado.matches); if (apaisado.matches) { if (t.parentNode !== c) c.insertBefore(t, document.querySelector('.consola > .izq')); } else if (t.parentNode !== z) { const e = $('#estado'); z.insertBefore(t, e && e.parentNode === z ? e : null); } };
   try { apaisado.addEventListener('change', coloca); } catch (e) { apaisado.addListener(coloca); } coloca();
   /* el gestor avisa de cada cambio y de cada lista nueva: se repinta la tira */
   const antesC = X.alCambiar, antesL = X.alLista;

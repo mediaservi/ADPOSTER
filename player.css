@@ -124,3 +124,51 @@ body.rot #escena.horizontal { --u0: min(1vw, calc(100vh * 9 / 1600)); }
 .panel .firma { text-align: center; color: #7d828c; font: 400 calc(var(--u) * 1.7) 'Share Tech Mono', monospace; letter-spacing: .06em; }
 .panel .firma a { color: inherit; }
 .horizontal .panel { --u: calc(var(--u0) * .86); padding-left: 24%; padding-right: 24%; }
+
+/* v1.23 · EMERGENCIA: pantalla completa, roja e intermitente, por encima de todo (también del panel) hasta que se retira */
+@keyframes ap-emer { 0%, 100% { background: #b3120a; } 50% { background: #e8281c; } }
+.emer { position: absolute; inset: 0; z-index: 60; display: none; flex-direction: column; align-items: center; justify-content: center; gap: calc(var(--u) * 4); padding: calc(var(--u) * 6); box-sizing: border-box; color: #fff; text-align: center; animation: ap-emer 1.2s steps(1) infinite; }
+.emer.on { display: flex; }
+.emer .em-t { font: 900 calc(var(--u) * 11) / 1 Inter, Arial, sans-serif; letter-spacing: .06em; text-shadow: 0 calc(var(--u) * .6) 0 rgba(0, 0, 0, .35); }
+.emer .em-x { max-width: 92%; font: 800 calc(var(--u) * 5.4) / 1.25 Inter, Arial, sans-serif; overflow-wrap: break-word; }
+.horizontal .emer .em-t { font-size: calc(var(--u) * 14); } .horizontal .emer .em-x { font-size: calc(var(--u) * 6.4); }
+.alerta .a-in { white-space: pre-line; }
+
+/* v1.23 · composiciones: la cinta y el QR van en su propia franja (la composición se aparta) y nunca tapan piezas */
+.modo-esc.con-cinta .esc-capa { bottom: calc(var(--u0) * 7); }
+.modo-esc.qr-b .esc-capa { bottom: calc(var(--u0) * 13); }
+.modo-esc.qr-a .esc-capa { top: calc(var(--u0) * 13); }
+.modo-esc .qr { flex-direction: row; align-items: center; width: calc(var(--u) * 13); height: calc(var(--u) * 11.4); padding: calc(var(--u) * .8); gap: calc(var(--u) * 1); }
+.modo-esc.qr-tx .qr { width: calc(var(--u) * 32); }
+.modo-esc .qr .q-img { height: 100%; aspect-ratio: 1; flex: none; } .modo-esc .qr .q-img svg { width: auto; height: 100%; }
+.modo-esc .qr .q-txt { flex: 1; font-size: calc(var(--u) * 1.8); text-align: left; }
+.modo-esc .qr.p-bd, .modo-esc .qr.p-bi { bottom: calc(var(--u) * .8); } .modo-esc .qr.p-ad, .modo-esc .qr.p-ai { top: calc(var(--u) * .8); }
+.modo-esc .qr.p-bd, .modo-esc .qr.p-ad { right: calc(var(--u) * .8); } .modo-esc .qr.p-bi, .modo-esc .qr.p-ai { left: calc(var(--u) * .8); }
+.modo-esc.qr-b .cinta { height: calc(var(--u) * 13); }
+.modo-esc.qr-b.qr-d .cinta { right: calc(var(--u) * 14.6); } .modo-esc.qr-b.qr-d.qr-tx .cinta { right: calc(var(--u) * 33.6); }
+.modo-esc.qr-b.qr-i .cinta { left: calc(var(--u) * 14.6); } .modo-esc.qr-b.qr-i.qr-tx .cinta { left: calc(var(--u) * 33.6); }
+
+/* v1.23 · lista táctil: la escena recibe los toques (solo las piezas con destino) */
+#escena.tactil .esc-capa.on .pz[data-ir] { pointer-events: auto; cursor: pointer; }
+body.ap:has(#escena.tactil) { cursor: default; }
+
+/* v1.23 · alta con código (…/p/?alta) */
+body.alta { cursor: default; }
+#alta { --a: min(1vw, 1.6vh); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(var(--a) * 2); width: 100%; height: 100%; padding: calc(var(--a) * 4); box-sizing: border-box; background: radial-gradient(ellipse at 50% 20%, #2b2b30, #0c0c0e 70%); text-align: center; }
+#alta img { height: calc(var(--a) * 9); }
+#alta h1 { margin: 0; font: 400 calc(var(--a) * 3.2) 'Share Tech Mono', monospace; letter-spacing: .3em; color: #9aa0aa; }
+#alta p { margin: 0; color: #c7cbd2; font-size: calc(var(--a) * 2.4); }
+#alta .cod { padding: calc(var(--a) * 1.4) calc(var(--a) * 4); border-radius: calc(var(--a) * 1.6); background: #0b0a06; box-shadow: inset 0 3px 12px #000, 0 1px 0 rgba(255, 255, 255, .1); color: #ffb000; font: 400 calc(var(--a) * 14) / 1 'Share Tech Mono', monospace; letter-spacing: .18em; text-shadow: 0 0 calc(var(--a) * 3) rgba(255, 176, 0, .6); }
+#alta .qr-a { width: calc(var(--a) * 18); padding: calc(var(--a) * 1); background: #fff; border-radius: calc(var(--a) * 1.2); } #alta .qr-a svg { display: block; width: 100%; height: auto; }
+#alta .ins { max-width: 70ch; } #alta .est { color: #ffb000; font-family: 'Share Tech Mono', monospace; letter-spacing: .1em; }
+.modo-esc .cinta { box-sizing: border-box; }
+
+/* v1.23 · mensajes en dos líneas, emergencia sin confirmar (sin parpadeo ni sirena) y modo LED 1:1 (el lienzo a su tamaño exacto, desde la esquina que lee la tarjeta emisora) */
+.aviso, .emer .em-x { white-space: pre-line; }
+.emer.sc { animation: none; background: #5a1410; }
+.emer.sc .em-x { font-size: calc(var(--u) * 4.2); }
+body.ap.px1 { display: block; position: relative; overflow: hidden; }
+body.ap.px1 #escena { contain: strict; }
+/* v1.23 · la página de alta cabe entera en cualquier pantalla (antes, en 1920×1080, se cortaban el logo y «Esperando…») */
+#alta { --a: min(.8vw, 1.15vh); gap: calc(var(--a) * 1.8); overflow: hidden; }
+#alta .qr-a { width: calc(var(--a) * 14); }

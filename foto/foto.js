@@ -8,7 +8,7 @@
      (el original no se toca nunca). Todo ocurre en el navegador: la imagen no sale del equipo. */
 (function () {
   'use strict';
-  const $ = s => document.querySelector(s), PX = window.ADPX, VERSION = '1.19';
+  const $ = s => document.querySelector(s), PX = window.ADPX, VERSION = '1.23';
   const lee = k => { try { return JSON.parse(localStorage.getItem('adposter:' + k)); } catch (e) { return null; } }, guarda = (k, v) => { try { localStorage.setItem('adposter:' + k, JSON.stringify(v)); } catch (e) {} };
   const IDI = ['es', 'en', 'ca']; let lang = lee('lang') || (IDI.includes((navigator.language || '').slice(0, 2)) ? navigator.language.slice(0, 2) : 'es');
   /* textos: español de base y [inglés, catalán] */
@@ -193,7 +193,7 @@
   async function descarga() { if (!D) return; espera(true); const b = await blob(); espera(false); if (!b) return; const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = nomSalida(); document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); estado(T('Descargar') + ' · ' + nomSalida()); }
   async function guardaCopia() { if (!D) return; const fm = EX.f === 'psd' ? 'image/webp' : EX.f; espera(true); const b = await blob(fm); espera(false); if (!b) return; const f = new File([b], nomSalida(fm), { type: fm }); let ok = false;   /* en ADPOSTER se guarda como imagen (el PSD, solo al descargar) */
     try { if (window.opener && !window.opener.closed && window.opener.ADGEST) { const k = await window.opener.ADGEST.sube(f); ok = !!k; } } catch (e) {}
-    if (!ok) { try { const bc = new BroadcastChannel('adposter-foto'); const r = await new Promise(res => { const t = setTimeout(() => res(null), 1500); bc.onmessage = e => { if (e.data && e.data.t === 'ok') { clearTimeout(t); res(e.data.k); } }; bc.postMessage({ t: 'guarda', archivo: f }); }); bc.close(); ok = !!r; } catch (e) {} }
+    if (!ok) { try { const bc = new BroadcastChannel('adposter-foto'); const r = await new Promise(res => { const t = setTimeout(() => res(null), 1500); bc.onmessage = e => { if (e.data && e.data.t === 'ok') { clearTimeout(t); res(e.data.k); } }; bc.postMessage({ t: 'guarda', archivo: f, de: new URLSearchParams(location.search).get('de') || '' }); }); bc.close(); ok = !!r; } catch (e) {} }
     if (ok) estado(T('Guardada en Mis imágenes de ADPOSTER')); else { estado(T('Abre FOTO desde el gestor de ADPOSTER para guardar ahí: ahora se descarga')); descarga(); } }
   /* ---------- abrir ---------- */
   function abreArchivo(f, comoCapa) { if (f && (/\.psd$/i.test(f.name || '') || f.type === 'image/vnd.adobe.photoshop') && EXT.psdAbre) { EXT.psdAbre(f, comoCapa && !!D); return; }   /* v1.18 · los PSD, con sus capas */

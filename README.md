@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.22**
+**Versión actual: v1.23** (borrador de prueba)
 
 
 ## Icono
@@ -26,11 +26,11 @@ El gestor (la página principal) prepara esa dirección con todo lo que es de ca
 | Ventana | Para qué |
 |---|---|
 | **DISPLAYS** (izquierda, arriba) | El estado de cada pantalla **en directo**: encendida, apagada, fuera de horario o sin señal; qué lista tiene, en qué formato, y su grupo y sede. Aquí se elige el destino de las órdenes: todas, un grupo, una sede o una sola. |
-| **LISTAS** (izquierda, abajo) | Las listas de reproducción: crear, borrar y elegir la que se edita. Cada lista es de **carteles** (carpetas que rotan) o una **composición** de escenas. Desde aquí se abren la **biblioteca** y el **calendario**. |
+| **LISTAS** (izquierda, abajo) | Las listas de reproducción: crear (vacía), duplicar, borrar y elegir la que se edita. Cada lista es de **carteles** (carpetas que rotan) o una **composición** de escenas. Desde aquí se abren la **biblioteca** y el **calendario**. |
 | **LIENZO** (centro) | En una lista de carteles, la vista previa en vivo, con **zoom**, desplazamiento y **guías que se arrastran**, y debajo **la tira con todos los carteles** en el orden en que salen (desde v1.15). En una composición, el **editor**: cada pieza se selecciona, se mueve, se escala y se gira con el ratón o el dedo, con imán, deshacer y la tira de escenas debajo. |
 | **Pestañas** (derecha) | **CONTENIDO** · **DISEÑO** · **TIEMPOS** · **DIRECTO** · **PUBLICAR**. En una composición, las dos primeras son **PIEZAS** (añadir, propiedades y capas) y **ESCENA** (fondo, duración, temporada y transición). Con botón de restablecer. |
 
-En tablet y móvil las ventanas se apilan, con el lienzo arriba; en móvil apaisado el lienzo se queda a la izquierda (y la tira de carteles pasa arriba de la columna de la derecha).
+En tablet y móvil se ve una ventana cada vez, con la barra de abajo **LISTAS · LIENZO · AJUSTES · MANDO** (v1.23). Arriba, el conmutador **SIMPLE · PRO** y la tecla roja **EMERGENCIA**.
 
 ## Funciones
 
@@ -139,6 +139,7 @@ No hay servidor propio. El gestor, los displays y la página del público se hab
 | `index.html`, `gestor.js`, `gestor.css` | El gestor |
 | `editor.js` | El editor de composiciones en el lienzo, las pestañas PIEZAS y ESCENA y la galería de plantillas |
 | `gestion.js` | La biblioteca de archivos y el calendario |
+| `pantallas.js` | SIMPLE / PRO, asistente por negocio, añadir pantalla (URL, QR y código), A PANTALLAS, EMERGENCIA, mando de turnos y pedidos, formato a medida, avisos de desconexión e informe de emisión (v1.23) |
 | `lista.js` | La tira de carteles bajo el lienzo, la ficha de cada cartel y «+» para añadir carteles sueltos (v1.15) |
 | `foto/` | FOTO, el editor de imagen (v1.16; guía en `foto/LEEME.md`): `index.html`, `foto.js` (capas, historial, herramientas y paneles), `px.js` (ajustes, filtros y botones mágicos) y `foto.css` |
 | `escena.js`, `escena.css` | El motor que pinta las escenas; lo usan igual el editor y el reproductor |
@@ -160,15 +161,106 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.22)
+## Cambios de la versión actual (v1.23, borrador)
+
+Versión de prueba (mockup funcional) para que la usen perfiles muy distintos, desde quien pone su primera pantalla hasta quien instala muchas. Todo lo de la v1.22 sigue igual.
+
+**Dos modos: SIMPLE y PRO**
+- **Conmutador SIMPLE · PRO** junto al logo, el mismo de SCREENS y SYSTEMS (en el móvil, una burbuja). Quien entra por primera vez empieza en SIMPLE; quien ya tenía listas, en PRO.
+- **SIMPLE** esconde lo técnico (diseño de márgenes, guías, biblioteca, origen privado, canal, capas, caja y animaciones de las piezas) y deja el QR en CONTENIDO.
+- **ASISTENTE por tipo de negocio** (SIMPLE): cafetería o bar, comida rápida, tienda, peluquería o estética, clínica o sala de espera, oficina, concesionario o LED. Tres pasos (negocio, pantalla y crear) y deja hechas las listas con sus plantillas; en la cafetería, cada escena con su franja horaria (desayuno, mediodía, tarde).
+
+**Pantallas**
+- **Añadir pantalla**: nombre, grupo, sede, lista, giro e idioma, y sale la URL del kiosco con su **código QR**.
+- **Alta con código**: la pantalla nueva abre `…/p/?alta` y enseña un código de 6 caracteres (y un QR que abre el gestor ya con el código). Se escribe en «Añadir pantalla» → **Emparejar** y la pantalla se configura sola (canal, lista, nombre, grupo, sede, giro e idioma), sin teclear direcciones con el mando.
+- **DISPLAYS**: contadores (en línea, fuera de horario, sin señal), **miniatura** de lo que sale en cada pantalla y **«visto hace…»**.
+- **Aviso de desconexión**: si una pantalla que estaba en línea deja de hablar más de 2 minutos, el gestor abierto pita, parpadea y, con permiso, saca una **notificación del navegador** (campana 🔔 de DISPLAYS para activarlo o no).
+- **Informe de emisión (CSV)** (PRO): cada display cuenta qué ha sacado y cuánto tiempo, por día (31 días); el gestor lo pide por el directo y lo descarga.
+- **Lienzo A MEDIDA para pantallas LED** (ancho × alto en píxeles, o columnas × filas de cabinets): el reproductor toma la proporción exacta del controlador, sin franjas negras.
+
+**Publicar: un solo botón A PANTALLAS**
+- Siempre a la vista bajo el lienzo, y en DIRECTO y PUBLICAR. **Qué** lista, **dónde** (todas, un grupo, una sede o una pantalla) y **cuándo**: **ahora**, **durante N minutos** (luego la pantalla vuelve sola a lo suyo) o **desde una fecha y hora** (crea la regla del calendario).
+- **Sin subir archivos**: con el directo activo, las listas, el calendario, los festivos y las imágenes propias que se usan viajan en un mensaje que el repetidor guarda («datos»). Cada display lo usa al momento y lo guarda para seguir sin conexión; manda el que sea más nuevo, este o el `playlists.json` publicado (que ahora lleva la fecha `publicado`). `playlists.json` sigue siendo la copia permanente: con acceso privado, panel ADMIN o previa local, A PANTALLAS también lo publica a la vez. Los repetidores son públicos y gratuitos, sin garantía de que guarden los mensajes para siempre: por eso conviene publicar también el archivo.
+
+**Calendario y horarios**
+- **Vista SEMANA** con franjas de color por lista (además de la de mes): tocar una franja libre crea una regla a esa hora; filtro **Ver** por grupo, sede o pantalla, y fila **POR DEFECTO** con la lista de casa.
+- **Varios tramos por día** en cada regla (p. ej. 09:30–14:00 y 16:00–20:00), atajos **L-V**, **S-D** y **Todos**, y **festivos** (lista común; cada regla vale también en festivos, nunca en festivos o solo en festivos).
+- **«PANTALLA EN NEGRO»** como destino de una regla: horario por pantalla, grupo o sede, y no solo por lista.
+- **Horario de encendido** con varios tramos y **cerrado en festivos**. «Apagar» se rotula como **negro**: el navegador no puede apagar la tele.
+- **Horas y días por cartel** (en su ficha de la tira, ⏰) **y por escena** (pestaña ESCENA), además de las fechas de siempre.
+- **Fechas y horas con campos propios**, en el formato de la app (dd/mm/aaaa y 24 h) y no en el del navegador.
+
+**Composiciones**
+- **Anuncios entre escenas**: carpetas de anuncios y «uno cada mín–máx escenas», a pantalla completa.
+- **Piezas nuevas**: **TURNOS** (número, puesto e historial; parpadea al llamar), **PEDIDOS LISTOS** (preparando / listos, que caducan solos) y **LISTA DE PRECIOS**, escrita a mano (`nombre;precio` por línea) o desde una **hoja de cálculo publicada como CSV** (se refresca sola y, sin red, sigue con la última copia).
+- **Modo TÁCTIL** por lista (PRO): los toques no abren los ajustes del display (se abren manteniendo pulsado 3 s); cada pieza puede llevar, **al tocarla**, a una escena; sin tocar, vuelve sola a la primera.
+- **Plantillas nuevas**: sala de espera con turnos, pedidos listos, carta con precios y servicios con precios (categoría nueva «Salud y atención»).
+- **La cinta y el QR ya no tapan piezas**: en una composición van en su propia franja y la escena se aparta.
+
+**Mando (también en el móvil)**
+- **EMERGENCIA** en la cabecera, roja y **con tapa** (primero se levanta la tapa, luego se dispara): textos preparados (evacuación, incendio, confinamiento, cierre) o libre, destino, **sirena** y **voz**. Sale a pantalla completa, **hasta retirarla**, queda **guardada en el repetidor** (la ve también la pantalla que se enciende después) y en cada display. El gestor pasa a modo alarma con **RETIRAR** a la vista.
+- **TURNOS**: ◀ ▶, puestos, **LLAMAR SIGUIENTE**, **REPETIR**, campana y **voz** del navegador del display.
+- **PEDIDOS LISTOS**: teclado numérico; un toque pasa un número de «preparando» a «listo» (con campana) y otro lo retira.
+- Los avisos, la cinta, el negro y la emergencia **se ven también encima del lienzo al componer** (antes no se veían en una composición).
+
+**Interfaz**
+- **«+ Nueva» crea una lista vacía**; **Duplicar** es una tecla aparte.
+- Los rótulos **nunca se parten a media palabra**: si no caben, se encoge la letra. Los **días encendidos** se ven encendidos.
+- **Móvil**: una ventana cada vez con la barra de abajo **LISTAS · LIENZO · AJUSTES · MANDO**, en lugar de una página de miles de píxeles.
+- La **URL del kiosco lleva el idioma** de la app (`lang`), que el display guarda: la fecha y los textos salen en ese idioma.
+- El **panel del display** y la página del público dicen la versión de la app (antes «v1.4» y «v1.3»).
+- **Subir vídeos** (MP4 o WebM, hasta 50 MB) desde «Subir carteles» con el acceso privado; se suben tal cual.
+- Copia nueva de la app en el service worker (`adposter-v17`); las imágenes guardadas se conservan.
+
+**Segunda tanda de la v1.23: uso real en el día a día**
+- **Emparejar deja la pantalla lista**: con el código viajan también las listas, así que la pantalla enseña lo suyo al momento. Si aún no tiene contenido, dice «Esperando el contenido del gestor…» (nunca «No existe la playlist»). Un código mal tecleado se avisa en segundos. Tras emparejar, el formulario conserva grupo, sede y lista para dar de alta la siguiente igual. La dirección de la pantalla lleva el canal, y sirve de página de inicio aunque se borre la memoria del aparato.
+- **✓ ENVIAR CAMBIOS**, aparte de ▶ A PANTALLAS: manda listas, calendario y festivos a todas las pantallas y **cada una sigue con su lista**. El estado ya no dice «Cambios sin publicar» después de enviar: dice **«✓ En pantalla 3/3»** cuando las pantallas confirman que tienen el envío, «Llegando…» mientras tanto, o cuántas no lo han recibido o les faltan imágenes. En el móvil, los dos botones están a la vista en todas las ventanas.
+- **A PANTALLAS seguro**: sin destino marcado por defecto, **confirmación** para «Todos», aviso si la orientación de la lista no casa con la de las pantallas, y el botón siempre visible con un resumen («CARTA → grupo menu (3) · ahora»). «Ahora» es un **cambio puntual**: la lista de siempre de cada pantalla no cambia salvo que se marque «Que sea su lista de siempre». La orden queda guardada en el repetidor: la recibe también la pantalla que estaba apagada.
+- **Imágenes propias sin tope común**: cada imagen viaja en su propio mensaje y solo se reenvían las que cambian. Al subir se ajustan hasta 1920 px y, si hay que reducirlas, se avisa. Si a una pantalla le falta alguna, el estado lo dice.
+- **Emergencia robusta**: si el repetidor está caído la banda dice «NO ENVIADA · reintentando» y sale sola al volver. **Cualquier gestor del canal** la ve y la retira, aunque su reloj vaya atrasado. La banda cuenta en cuántas pantallas está saliendo. Una pantalla que arranca con una emergencia que nadie confirma deja de sonar y lo indica, y el gestor la señala para retirarla. Durante la emergencia, los turnos y los pedidos no suenan. En el móvil apaisado, la tapa y DISPARAR quedan a la vista.
+- **Turnos**: un **contador por canal** (dos recepciones nunca repiten números), **Empezar de 0**, REPETIR sin duplicar el historial, la voz dice «Turno A 5» (sin ceros) y la campana no vuelve a sonar al reiniciar la pantalla. Los puestos se renombran también en SIMPLE.
+- **El público elige durante 5 minutos**: la pantalla vuelve sola a la lista de su dueño y nunca cambia su lista de siempre. La página del público enseña el nombre de la pantalla.
+- **Grupo y sede a la vez** («menu en gracia») en reglas, A PANTALLAS y órdenes; «Ver» una pantalla en el calendario enseña todo lo que le toca.
+- **Pantallas a escala**: DISPLAYS en una línea por pantalla (las caídas primero), filtros en chips con iconos (◫ grupo, ⌂ sede, ▭ pantalla) y la ventana **Todas las pantallas**, con la miniatura real de lo que sale, el estado y «visto hace…». Al abrir el gestor se avisa de las pantallas que ya estaban caídas. Si quien pierde la conexión es el propio gestor, no avisa de cada pantalla.
+- **Mando en el móvil por QR**: un código lleva cualquier móvil a tus pantallas; se une y trae las listas e imágenes que tienen. El MANDO empieza por LLAMAR SIGUIENTE y pedidos (teclas grandes), y «Cambiar la lista» queda plegado al final, con un segundo toque si afecta a varias pantallas. También se puede unir pegando el enlace o el código.
+- **Avisos «hasta las 14:00»** (siguen aunque la pantalla se reinicie) y **cinta «Solo hoy»**, que caduca al acabar el día.
+- **QR sin saber de direcciones**: un teléfono se convierte en un enlace de WhatsApp, «@usuario» en Instagram y «midominio.com» se completa; si no es una dirección, se avisa.
+- **Editor**: en el móvil, tocar un texto abre un cuadro para escribirlo. Un toque en el asa de una pieza que tapa a otra elige la otra. Las propiedades de la pieza elegida van antes que «Añadir pieza», las piezas nuevas caen en cascada y se avisa si una pieza se sale del lienzo. Los datos de ejemplo (precios, titulares, turnos, el tiempo, QR vacío) llevan la marca EJEMPLO. Una cinta de noticias sin canal no deja una banda negra en la pantalla.
+- **Asistente**: el nombre del negocio solo va en el rótulo de marca (ya no pisa «HAPPY» ni «WiFi»). Las zonas con carteles de ejemplo pasan a ser una imagen vacía para la foto propia. Las tiendas empiezan sin carteles ni anuncios de muestra. Hay negocio nuevo, **Panadería o pastelería**. Al terminar, se va al lienzo con un mensaje claro. También está en PRO.
+- **Listas de carteles**: subida de **varias imágenes a la vez, con su nombre**; **«A todos»** pone fechas, días y horas a todos los carteles; una imagen propia puede ser **anuncio**; el ciclo empieza por un cartel, no por un anuncio; Tab pasa de «Desde» a «Hasta».
+- **Calendario**: una regla nueva nace en **borrador** y no se aplica hasta «Guardar la regla» (al cerrar se avisa de las pendientes). La vista Semana dibuja solo la regla que manda en cada franja, a todo lo ancho, e indica a cuáles tapa. «Ver» es un desplegable. Las fechas aceptan «25122026» sin barras.
+- **Horario más simple**: el tramo nuevo copia los días del anterior y empieza después; un tramo sin días se avisa; «A todas las listas» copia el horario.
+- **SIMPLE**: se recuerda desde la primera visita. Usa palabras de tienda (Pantallas, Conectar las pantallas, Guardar una copia…) y no muestra guías, Imán, Trama, Participación del público ni anuncios entre escenas. Las listas de ejemplo se esconden cuando hay una propia (tecla «Ejemplos»). La cabecera está más limpia y la tecla de emergencia es más discreta hasta que se usa. En el móvil, las teclas miden al menos 44 px.
+- **LED**: modo **1:1 píxel** con desplazamiento X/Y para la tarjeta emisora (`…&px=1&ox=0&oy=0`, en «Añadir pantalla», PRO) y **cabinets rectangulares** (ancho y alto por cabinet).
+- **FOTO** al día (v1.23): la copia editada **ocupa el sitio del original** en la lista.
+- **Vídeo**: la pieza Vídeo tiene «Subir» con el acceso privado; sin él, se explica claramente por qué no puede viajar (pesa demasiado para el directo sin un sitio donde guardarlo) y cómo usar una dirección https.
+- La página de alta de la pantalla cabe entera en 1920×1080. LISTAS cabe en pantallas bajas (960×540). El informe CSV lleva grupo, sede y lista, y una fila «sin datos» por cada pantalla que no responde.
+
+### Siguiente fase (anotado, aún no hecho)
+- **Vídeos subidos sin acceso privado**: no hay vía fiable sin un servidor de pago (los repetidores públicos no aguantan archivos de varios MB); se valorará guardarlos en el panel ADMIN o enviarlos de aparato a aparato.
+- **Copiar o reutilizar una escena en varias listas** y anuncios entre escenas hechos con escenas propias.
+- **Asistente «Restaurante»** con varias listas y pantallas de una vez; botón «Hoy cerrado» de un toque en el MANDO.
+- **Pieza «Botón»** con estilo listo y opción «quedarse en la portada hasta que toquen» para kioscos táctiles; «Al tocar» visible aunque el modo táctil esté apagado.
+- **Posición de piezas en píxeles** en los lienzos a medida, para cuadrar con los módulos LED.
+- **Fondo desenfocado o «llenar»** para carteles verticales en pantallas horizontales en SIMPLE; tira de carteles con miniaturas más grandes.
+- Deshacer en el mando de pedidos.
+- Pieza **Agenda** que lea un calendario ICS publicado; necesita que el calendario deje leerse desde otra web o un pequeño intermediario.
+- **Etiquetas** por pantalla (varias por display) además de grupo y sede.
+- **Sincronía de vídeo** entre pantallas y muro de varios monitores con reloj común.
+- **Canal de operador** limitado (solo turnos y avisos preparados) para recepción.
+- **Tema de marca** aplicado a todas las plantillas; layouts de zonas con una lista dentro de una zona.
+- Guardar también los vídeos para uso sin conexión.
+- El editor de composiciones muestra la franja que reservan la cinta y el QR (hoy se ve al «Probar» y en el display).
+
+### v1.22
 - **Móvil vertical más limpio**, igual que SCREENS y SYSTEMS (pedido por Josep, 23-11-2026): cabecera en una sola fila (isotipo, botón de información, idioma y el logo de AVHUB, que lleva a todas las apps; fuera los logos de las otras apps) y pie en una sola fila («ADPOSTER v1.22», «Aviso legal» y candado). Instalar y avisar de un fallo pasan a la nueva ventana de información, que solo aparece en el móvil.
 
-## Cambios de la v1.21
+### v1.21
 - **Sin caché** (pedido por Josep, 18-11-2026): las páginas llevan las etiquetas equivalentes a `Cache-Control: no-cache, no-store, must-revalidate` y el service worker pide siempre al servidor lo de la propia app, revalidando, sin pasar por la copia del navegador. Sin conexión sigue funcionando con la copia guardada (los carteles descargados en cada pantalla no cambian: siguen guardados).
 
 ### v1.20
 
-Correcciones de la revisión en el móvil en vertical:
+Correcciones en el móvil en vertical:
 
 - **Aviso legal:** se abre por el principio (antes salía desplazado hasta abajo).
 - **Fila de la familia AVHUB** bajo la cabecera en el móvil (screens, systems, AVHUB, vjshow y msgame), centrada.
@@ -363,8 +455,6 @@ Sigue de la v0.1:
 
 ## Próximos pasos
 
-- Publicar desde el gestor sin subir archivos a mano, y subir imágenes arrastrándolas.
-- Selección de varias piezas a la vez, alinear y repartir; más plantillas.
 - Adaptar sola una composición al cambiar de vertical a horizontal.
 - Conexión con nubes y discos del usuario.
 - Repetidor propio para el directo.
@@ -375,7 +465,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.20 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.23 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

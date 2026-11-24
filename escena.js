@@ -4,7 +4,10 @@
    Escena: { id, n, seg, fondo: { t: 'color'|'deg'|'malla'|'img', c, c2, c3, a, src, osc, tr }, piezas: [ … ] }
    Pieza:  { id, t, x, y, w, h (en % del lienzo), r (giro en grados), o (opacidad), an (entrada), ret (retardo), oculta, bloq,
              fondo, radio, borde, bcol, sombra (la caja)  +  lo propio de cada tipo:
-             texto · imagen · video · zona (una carpeta que va pasando) · reloj · fecha · tiempo · rss · qr · forma · web }
+             texto · imagen · video · zona (una carpeta que va pasando) · reloj · fecha · tiempo · rss · qr · forma · web
+             v1.23 · turno (número llamado, puesto e historial) · pedidos (preparando / listos) · precios (filas escritas o una hoja CSV publicada)
+             y, en cualquier pieza, «ir» (id de escena): en una lista táctil, tocarla lleva a esa escena }
+   Los datos en vivo (turno y pedidos) llegan por window.ADVIVO, que rellena el reproductor con lo que manda el gestor por el directo.
    Las medidas de letra, radios y bordes van en «u» = una centésima del lado corto del display.
 
    window.ADESCENA = { FUENTES, TIPOS, nueva(tipo, hor), monta(cont, escena, ctx) → { pon(escena), ajusta(), destruye() } }
@@ -14,15 +17,16 @@
   'use strict';
   const FUENTES = [['Inter', 'Inter'], ['Montserrat', 'Montserrat'], ['Poppins', 'Poppins'], ['Bebas Neue', 'Bebas Neue'], ['Anton', 'Anton'], ['Oswald', 'Oswald'], ['League Gothic', 'League Gothic'], ['Archivo Black', 'Archivo Black'],
     ['Playfair', 'Playfair Display'], ['Abril', 'Abril Fatface'], ['Cinzel', 'Cinzel'], ['Marcellus', 'Marcellus'], ['Alfa Slab', 'Alfa Slab One'], ['Fredoka', 'Fredoka'], ['Righteous', 'Righteous'], ['Pacifico', 'Pacifico'], ['Caveat', 'Caveat'], ['Courier', 'Courier Prime'], ['Mono', 'Share Tech Mono']];
-  const TIPOS = ['texto', 'imagen', 'video', 'zona', 'forma', 'reloj', 'fecha', 'tiempo', 'rss', 'qr', 'web'];
+  const TIPOS = ['texto', 'imagen', 'video', 'zona', 'forma', 'reloj', 'fecha', 'tiempo', 'rss', 'qr', 'web', 'turno', 'pedidos', 'precios'];
+  const VIVO = window.ADVIVO || (window.ADVIVO = { d: {}, fs: new Set(), pon(k, v) { this.d[k] = v; this.fs.forEach(f => { try { f(k, v); } catch (e) {} }); }, oye(f) { this.fs.add(f); return () => this.fs.delete(f); } });
   const FAM = f => (FUENTES.find(x => x[1] === f) || FUENTES[0])[1];
   const col = (c, d) => typeof c === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(c) ? c : d;
   const num = (v, d, a, b) => { v = +v; return isFinite(v) ? Math.min(b, Math.max(a, v)) : d; };
   const el = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
   const U = n => 'calc(var(--u) * ' + n + ')';
-  const TXT = { es: { imagen: 'Imagen', video: 'Vídeo', zona: 'Zona de carpeta', web: 'Página web', rss: 'Noticias', sin: 'elige un archivo', sinc: 'elige una carpeta', sinu: 'escribe la dirección', tit: ['Titular de ejemplo de las noticias en directo', 'Segundo titular, tal como llegará del canal', 'Tercer titular de muestra'], lugar: 'Tu ciudad' },
-    en: { imagen: 'Image', video: 'Video', zona: 'Folder zone', web: 'Web page', rss: 'News', sin: 'pick a file', sinc: 'pick a folder', sinu: 'type the address', tit: ['Sample headline from the live news feed', 'Second headline, as it will arrive from the feed', 'Third sample headline'], lugar: 'Your city' },
-    ca: { imagen: 'Imatge', video: 'Vídeo', zona: 'Zona de carpeta', web: 'Pàgina web', rss: 'Notícies', sin: 'tria un arxiu', sinc: 'tria una carpeta', sinu: "escriu l'adreça", tit: ['Titular d’exemple de les notícies en directe', 'Segon titular, tal com arribarà del canal', 'Tercer titular de mostra'], lugar: 'La teva ciutat' } };
+  const TXT = { es: { imagen: 'Imagen', video: 'Vídeo', zona: 'Zona de carpeta', web: 'Página web', rss: 'Noticias', sin: 'elige un archivo', sinc: 'elige una carpeta', sinu: 'escribe la dirección', tit: ['Titular de ejemplo de las noticias en directo', 'Segundo titular, tal como llegará del canal', 'Tercer titular de muestra'], lugar: 'Tu ciudad', turno: 'TURNO', prep: 'PREPARANDO', listos: 'LISTOS', precios: 'Café con leche;1,60 €\nCroissant;1,90 €\nTostada con tomate;2,40 €\nZumo natural;3,10 €', sinh: 'pega la dirección de la hoja (CSV)' },
+    en: { imagen: 'Image', video: 'Video', zona: 'Folder zone', web: 'Web page', rss: 'News', sin: 'pick a file', sinc: 'pick a folder', sinu: 'type the address', tit: ['Sample headline from the live news feed', 'Second headline, as it will arrive from the feed', 'Third sample headline'], lugar: 'Your city', turno: 'NOW SERVING', prep: 'PREPARING', listos: 'READY', precios: 'Latte;1.60\nCroissant;1.90\nToast with tomato;2.40\nFresh juice;3.10', sinh: 'paste the sheet address (CSV)' },
+    ca: { imagen: 'Imatge', video: 'Vídeo', zona: 'Zona de carpeta', web: 'Pàgina web', rss: 'Notícies', sin: 'tria un arxiu', sinc: 'tria una carpeta', sinu: "escriu l'adreça", tit: ['Titular d’exemple de les notícies en directe', 'Segon titular, tal com arribarà del canal', 'Tercer titular de mostra'], lugar: 'La teva ciutat', turno: 'TORN', prep: 'PREPARANT', listos: 'A PUNT', precios: 'Cafè amb llet;1,60 €\nCroissant;1,90 €\nTorrada amb tomàquet;2,40 €\nSuc natural;3,10 €', sinh: 'enganxa l’adreça del full (CSV)' } };
   const esVideo = f => /\.(mp4|webm|m4v|mov)(\?|$)/i.test(f || '');
 
   /* ---------- pieza nueva, con valores sensatos para cada tipo ---------- */
@@ -39,6 +43,9 @@
     if (t === 'rss') return Object.assign(b, { url: '', modo: 'cinta', n: 4, fam: 'Inter', col: '#ffffff', tam: 3, fondo: '#000000b3', x: 0, w: 100, y: 92, h: hor ? 8 : 5 });
     if (t === 'qr') return Object.assign(b, cuad(26), { url: '', col: '#000000', cfondo: '#ffffff', radio: 1.2 });
     if (t === 'web') return Object.assign(b, { url: '', x: 10, y: 15, w: 80, h: 60 });
+    if (t === 'turno') return Object.assign(b, { tit: '', nh: 3, col: '#ffffff', acento: '#ffb000', fam: 'Inter', fondo: '#000000a6', radio: 2, x: 8, w: 84, y: 18, h: hor ? 64 : 46 });
+    if (t === 'pedidos') return Object.assign(b, { col: '#ffffff', fam: 'Inter', fondo: '#000000a6', radio: 2, x: 4, w: 92, y: 12, h: hor ? 80 : 76 });
+    if (t === 'precios') return Object.assign(b, { src: 'texto', filas: '', url: '', cn: 1, cp: 2, cab: true, ref: 10, cols: 1, col: '#ffffff', acento: '#ffb000', fam: 'Inter', x: 8, w: 84, y: 20, h: hor ? 66 : 56 });
     return b; }
 
   /* ---------- iconos del tiempo (dibujos propios) ---------- */
@@ -59,6 +66,13 @@
   const noticias = (u, base) => trae('rss:' + u, 10, async () => { const d = new URL(u, base || location.href); if (!/^https?:$/.test(d.protocol)) throw 0; const r = await fetch(d.href, { cache: 'no-store' }); if (!r.ok) throw 0;
     const x = new DOMParser().parseFromString(await r.text(), 'text/xml'), t = [...x.querySelectorAll('item > title, entry > title')].map(e => (e.textContent || '').replace(/\s+/g, ' ').trim()).filter(Boolean).slice(0, 20); if (!t.length) throw 0; return t; });
 
+  /* v1.23 · fuente de datos «Hoja»: una hoja de cálculo publicada como CSV (Google Sheets → Archivo → Compartir → Publicar en la web → CSV) o un .csv propio.
+     Se refresca cada pocos minutos y, sin red, se usa la última copia guardada en el display */
+  function csv(t) { t = String(t || '').replace(/^\ufeff/, ''); const l1 = t.split(/\r?\n/)[0] || '', sep = (l1.match(/;/g) || []).length > (l1.match(/,/g) || []).length ? ';' : (l1.indexOf('\t') >= 0 ? '\t' : ','), F = []; let f = [], c = '', q = false;
+    for (let i = 0; i < t.length; i++) { const ch = t[i]; if (q) { if (ch === '"') { if (t[i + 1] === '"') { c += '"'; i++; } else q = false; } else c += ch; } else if (ch === '"') q = true; else if (ch === sep) { f.push(c); c = ''; } else if (ch === '\n' || ch === '\r') { if (ch === '\r' && t[i + 1] === '\n') i++; f.push(c); F.push(f); f = []; c = ''; } else c += ch; }
+    if (c || f.length) { f.push(c); F.push(f); } return F.filter(r => r.some(x => String(x).trim())); }
+  const hoja = (u, base, min) => trae('hoja:' + u, Math.max(1, min || 10), async () => { const d = new URL(u, base || location.href); if (!/^https?:$/.test(d.protocol)) throw 0; const r = await fetch(d.href, { cache: 'no-store' }); if (!r.ok) throw 0; const F = csv(await r.text()); if (!F.length) throw 0; return F; });
+
   /* ---------- el fondo de la escena ---------- */
   function fondo(cont, f, ctx) { f = f || {}; const c = col(f.c, '#101014'), c2 = col(f.c2, '#3a1c71'), c3 = col(f.c3, c2); let bg = c;
     if (f.t === 'deg') bg = 'linear-gradient(' + num(f.a, 160, 0, 360) + 'deg,' + c + ',' + c2 + ')';
@@ -75,6 +89,8 @@
     for (let i = 0; i < 10; i++) { const m = (a + b) / 2; tx.style.fontSize = m + 'px'; const ok = envuelve ? (tx.scrollWidth <= Math.ceil(W) + 1 && tx.offsetHeight <= H + 1) : (tx.offsetWidth <= W + 1 && tx.offsetHeight <= H + 1); if (ok) a = m; else b = m; } tx.style.fontSize = a + 'px'; }
 
   /* ---------- cada tipo de pieza: hace(pieza, caja, ctx) devuelve { ajusta?, tic?, fin? } ---------- */
+  /* v1.23 · los datos de ejemplo del editor llevan la marca EJEMPLO: así nadie piensa que esos precios o titulares saldrán en la pantalla */
+  const ej = (caja, ctx, si) => { if (!ctx || !ctx.edita || ctx.mini) return; caja.classList.toggle('ejemplo', !!si); caja.dataset.ej = ctx.lang === 'en' ? 'SAMPLE' : ctx.lang === 'ca' ? 'EXEMPLE' : 'EJEMPLO'; };
   const vacio = (caja, t, nota, ctx) => { if (!ctx || !ctx.edita) return; const v = el('div', 'vacio'); v.textContent = t; if (nota) { const s = el('small'); s.textContent = nota; v.appendChild(s); } caja.appendChild(v); };
   const letra = (e, p, peso) => { e.style.fontFamily = "'" + FAM(p.fam) + "',Inter,Arial,sans-serif"; e.style.fontWeight = peso || 800; e.style.color = col(p.col, '#ffffff'); };
   const HAZ = {
@@ -109,21 +125,52 @@
         const a = el('div', 'ahora'), ic = el('div', 'ico'), g = el('div'), gr = el('div', 'gr'), lu = el('div', 'lug'), cr = el('div', 'cred'); ic.innerHTML = icono(d.c, d.d); gr.textContent = d.g + '°'; lu.textContent = lugar; cr.textContent = 'open-meteo.com'; g.appendChild(gr); g.appendChild(lu); g.appendChild(cr); a.appendChild(ic); a.appendChild(g); w.appendChild(a);
         if (p.dias !== false && d.dias && d.dias.length) { const ds = el('div', 'dias'); d.dias.forEach(x => { const c = el('div'), b = el('b'), i = el('div', 'ico'), s = el('span'); let n = ''; try { n = new Intl.DateTimeFormat(L, { weekday: 'short' }).format(new Date(x.f + 'T12:00:00')).replace('.', ''); } catch (e) {} b.textContent = n; i.innerHTML = icono(x.c, 1); s.textContent = x.a + '° ' + x.b + '°'; c.appendChild(b); c.appendChild(i); c.appendChild(s); ds.appendChild(c); }); w.appendChild(ds); }
         encaja(caja, w, false); };
-      const muestra = { g: 21, c: 2, d: 1, dias: [{ f: '2026-01-05', c: 0, a: 23, b: 14 }, { f: '2026-01-06', c: 3, a: 20, b: 13 }, { f: '2026-01-07', c: 61, a: 18, b: 12 }] }; let ult = muestra; if (ctx.edita) pinta(muestra);   // los datos de ejemplo solo se ven al componer: en un display, nada hasta tener los de verdad
-      const pide = () => { if (!ctx.red || !vivo) return; tiempo(num(p.lat, 41.39, -90, 90), num(p.lon, 2.17, -180, 180)).then(d => { if (d && vivo) { ult = d; pinta(d); } }); }; pide(); if (ctx.red && ctx.vivo) t = setInterval(pide, 1800000);
+      const muestra = { g: 21, c: 2, d: 1, dias: [{ f: '2026-01-05', c: 0, a: 23, b: 14 }, { f: '2026-01-06', c: 3, a: 20, b: 13 }, { f: '2026-01-07', c: 61, a: 18, b: 12 }] }; let ult = muestra; if (ctx.edita) { pinta(muestra); ej(caja, ctx, true); }   // los datos de ejemplo solo se ven al componer: en un display, nada hasta tener los de verdad
+      const pide = () => { if (!ctx.red || !vivo) return; tiempo(num(p.lat, 41.39, -90, 90), num(p.lon, 2.17, -180, 180)).then(d => { if (d && vivo) { ult = d; pinta(d); ej(caja, ctx, false); } }); }; pide(); if (ctx.red && ctx.vivo) t = setInterval(pide, 1800000);
       return { ajusta() { encaja(caja, w, false); }, fin() { vivo = false; clearInterval(t); } }; },
-    rss(p, caja, ctx) { let vivo = true, t = 0, t2 = 0, tit = T(ctx).tit, i = 0; const modo = ['cinta', 'lista', 'uno'].includes(p.modo) ? p.modo : 'cinta'; letra(caja, p, 700); caja.style.padding = '0 ' + U(1.5);
+    rss(p, caja, ctx, pz) { if (!ctx.edita && !String(p.url || '').trim()) { if (pz) pz.style.visibility = 'hidden'; return {}; }   // v1.23 · sin canal, en la pantalla no queda una banda negra vacía
+      ej(caja, ctx, true); let vivo = true, t = 0, t2 = 0, tit = T(ctx).tit, i = 0; const modo = ['cinta', 'lista', 'uno'].includes(p.modo) ? p.modo : 'cinta'; letra(caja, p, 700); caja.style.padding = '0 ' + U(1.5);
       const pinta = () => { if (!vivo) return; clearInterval(t2); caja.textContent = '';
         if (modo === 'cinta') { const s = el('span', 'cinta'), x = tit.join('   •   '); s.textContent = x; caja.style.setProperty('--ct', Math.max(14, Math.round(x.length * .2 + 10)) + 's'); caja.appendChild(s); s.style.fontSize = Math.max(8, caja.clientHeight * .5) + 'px'; if (!ctx.vivo) { s.style.animation = 'none'; s.style.paddingLeft = '0'; } }
         else if (modo === 'lista') { const ul = el('ul'); tit.slice(0, num(p.n, 4, 1, 8)).forEach(x => { const li = el('li'); li.textContent = x; ul.appendChild(li); }); ul.style.fontSize = U(num(p.tam, 3, .8, 20)); caja.appendChild(ul); }
         else { const pon = () => { caja.textContent = ''; const d = el('div', 'uno'); d.textContent = tit[i % tit.length]; i++; d.style.fontSize = U(num(p.tam, 3, .8, 20)); caja.appendChild(d); }; pon(); if (ctx.vivo) t2 = setInterval(pon, 7000); } };
-      pinta(); const pide = () => { const u = String(p.url || '').trim(); if (!u || !ctx.red || !vivo) return; noticias(u, ctx.base).then(d => { if (d && vivo && d.join('|') !== tit.join('|')) { tit = d; pinta(); } }); }; pide(); if (ctx.red && ctx.vivo) t = setInterval(pide, 600000);
+      pinta(); const pide = () => { const u = String(p.url || '').trim(); if (!u || !ctx.red || !vivo) return; noticias(u, ctx.base).then(d => { if (d && vivo && d.join('|') !== tit.join('|')) { tit = d; pinta(); ej(caja, ctx, false); } }); }; pide(); if (ctx.red && ctx.vivo) t = setInterval(pide, 600000);
       return { ajusta: modo === 'cinta' ? () => { const s = caja.querySelector('.cinta'); if (s) s.style.fontSize = Math.max(8, caja.clientHeight * .5) + 'px'; } : null, fin() { vivo = false; clearInterval(t); clearInterval(t2); } }; },
     qr(p, caja, ctx) { const u = String(p.url || '').trim(), bg = col(p.cfondo, '#ffffff'); if (!/^https?:\/\/\S+$/i.test(u) && !ctx.edita) return {};   // sin enlace, en un display no sale nada
-      caja.style.background = bg; caja.style.padding = '6%';
+      caja.style.background = bg; caja.style.padding = '6%'; ej(caja, ctx, !/^https?:\/\/\S+$/i.test(u));
       if (!window.qrcode) return {}; try { const g = window.qrcode(0, 'M'); g.addData(/^https?:\/\/\S+$/i.test(u) ? u : 'https://adposter.mediaservi.com/'); g.make(); caja.innerHTML = g.createSvgTag({ cellSize: 4, margin: 0, scalable: true }); caja.querySelectorAll('[fill="black"],[fill="#000000"],path').forEach(e => { if (e.getAttribute('fill') !== 'white' && e.getAttribute('fill') !== '#ffffff') e.setAttribute('fill', col(p.col, '#000000')); }); caja.querySelectorAll('rect').forEach(e => e.setAttribute('fill', bg)); } catch (e) {}
       return {}; },
-    web(p, caja, ctx) { const u = String(p.url || '').trim(); if (!ctx.vivo || !/^https:\/\/[^\s"'<>]+$/i.test(u)) { vacio(caja, T(ctx).web, u || T(ctx).sinu, ctx); return {}; } const f = el('iframe'); f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms'); f.setAttribute('referrerpolicy', 'no-referrer'); f.loading = 'eager'; f.src = u; caja.appendChild(f); return {}; }
+    web(p, caja, ctx) { const u = String(p.url || '').trim(); if (!ctx.vivo || !/^https:\/\/[^\s"'<>]+$/i.test(u)) { vacio(caja, T(ctx).web, u || T(ctx).sinu, ctx); return {}; } const f = el('iframe'); f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms'); f.setAttribute('referrerpolicy', 'no-referrer'); f.loading = 'eager'; f.src = u; caja.appendChild(f); return {}; },
+    /* v1.23 · TURNOS: el número que se llama, el puesto y los anteriores. Parpadea al llamar (el sonido lo pone el reproductor) */
+    turno(p, caja, ctx, pz) { const sb = cls => { const b = el('div', 'sb ' + cls), t = el('div', 'tx'); b.appendChild(t); caja.appendChild(b); return t; }, tc = sb('tu-t'), tn = sb('tu-n'), tp = sb('tu-p'), hs = el('div', 'tu-h'); caja.appendChild(hs);
+      letra(caja, p, 800); tn.style.color = col(p.acento, '#ffb000'); const nh = num(p.nh, 3, 0, 6); caja.classList.add(nh ? 'con-h' : 'sin-h'); let ult = '', tF = 0;
+      const pinta = () => { const d = VIVO.d.turno || (ctx.edita ? { n: 'A-042', p: 'CONSULTA 3', h: [{ n: 'A-041', p: 'CONSULTA 1' }, { n: 'A-040', p: 'CONSULTA 2' }, { n: 'A-039', p: 'CONSULTA 3' }], t: 0 } : null);
+        tc.textContent = String(p.tit || T(ctx).turno).slice(0, 30); tn.textContent = d && d.n ? String(d.n).slice(0, 12) : '—'; ej(caja, ctx, !VIVO.d.turno); tp.textContent = d && d.p ? '→ ' + String(d.p).slice(0, 30) : '';
+        hs.textContent = ''; (d && Array.isArray(d.h) ? d.h : []).slice(0, nh).forEach(x => { const r = el('div', 'tu-r'), a = el('b'), b = el('span'); a.textContent = String(x.n || '').slice(0, 12); b.textContent = String(x.p || '').slice(0, 30); r.appendChild(a); r.appendChild(b); hs.appendChild(r); });
+        ajusta(); const k = d ? d.n + '|' + d.t : ''; if (ult && k !== ult && ctx.vivo) { pz.classList.remove('llama'); void pz.offsetWidth; pz.classList.add('llama'); clearTimeout(tF); tF = setTimeout(() => pz.classList.remove('llama'), 6500); } ult = k; };
+      const ajusta = () => { [tc, tn, tp].forEach(t => encaja(t.parentNode, t, false)); hs.style.fontSize = Math.max(6, Math.min(hs.clientHeight / Math.max(3, nh) * .62, hs.clientWidth / 16)) + 'px'; };
+      const quita = VIVO.oye(k => { if (k === 'turno') pinta(); }); pinta(); return { ajusta, fin() { quita(); clearTimeout(tF); } }; },
+    /* v1.23 · PEDIDOS LISTOS: dos columnas, «preparando» y «listos»; los listos caducan solos */
+    pedidos(p, caja, ctx, pz) { letra(caja, p, 800); const c1 = el('div', 'pe-c pe-p'), c2 = el('div', 'pe-c pe-l'); [c1, c2].forEach(c => { const h = el('div', 'pe-h'), b = el('div', 'pe-b'); c.appendChild(h); c.appendChild(b); caja.appendChild(c); }); let ult = '';
+      const datos = () => { ej(caja, ctx, !VIVO.d.pedidos); return VIVO.d.pedidos || (ctx.edita ? { prep: ['105', '106', '107', '108'], listos: [['101', Date.now()], ['102', Date.now()], ['104', Date.now()]], cad: 10 } : { prep: [], listos: [] }); };
+      const col = (c, L, nuevo) => { const b = c.lastChild, W = b.clientWidth, H = b.clientHeight, n = Math.max(1, L.length), nc = n <= 4 ? 1 : n <= 12 ? 2 : 3, nr = Math.ceil(n / nc), fs = Math.max(6, Math.min(W / nc / 3.3, H / nr * .62));
+        b.textContent = ''; b.style.gridTemplateColumns = 'repeat(' + nc + ',1fr)'; b.style.fontSize = fs + 'px'; L.forEach(x => { const e = el('div', 'pe-n' + (nuevo && x === nuevo ? ' nuevo' : '')); e.textContent = String(x).slice(0, 5); b.appendChild(e); }); };
+      const pinta = () => { const d = datos(), cad = num(d.cad, 10, 1, 120) * 60000, ahora = Date.now(), ls = (Array.isArray(d.listos) ? d.listos : []).filter(x => Array.isArray(x) && (ctx.edita || ahora - (+x[1] || 0) < cad)).map(x => String(x[0])), ps = (Array.isArray(d.prep) ? d.prep : []).map(String);
+        c1.firstChild.textContent = T(ctx).prep; c2.firstChild.textContent = T(ctx).listos; [c1, c2].forEach(c => { c.firstChild.style.fontSize = Math.max(6, Math.min(c.clientWidth / 9, c.clientHeight * .07)) + 'px'; });
+        const k = ls.join(','), nuevo = ult && ls[0] && ult.split(',').indexOf(ls[0]) < 0 ? ls[0] : ''; ult = k; col(c1, ps.slice(0, 24)); col(c2, ls.slice(0, 24), nuevo); };
+      const quita = VIVO.oye(k => { if (k === 'pedidos') pinta(); }); pinta(); let n = 0; return { ajusta: pinta, tic() { if (++n % 15 === 0) pinta(); }, fin() { quita(); } }; },
+    /* v1.23 · LISTA DE PRECIOS: filas escritas a mano («nombre;precio» por línea) o una hoja CSV publicada; se ajusta sola a la caja */
+    precios(p, caja, ctx) { letra(caja, p, 700); const lis = el('div', 'pr'); caja.appendChild(lis); let filas = [], vivo = true, t = 0;
+      const deTexto = () => { ej(caja, ctx, !p.filas && !(p.src === 'hoja' && p.url)); return String(p.filas || (ctx.edita ? T(ctx).precios : '')).split(/\r?\n/).map(l => l.split(/\s*[;|\t]\s*/)).filter(r => r[0] && r[0].trim()).map(r => [r[0].trim(), (r[1] || '').trim()]); };
+      const deHoja = F => { const a = num(p.cn, 1, 1, 26) - 1, b = num(p.cp, 2, 1, 26) - 1; return F.slice(p.cab === false ? 0 : 1).map(r => [String(r[a] || '').trim(), String(r[b] || '').trim()]).filter(r => r[0]); };
+      const pinta = () => { if (!vivo) return; lis.textContent = ''; const L = filas.slice(0, 40), nc = num(p.cols, 1, 1, 3); lis.style.gridTemplateColumns = 'repeat(' + nc + ',1fr)';
+        if (!L.length) { vacio(caja, T(ctx).precios.split('\n')[0], T(ctx).sinh, ctx); return; } caja.querySelectorAll('.vacio').forEach(v => v.remove());
+        L.forEach(([n, pr]) => { const r = el('div', 'pr-f'), a = el('span', 'pr-n'), d = el('i'), b = el('b', 'pr-p'); a.textContent = n.slice(0, 60); b.textContent = pr.slice(0, 16); b.style.color = col(p.acento, '#ffb000'); r.appendChild(a); r.appendChild(d); r.appendChild(b); lis.appendChild(r); }); ajusta(); };
+      const ajusta = () => { const nr = Math.ceil(Math.min(40, filas.length || 1) / num(p.cols, 1, 1, 3)); let fs = Math.max(6, Math.min(lis.clientHeight / nr * .6, lis.clientWidth / 8)); lis.style.fontSize = fs + 'px';
+        for (let i = 0; i < 10 && ([...lis.children].some(r => r.scrollWidth > r.clientWidth + 1) || lis.scrollHeight > lis.clientHeight + 1); i++) { fs *= .9; lis.style.fontSize = fs + 'px'; } };
+      const pide = () => { const u = String(p.url || '').trim(); if (p.src !== 'hoja' || !u) return; if (!ctx.red) return; hoja(u, ctx.base, num(p.ref, 10, 1, 1440)).then(F => { if (F && vivo) { filas = deHoja(F); pinta(); } }); };
+      filas = p.src === 'hoja' ? (ctx.edita && !p.url ? deTexto() : []) : deTexto(); pinta(); pide(); if (p.src === 'hoja' && ctx.vivo) t = setInterval(pide, num(p.ref, 10, 1, 1440) * 60000);
+      return { ajusta, fin() { vivo = false; clearInterval(t); } }; }
   };
   const T = ctx => TXT[ctx.lang] || TXT.es;
 
@@ -136,7 +183,7 @@
     const unidad = () => { const w = cont.clientWidth, h = cont.clientHeight; if (w && h) cont.style.setProperty('--u', Math.min(w, h) / 100 + 'px'); };
     function geo(v, p) { const s = v.el.style; s.left = num(p.x, 0, -200, 300) + '%'; s.top = num(p.y, 0, -200, 300) + '%'; s.width = num(p.w, 10, .2, 400) + '%'; s.height = num(p.h, 10, .2, 400) + '%'; s.transform = p.r ? 'rotate(' + num(p.r, 0, -360, 360) + 'deg)' : ''; s.opacity = p.o == null ? '' : num(p.o, 1, 0, 1); v.el.classList.toggle('oculta', !!p.oculta);
       const g = [p.w, p.h].join(); if (v.g !== g) { v.g = g; v.ctl.ajusta && v.ctl.ajusta(); } }
-    function crea(p, i) { const pz = el('div', 'pz pz-' + p.t), caja = el('div', 'in'); pz.dataset.id = p.id; if (p.an && ctx.entra) { pz.dataset.an = p.an; pz.style.setProperty('--ret', num(p.ret, 0, 0, 20) + 's'); }
+    function crea(p, i) { const pz = el('div', 'pz pz-' + p.t), caja = el('div', 'in'); pz.dataset.id = p.id; if (p.ir) pz.dataset.ir = String(p.ir);   // v1.23 · lista táctil: tocar la pieza lleva a otra escena if (p.an && ctx.entra) { pz.dataset.an = p.an; pz.style.setProperty('--ret', num(p.ret, 0, 0, 20) + 's'); }
       if (p.t !== 'forma' && p.t !== 'qr' && p.fondo) caja.style.background = col(p.fondo, 'transparent'); if (p.radio) caja.style.borderRadius = U(num(p.radio, 0, 0, 50)); if (p.borde) caja.style.border = U(num(p.borde, 0, 0, 10)) + ' solid ' + col(p.bcol, '#ffffff'); if (p.sombra) caja.style.boxShadow = '0 ' + U(.8) + ' ' + U(3) + ' rgba(0,0,0,.55)';
       pz.appendChild(caja); const v = { el: pz, f: firma(p), g: '', ctl: {} }; cont.appendChild(pz); geo(v, p); v.g = [p.w, p.h].join(); try { v.ctl = (HAZ[p.t] || (() => ({})))(p, caja, ctx, pz) || {}; } catch (e) { v.ctl = {}; } v.ctl.ajusta && v.ctl.ajusta(); return v; }
     function pon(e) { if (muerto) return; escena = e || {}; unidad(); fondo(cont, escena.fondo, ctx); const ps = Array.isArray(escena.piezas) ? escena.piezas.filter(p => p && TIPOS.includes(p.t) && p.id) : [], hay = new Set(ps.map(p => p.id));
@@ -149,5 +196,5 @@
     if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', ajusta);
     return { pon, ajusta, el: id => (vivas.get(id) || {}).el || null, destruye() { muerto = true; clearInterval(tTic); ro && ro.disconnect(); if (document.fonts && document.fonts.removeEventListener) document.fonts.removeEventListener('loadingdone', ajusta); vivas.forEach(v => v.ctl.fin && v.ctl.fin()); vivas.clear(); cont.textContent = ''; cont.classList.remove('esc', 'entra'); cont.style.background = ''; } };
   }
-  window.ADESCENA = { FUENTES, TIPOS, nueva, monta, id, col };
+  window.ADESCENA = { FUENTES, TIPOS, nueva, monta, id, col, csv, hoja };
 })();

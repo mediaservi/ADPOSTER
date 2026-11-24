@@ -4,7 +4,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const CATS = [['hosteleria', ['Hostelería', 'Food & drink', 'Hostaleria']], ['comercio', ['Comercio', 'Retail', 'Comerç']], ['eventos', ['Eventos', 'Events', 'Esdeveniments']], ['empresa', ['Empresa', 'Workplace', 'Empresa']], ['info', ['Información', 'Information', 'Informació']], ['redes', ['QR y redes', 'QR & social', 'QR i xarxes']], ['medios', ['Fotos y carteles', 'Photos & posters', 'Fotos i cartells']]];
+  const CATS = [['hosteleria', ['Hostelería', 'Food & drink', 'Hostaleria']], ['comercio', ['Comercio', 'Retail', 'Comerç']], ['eventos', ['Eventos', 'Events', 'Esdeveniments']], ['empresa', ['Empresa', 'Workplace', 'Empresa']], ['info', ['Información', 'Information', 'Informació']], ['redes', ['QR y redes', 'QR & social', 'QR i xarxes']], ['medios', ['Fotos y carteles', 'Photos & posters', 'Fotos i cartells']], ['salud', ['Salud y atención', 'Health & service', 'Salut i atenció']]];
   let H = false, LG = 'es';
   const L = (es, en, ca) => LG === 'en' ? en : LG === 'ca' ? (ca == null ? es : ca) : es;
   const R = (h, v) => H ? h : v;                                            // [x, y, w, h] en horizontal o en vertical
@@ -278,7 +278,30 @@
       tx(L('TÍTULO DE LA OBRA', 'TITLE OF THE WORK', 'TÍTOL DE L’OBRA'), R([24, 87, 52, 5], [12, 83, 76, 3.2]), { fam: 'Marcellus', col: '#2b2a27', esp: .14 }),
       tx(L('Autor · año · técnica', 'Artist · year · medium', 'Autor · any · tècnica'), R([30, 92.5, 40, 4], [20, 87.4, 60, 2.4]), { fam: 'Montserrat', peso: 400, col: '#6f6a60' }) ] })],
 
-    ['lienzo', 'medios', ['Lienzo en blanco', 'Blank canvas', 'Llenç en blanc'], () => ({ fondo: { t: 'color', c: '#15151b' }, piezas: [] })]
+    ['lienzo', 'medios', ['Lienzo en blanco', 'Blank canvas', 'Llenç en blanc'], () => ({ fondo: { t: 'color', c: '#15151b' }, piezas: [] })],
+
+    /* v1.23 · plantillas con las piezas nuevas: turnos, pedidos listos y listas de precios (escritas o desde una hoja) */
+    ['turnos', 'salud', ['Sala de espera con turnos', 'Waiting room with queue', 'Sala d’espera amb torns'], () => ({ fondo: { t: 'deg', c: '#0b2a3a', c2: '#06121a', a: 160 }, piezas: [
+      fo(R([0, 0, 100, 12], [0, 0, 100, 8]), '#ffffff14'),
+      tx(L('CENTRO MÉDICO', 'MEDICAL CENTRE', 'CENTRE MÈDIC'), R([4, 1.5, 60, 9], [5, 1.5, 62, 5]), { fam: 'Montserrat', ali: 'izq', esp: .08 }),
+      rj(R([72, 1.5, 24, 9], [70, 1.5, 25, 5])),
+      pz('turno', R([4, 16, 46, 72], [6, 11, 88, 40]), { tit: '', nh: 3, col: '#ffffff', acento: '#ffd166', fam: 'Inter', fondo: '#00000059', radio: 2 }),
+      zn(R([54, 16, 42, 72], [6, 54, 88, 34]), { aj: 'cubrir', radio: 2 }),
+      fo(R([0, 91, 100, 9], [0, 94, 100, 6]), '#000000b3'),
+      tx(L('Le llamaremos por su número. Gracias por esperar.', 'We will call you by your number. Thank you for waiting.', 'Us cridarem pel vostre número. Gràcies per esperar.'), R([4, 92, 92, 7], [4, 94.6, 92, 4.8]), { fam: 'Inter', peso: 700, col: '#cfe8f5' }) ] })],
+    ['pedidos-listos', 'hosteleria', ['Pedidos listos', 'Orders ready', 'Comandes a punt'], () => ({ fondo: { t: 'color', c: '#111114' }, piezas: [
+      tx(L('TU PEDIDO', 'YOUR ORDER', 'LA TEVA COMANDA'), R([5, 2, 90, 10], [5, 2, 90, 6]), { fam: 'Bebas Neue', col: '#ffb000', esp: .06 }),
+      pz('pedidos', R([4, 14, 92, 80], [4, 10, 92, 84]), { col: '#ffffff', fam: 'Inter', fondo: '#00000000', radio: 0 }),
+      rj(R([80, 2.5, 16, 8], [70, 95, 26, 4]), { col: '#9aa0aa' }) ] })],
+    ['carta-precios', 'hosteleria', ['Carta con precios', 'Menu with prices', 'Carta amb preus'], () => ({ fondo: { t: 'deg', c: '#2a1608', c2: '#120a05', a: 170, tr: 'vineta' }, piezas: [
+      tx(L('NUESTRA CARTA', 'OUR MENU', 'LA NOSTRA CARTA'), R([6, 4, 60, 13], [8, 5, 84, 8]), { fam: 'Abril Fatface', col: '#f6e7c1', ali: R('izq', 'cen') }),
+      fo(R([6, 18, 20, .6], [30, 14.5, 40, .4]), '#ffb000'),
+      pz('precios', R([6, 22, 56, 70], [8, 18, 84, 54]), { src: 'texto', filas: '', cn: 1, cp: 2, cab: true, ref: 10, cols: 1, col: '#f6e7c1', acento: '#ffb000', fam: 'Montserrat' }),
+      zn(R([66, 8, 30, 84], [8, 74, 84, 22]), { aj: 'cubrir', radio: 2 }) ] })],
+    ['servicios-precios', 'salud', ['Servicios y precios', 'Services and prices', 'Serveis i preus'], () => ({ fondo: { t: 'malla', c: '#1d1324', c2: '#5b2a6e', c3: '#2d4a6e' }, piezas: [
+      tx(L('SERVICIOS', 'SERVICES', 'SERVEIS'), R([6, 5, 88, 12], [8, 6, 84, 8]), { fam: 'Montserrat', esp: .14 }),
+      pz('precios', R([10, 22, 80, 64], [8, 18, 84, 62]), { src: 'texto', filas: L('Corte;18 €\nCorte y peinado;25 €\nTinte;35 €\nManicura;15 €\nTratamiento facial;40 €', 'Haircut;18\nCut and style;25\nColour;35\nManicure;15\nFacial;40', 'Tall;18 €\nTall i pentinat;25 €\nTint;35 €\nManicura;15 €\nTractament facial;40 €'), cols: 1, col: '#ffffff', acento: '#ffd6f5', fam: 'Montserrat' }),
+      tx(L('Pide cita en recepción', 'Book at reception', 'Demana cita a recepció'), R([10, 89, 80, 6], [8, 85, 84, 5]), { fam: 'Montserrat', peso: 400, col: '#e9d8f0' }) ] })]
   ];
 
   function haz(id, hor, lang) { const p = P.find(x => x[0] === id); if (!p) return null; H = !!hor; LG = ['en', 'ca'].includes(lang) ? lang : 'es'; const e = p[3](), red = v => Math.round(v * 100) / 100;
