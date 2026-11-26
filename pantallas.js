@@ -17,6 +17,12 @@
   'use strict';
   const G = window.ADG; if (!G || !G.ext.abreModal) return;
   const { T, TX, $, esc, tecla, campo, lim, copia } = G, X = G.ext, ACC = G.ACC, html = document.documentElement;
+  Object.assign(TX, { 'Ámbar': ['Amber', 'Ambre'], 'Rojo': ['Red', 'Vermell'], 'Verde': ['Green', 'Verd'], 'Azul': ['Blue', 'Blau'], 'Aviso': ['Notice', 'Avís'], 'Mandar un aviso a las pantallas': ['Send a notice to the screens', 'Envia un avís a les pantalles'], 'Cuánto dura': ['How long', 'Quant dura'], 'Color': ['Colour', 'Color'], 'Enviar aviso': ['Send notice', 'Envia l’avís'], 'Aviso enviado': ['Notice sent', 'Avís enviat'],
+    'Sale encima de lo que esté saliendo en todas las pantallas y luego desaparece solo.': ['It shows on top of whatever is playing on every screen and then goes away by itself.', 'Surt a sobre del que estigui sortint a totes les pantalles i després desapareix sol.'],
+    'Cerramos antes hoy': ['Closing early today', 'Avui tanquem abans'], 'Hoy cerramos antes. ¡Gracias por su visita!': ['We close early today. Thanks for your visit!', 'Avui tanquem abans. Gràcies per la visita!'],
+    'Volvemos enseguida': ['Back soon', 'Tornem de seguida'], 'Volvemos en 10 minutos.': ['Back in 10 minutes.', 'Tornem en 10 minuts.'],
+    'Oferta del día': ['Deal of the day', 'Oferta del dia'], 'Oferta del día: pregunte en el mostrador.': ['Deal of the day: ask at the counter.', 'Oferta del dia: pregunteu al taulell.'],
+    'Hoy cerrado': ['Closed today', 'Avui tancat'], 'Hoy permanecemos cerrados. Disculpen las molestias.': ['We are closed today. Sorry for the inconvenience.', 'Avui romanem tancats. Disculpeu les molèsties.'] });
   Object.assign(TX, { 'En la tele': ['On the TV', 'A la tele'], 'Cómo se llama y qué enseña': ['Its name and what it shows', 'Com es diu i què ensenya'], 'Más opciones': ['More options', 'Més opcions'], 'grupo, sede, giro, idioma': ['group, site, rotation, language', 'grup, seu, gir, idioma'], 'Escribe el código de la tele': ['Type the code shown on the TV', 'Escriu el codi de la tele'] });
   Object.assign(TX, { 'Poner otra lista un rato o desde una fecha': ['Show another list for a while or from a date', 'Posa una altra llista una estona o des d’una data'], 'Siguiente': ['Next', 'Següent'], 'código': ['code', 'codi'], 'Lista creada: toca un texto del lienzo para cambiarlo y, cuando esté, «✓ Publicar».': ['List created: tap a text on the canvas to change it and, when ready, “✓ Publish”.', 'Llista creada: toca un text del llenç per canviar-lo i, quan estigui, «✓ Publica».'],
     'Pon otra lista en algunas pantallas: ahora, un rato o desde una fecha.': ['Put another list on some screens: now, for a while or from a date.', 'Posa una altra llista en algunes pantalles: ara, una estona o des d’una data.'],
@@ -119,6 +125,19 @@
 
   /* ================= EMERGENCIA: tecla roja en la cabecera, con tapa ================= */
   const bEm = el('button', 'tecla emer-bt'); bEm.type = 'button'; bEm.dataset.a = 'emergencia'; $('.cab .der').prepend(bEm);
+  /* v1.33 · AVISO de un toque, junto a la EMERGENCIA: textos preparados o libre, cuánto dura y ENVIAR (lo mismo que la pestaña AVISOS) */
+  const bAv = el('button', 'tecla aviso-bt'); bAv.type = 'button'; bAv.dataset.a = 'avisoRapido'; $('.cab .der').prepend(bAv);
+  const AVP = [['Cerramos antes hoy', 'Hoy cerramos antes. ¡Gracias por su visita!'], ['Volvemos enseguida', 'Volvemos en 10 minutos.'], ['Oferta del día', 'Oferta del día: pregunte en el mostrador.'], ['Hoy cerrado', 'Hoy permanecemos cerrados. Disculpen las molestias.']];
+  let av = null;
+  function avPinta() { if (!av) return; const D = G.D;
+    G.pon('#modal .m-caja', X.cabModal(T('Aviso')) + `<div class="av"><div class="rej dos">${AVP.map(([n, x], i) => tecla('avTxt', i, T(n), D.aviso === T(x))).join('')}</div>
+      ${campo('av-x', D.aviso, T('texto del aviso'), ' maxlength="200" data-d="aviso"')}
+      <h2>${T('Cuánto dura')}</h2><div class="fila">${[[30, '30 s'], [120, '2 min'], [600, '10 min']].map(([v, t]) => tecla('avSeg', v, t, !D.hasta && D.seg === v)).join('')}<small class="o-hasta">${T('o hasta las')}</small>${G.campoHora('av-hasta', D.hasta, ' data-dh="1" aria-label="' + T('hasta las') + '"')}</div>
+      <h2>${T('Color')}</h2><div class="fila">${[['ambar', 'Ámbar'], ['rojo', 'Rojo'], ['verde', 'Verde'], ['azul', 'Azul']].map(([c, n]) => tecla('avCol', c, T(n), D.color === c)).join('')}</div>
+      <div class="nota">${G.canal ? T('Sale encima de lo que esté saliendo en todas las pantallas y luego desaparece solo.') : T('Sin pantallas conectadas: solo se ve aquí. Añade una pantalla para mandarla.')}</div>
+      <div class="fila"><button type="button" class="tecla pri" data-a="avEnvia"${D.aviso.trim() ? '' : ' disabled'}>${T('Enviar aviso')}</button></div></div>`); }
+  document.addEventListener('input', e => { if (av && e.target.id === 'av-x') { const b = $('#modal [data-a="avEnvia"]'); if (b) b.disabled = !G.D.aviso.trim(); } });
+  document.addEventListener('change', e => { if (av && e.target.id === 'av-hasta') setTimeout(avPinta, 0); });
   const banda = el('div'); banda.id = 'alarma'; banda.hidden = true; document.body.insertBefore(banda, $('main'));
   /* v1.23 · la emergencia lleva un id: cualquier gestor del canal la ve (escucha el tema «emergencia») y la retira; si el repetidor está caído se dice
      («NO ENVIADA · reintentando») y se manda sola al volver; la banda cuenta en cuántas pantallas está saliendo. Si una pantalla enseña una emergencia
@@ -131,7 +150,7 @@
     const lin = L.filter(i => Date.now() - D[i].visto < 50000), n = lin.filter(i => +D[i].e && (!D[i].ei || D[i].ei === EM.id)).length, est = EM.pend ? T('NO ENVIADA · reintentando') : lin.length ? T('en {n}/{m} pantallas').replace('{n}', n).replace('{m}', lin.length) : '';
     banda.className = EM.pend ? 'pend' : ''; banda.innerHTML = `<i class="sir" aria-hidden="true"></i><b>${T('EMERGENCIA EN CURSO')}</b><span>${esc(EM.x)}</span><small>${esc((EM.dn || '') + (est ? ' · ' + est : ''))}</small><button type="button" class="tecla" data-a="emRetira">${T('Retirar')}</button>`; }
   setInterval(pintaEm, 3000);
-  const PRESET = [['evac', 'Evacuación', 'EVACUACIÓN: salgan con calma por la salida más cercana y sigan las indicaciones del personal.'], ['fuego', 'Incendio', 'INCENDIO: no usen los ascensores. Salgan por la escalera de emergencia.'], ['conf', 'Confinamiento', 'CONFINAMIENTO: permanezcan dentro, lejos de puertas y ventanas, hasta nuevo aviso.'], ['cierre', 'Cierre del local', 'Cerramos en unos minutos. Gracias por su visita.'], ['libre', 'Texto libre', '']];
+  const PRESET = [['evac', 'Evacuación', 'EVACUACIÓN: salgan con calma por la salida más cercana y sigan las indicaciones del personal.'], ['fuego', 'Incendio', 'INCENDIO: no usen los ascensores. Salgan por la escalera de emergencia.'], ['conf', 'Confinamiento', 'CONFINAMIENTO: permanezcan dentro, lejos de puertas y ventanas, hasta nuevo aviso.'], ['libre', 'Texto libre', '']];
   let em = null;
   /* la tapa y DISPARAR van arriba: en el móvil apaisado se ven sin desplazar */
   function emPinta() { const m = $('#modal .m-caja'); if (!m || !em) return; const D = G.DSP, ids = Object.keys(D), gs = [...new Set(ids.map(i => D[i].g).filter(Boolean))], ss = [...new Set(ids.map(i => D[i].s).filter(Boolean))];
@@ -320,6 +339,9 @@
   /* ================= acciones ================= */
   Object.assign(ACC, {
     vista(v) { const s = v === 'simple'; html.classList.toggle('md-simple', s); guarda('g-vista', s ? 'simple' : 'pro'); pintaSw(); G.repinta(); X.alLista && X.alLista(); },
+    avisoRapido() { av = {}; X.abreModal('', 'm-av', () => { av = null; }); avPinta(); const i = $('#av-x'); i && i.focus(); },
+    avTxt(v) { const p = AVP[+v]; if (p) { G.D.aviso = T(p[1]); avPinta(); } }, avSeg(v) { G.D.seg = +v; G.D.hasta = ''; avPinta(); }, avCol(v) { G.D.color = v; avPinta(); },
+    avEnvia() { if (!G.D.aviso.trim()) return; ACC.aviso(); X.cierraModal ? X.cierraModal() : ACC.modalCierra(); G.estado('✓ ' + T('Aviso enviado')); },   /* v1.33 */
     alMas() { if (al) { al.mas = !al.mas; alPinta(); } },   /* v1.32 */
     bvVe(v) { guarda('g-bv', 1); X.cierraModal ? X.cierraModal() : ACC.modalCierra(); if (v === 'as') ACC.asistente(); else if (v === 'tv') ACC.altaPantalla(); },   /* v1.25 · bienvenida */
     asistente() { as = { paso: 1, neg: '', f: 'vertical', nom: '' }; X.abreModal('', 'm-as', () => { as = null; }); asPinta(); },
@@ -397,7 +419,7 @@
   const mq = matchMedia('(max-width: 900px)'), colocaEst = () => { const e = $('#estado'), z = $('.lienzo-zona'); if (!e || !z) return; if (mq.matches) { if (e.parentNode !== document.body) document.body.appendChild(e); } else if (e.parentNode !== z) z.appendChild(e); };
   try { mq.addEventListener('change', colocaEst); } catch (e) { mq.addListener(colocaEst); } colocaEst();
   /* ================= arranque y repintados ================= */
-  const pinta = () => { pintaSw(); pintaEm(); pintaNav(); bEnv.textContent = '✓ ' + T('Publicar'); bEnv.title = T('Manda tus cambios a todas las pantallas; cada una sigue con su lista.'); bAp.textContent = '▾'; bAp.title = T('Poner otra lista un rato o desde una fecha'); bAp.setAttribute('aria-label', bAp.title); };   /* v1.27 · un solo botón PUBLICAR y, al lado, ▾ para lo demás */
+  const pinta = () => { pintaSw(); pintaEm(); pintaNav(); bAv.innerHTML = `<span>${T('Aviso')}</span>`; bAv.title = T('Mandar un aviso a las pantallas'); bAv.setAttribute('aria-label', bAv.title); bEnv.textContent = '✓ ' + T('Publicar'); bEnv.title = T('Manda tus cambios a todas las pantallas; cada una sigue con su lista.'); bAp.textContent = '▾'; bAp.title = T('Poner otra lista un rato o desde una fecha'); bAp.setAttribute('aria-label', bAp.title); };   /* v1.27 · un solo botón PUBLICAR y, al lado, ▾ para lo demás */
   if (window.AVCREDITO) window.AVCREDITO.alCambiar(pinta);
   const idV = ACC.idioma; ACC.idioma = () => { idV(); pinta(); };
   const vistaV = ACC.vista; ACC.vista = v => { vistaV(v); pinta(); };

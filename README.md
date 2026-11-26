@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.32**
+**Versión actual: v1.33**
 
 
 ## Icono
@@ -161,7 +161,12 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.32)
+## Cambios de la versión actual (v1.33)
+- **Tecla AVISO** en la cabecera, ámbar, junto a la roja de EMERGENCIA: abre una ventanita con textos preparados (**Cerramos antes hoy**, **Volvemos enseguida**, **Oferta del día**, **Hoy cerrado**) o libre, **cuánto dura** (30 s, 2 min, 10 min o hasta una hora), el **color** y **ENVIAR AVISO**. Es el mismo aviso de la pestaña AVISOS/DIRECTO, a un toque.
+- La **EMERGENCIA** se queda para lo que es: evacuación, incendio, confinamiento o texto libre. «Cierre del local» sale de su lista (para eso está el AVISO).
+- Caché nueva de la app (`adposter-v28`).
+
+## Cambios de la v1.32
 - **Dirección corta para la tele: `adposter.mediaservi.com/tv`**, fácil de teclear con el mando; abre la página de alta con código (lo mismo que `…/p/?alta`). «Añadir pantalla» la enseña en su lugar. Ojo: una lista que se llamara «tv» ya no tendría la dirección corta `/tv` (usa `…/p/?l=tv`).
 - **«Añadir pantalla» en SIMPLE, en tres pasos y en una columna:** 1 · en la tele (qué abrir), 2 · cómo se llama y qué lista enseña, 3 · el código y EMPAREJAR. Grupo, sede, giro e idioma, plegados en **«Más opciones»**. En PRO, igual que antes.
 - Los ejemplos de los campos de nombre, grupo y sede ya no se cortan en el móvil.
@@ -520,7 +525,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.32 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.33 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

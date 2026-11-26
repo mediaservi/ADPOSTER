@@ -737,3 +737,7 @@ h2 .h2-enl { float: right; min-height: 0; height: auto; padding: 3px 8px; font-s
 .alta.alta-s { grid-template-columns: minmax(0, 1fr); max-width: 680px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: var(--sep); }
 .alta-s .al-mas { justify-content: flex-start; } .alta-s .al-mas small { margin-left: .8em; }
 #al-g::placeholder, #al-s::placeholder, #al-n::placeholder { letter-spacing: normal; }
+.tecla.aviso-bt { min-height: clamp(30px, 4vh, 40px); color: #1a1205; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; background: linear-gradient(180deg, #ffc23d, #e09000); border-color: #4a3000; margin-right: 6px; }
+.modal.m-av .m-caja { width: min(620px, 100%); height: auto; max-height: 100%; overflow: auto; }
+@media (max-width: 900px) { .modal.m-av .m-caja { height: auto; } }
+.av { display: flex; flex-direction: column; gap: var(--sep); } .av .rej.dos .tecla { white-space: normal; }
