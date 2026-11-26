@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.42**
+**Versión actual: v1.43**
 
 
 ## Icono
@@ -161,7 +161,13 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.42)
+## Cambios de la versión actual (v1.43)
+- **Modo operador para tu equipo:** en «📱 Mando en el móvil» hay dos códigos, **Completo** y **Solo operador**. El de operador abre el gestor unido a tus pantallas pero solo con lo del día a día: las pantallas, los turnos, los pedidos, los avisos y la emergencia; sin listas, editor, publicar ni SIMPLE/PRO. Para volver al gestor completo, «Salir del modo operador» (dos toques). Es para simplificar, no un candado: quien tiene el código del canal puede mandar a las pantallas.
+- En el móvil apaisado, el QR del mando va a la izquierda y los textos a la derecha, para que quepa todo.
+- La guía (AYUDA) explica el modo operador.
+- Caché nueva de la app (`adposter-v38`).
+
+## Cambios de la v1.42
 - **AYUDA: guía de uso en español, inglés y catalán.** Botón «?» en la cabecera, en todos los formatos. Doce apartados cortos: qué es, empezar en 4 pasos, listas, editar una escena, pantallas, publicar, avisos y emergencia, horarios y calendario, turnos, pedidos y precios, pantallas táctiles, SIMPLE y PRO, y trucos. Algunos apartados llevan un botón que abre directamente esa parte de la app (asistente, añadir pantalla, aviso, calendario). En el móvil vertical, el «?» ocupa el sitio de la «i»: la información (versión, instalar, avisar de un fallo) se abre desde «Acerca de» dentro de la guía.
 - **Tema de marca** (pestaña ESCENA): eliges un color de acento y una letra para los títulos, y se aplican a todas las escenas de la lista y a las plantillas que añadas después. El acento sustituye los colores vivos (no blancos, negros ni grises, ni los QR); si un texto queda del mismo color que lo que tiene debajo, pasa a blanco o negro. Se deshace con ↶.
 - En el móvil vertical, los botones redondos de la cabecera ya no se encogen y el botón de aviso ajusta su letra para caber en los tres idiomas.
@@ -574,7 +580,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.42 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.43 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 
