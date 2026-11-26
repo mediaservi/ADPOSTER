@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.25**
+**Versión actual: v1.26**
 
 
 ## Icono
@@ -161,7 +161,11 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.25)
+## Cambios de la versión actual (v1.26)
+- **Bienvenida** (SIMPLE, solo la primera vez y sin listas propias): en lugar de abrir el editor de un ejemplo, tres caminos grandes: **Crear mis carteles** (abre el asistente), **Conectar mi tele** (abre «Añadir pantalla») y **Ver un ejemplo**. Sale una sola vez; en PRO o con listas propias no sale. En español, inglés y catalán.
+- Caché nueva de la app (`adposter-v21`).
+
+## Cambios de la v1.25
 Más fácil para quien empieza, sin mover nada de sitio. Todo lo de la v1.24 sigue igual.
 
 - **Restablecer pide un segundo toque**, como Borrar la lista: antes, en una composición, borraba todas las escenas de golpe.
@@ -485,7 +489,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.25 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.26 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

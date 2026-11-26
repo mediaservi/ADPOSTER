@@ -307,6 +307,7 @@
   /* ================= acciones ================= */
   Object.assign(ACC, {
     vista(v) { const s = v === 'simple'; html.classList.toggle('md-simple', s); guarda('g-vista', s ? 'simple' : 'pro'); pintaSw(); G.repinta(); X.alLista && X.alLista(); },
+    bvVe(v) { guarda('g-bv', 1); X.cierraModal ? X.cierraModal() : ACC.modalCierra(); if (v === 'as') ACC.asistente(); else if (v === 'tv') ACC.altaPantalla(); },   /* v1.25 · bienvenida */
     asistente() { as = { paso: 1, neg: '', f: 'vertical', nom: '' }; X.abreModal('', 'm-as', () => { as = null; }); asPinta(); },
     asNeg(v) { as.neg = v; as.f = ['cafe', 'rapida', 'oficina'].includes(v) ? 'horizontal' : 'vertical'; asPinta(); }, asFor(v) { as.f = v; asPinta(); }, asPaso(v) { as.paso = lim(as.paso + +v, 1, 3); asPinta(); }, asCrea() { asCrea(); },
     emergencia() { em = { pre: 'evac', x: T(PRESET[0][2]), k: 'todos', v: '', son: true, voz: true, tapa: false }; X.abreModal('', 'm-em', () => { em = null; }); emPinta(); },
@@ -392,5 +393,20 @@
   const qs = new URLSearchParams(location.search), cod = qs.get('alta'), uni = qs.get('unir');
   if (cod && /^[a-z0-9]{6}$/i.test(cod)) { const t = setInterval(() => { if (G.B) { clearInterval(t); ACC.altaPantalla(cod.toUpperCase()); } }, 300); }
   else if (uni && window.ADDIRECTO && window.ADDIRECTO.canalOk(uni)) { const t = setInterval(() => { if (G.B) { clearInterval(t); if (G.canal === uni) { const u = new URL(location.href); u.searchParams.delete('unir'); history.replaceState(null, '', u.href); ponVm('mando'); } else ACC.unirCanal(uni); } }, 300); }
+  /* v1.25 · BIENVENIDA: en SIMPLE, la primera vez y sin listas propias, tres caminos claros en lugar de abrir el editor de un ejemplo */
+  function bienvenida() {
+    const c = (v, t, d) => `<button type="button" class="tecla bv-t" data-a="bvVe" data-v="${v}"><b>${T(t)}</b><small>${T(d)}</small></button>`;
+    X.abreModal('', 'm-bv', () => guarda('g-bv', 1));
+    G.pon('#modal .m-caja', X.cabModal(T('Te damos la bienvenida a ADPOSTER')) + `<div class="bv"><p class="nota">${T('Convierte cualquier tele en un cartel digital. ¿Por dónde empezamos?')}</p><div class="bv-rej">`
+      + c('as', 'Crear mis carteles', 'Eliges tu negocio y te dejo la pantalla hecha: solo cambias textos y fotos.')
+      + c('tv', 'Conectar mi tele', 'Abres una dirección en la tele, sale un código y lo escribes aquí.')
+      + c('ej', 'Ver un ejemplo', 'Mira las listas de muestra y prueba sin miedo: no salen en ninguna pantalla.')
+      + `</div><p class="nota">${T('Lo tienes siempre a mano: ASISTENTE en LISTAS y «+ Añadir pantalla» en PANTALLAS.')}</p></div>`); }
+  Object.assign(TX, { 'Te damos la bienvenida a ADPOSTER': ['Welcome to ADPOSTER', 'Et donem la benvinguda a ADPOSTER'], 'Convierte cualquier tele en un cartel digital. ¿Por dónde empezamos?': ['Turn any TV into a digital sign. Where shall we start?', 'Converteix qualsevol tele en un cartell digital. Per on comencem?'],
+    'Crear mis carteles': ['Create my signs', 'Crea els meus cartells'], 'Eliges tu negocio y te dejo la pantalla hecha: solo cambias textos y fotos.': ['Pick your business and I leave the screen ready: you just change texts and photos.', 'Tries el teu negoci i et deixo la pantalla feta: només canvies textos i fotos.'],
+    'Conectar mi tele': ['Connect my TV', 'Connecta la meva tele'], 'Abres una dirección en la tele, sale un código y lo escribes aquí.': ['Open an address on the TV, a code shows up and you type it here.', 'Obres una adreça a la tele, surt un codi i l’escrius aquí.'],
+    'Ver un ejemplo': ['See an example', 'Mira un exemple'], 'Mira las listas de muestra y prueba sin miedo: no salen en ninguna pantalla.': ['Look at the sample lists and try things freely: they don’t show on any screen.', 'Mira les llistes de mostra i prova sense por: no surten a cap pantalla.'],
+    'Lo tienes siempre a mano: ASISTENTE en LISTAS y «+ Añadir pantalla» en PANTALLAS.': ['Always at hand: WIZARD in LISTS and “+ Add screen” in SCREENS.', 'Sempre a mà: ASSISTENT a LLISTES i «+ Afegeix una pantalla» a PANTALLES.'] });
+  if (vistaIni === 'simple' && !lee('g-bv') && !cod && !uni) { const t = setInterval(() => { if (!G.B) return; clearInterval(t); if (Object.keys(G.B.playlists).every(G.esDemo) && !document.querySelector('#modal.abierto, #modal:not([hidden]) .m-caja:not(:empty)')) bienvenida(); else guarda('g-bv', 1); }, 300); }
   window.ADPANT = { mandaDatos, datosVivo, TU, PE, get EM() { return EM; } };
 })();
