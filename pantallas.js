@@ -25,7 +25,7 @@
     'Volvemos enseguida': ['Back soon', 'Tornem de seguida'], 'Volvemos en 10 minutos.': ['Back in 10 minutes.', 'Tornem en 10 minuts.'],
     'Oferta del día': ['Deal of the day', 'Oferta del dia'], 'Oferta del día: pregunte en el mostrador.': ['Deal of the day: ask at the counter.', 'Oferta del dia: pregunteu al taulell.'],
     'Hoy cerrado': ['Closed today', 'Avui tancat'], 'Hoy permanecemos cerrados. Disculpen las molestias.': ['We are closed today. Sorry for the inconvenience.', 'Avui romanem tancats. Disculpeu les molèsties.'] });
-  Object.assign(TX, { 'En la tele': ['On the TV', 'A la tele'], 'Cómo se llama y qué enseña': ['Its name and what it shows', 'Com es diu i què ensenya'], 'Más opciones': ['More options', 'Més opcions'], 'grupo, sede, giro, idioma': ['group, site, rotation, language', 'grup, seu, gir, idioma'], 'Escribe el código de la tele': ['Type the code shown on the TV', 'Escriu el codi de la tele'] });
+  Object.assign(TX, { 'En la tele': ['On the TV', 'A la tele'], 'Cómo se llama y qué enseña': ['Its name and what it shows', 'Com es diu i què ensenya'], 'Más opciones': ['More options', 'Més opcions'], 'grupo, sede, giro, idioma': ['group, site, tags, rotation, language', 'grup, seu, etiquetes, gir, idioma'], 'etiquetas, separadas por comas (p. ej. barra, terraza)': ['tags, comma-separated (e.g. bar, terrace)', 'etiquetes, separades per comes (p. ex. barra, terrassa)'], 'Escribe el código de la tele': ['Type the code shown on the TV', 'Escriu el codi de la tele'] });
   Object.assign(TX, { 'Poner otra lista un rato o desde una fecha': ['Show another list for a while or from a date', 'Posa una altra llista una estona o des d’una data'], 'Siguiente': ['Next', 'Següent'], 'código': ['code', 'codi'], 'Lista creada: toca un texto del lienzo para cambiarlo y, cuando esté, «✓ Publicar».': ['List created: tap a text on the canvas to change it and, when ready, “✓ Publish”.', 'Llista creada: toca un text del llenç per canviar-lo i, quan estigui, «✓ Publica».'],
     'Pon otra lista en algunas pantallas: ahora, un rato o desde una fecha.': ['Put another list on some screens: now, for a while or from a date.', 'Posa una altra llista en algunes pantalles: ara, una estona o des d’una data.'],
     'Si no lo marcas, es solo por un rato: luego cada pantalla vuelve a su lista.': ['If unticked, it’s only for a while: each screen then goes back to its list.', 'Si no ho marques, és només una estona: després cada pantalla torna a la seva llista.'],
@@ -106,15 +106,15 @@
   const publica = (tema, datos, ret) => { const d = G.dir; if (!G.canal) return 'sin'; if (!d || !d.valido) return 'red'; d.pub(tema, datos, ret); return d.up ? 'ok' : 'red'; };
   const temaDe = (k, v) => !k || k === 'todos' ? 'orden/todos' : 'orden/' + k + '/' + v;
   /* qué pantallas son de un destino (todas, grupo, sede, grupo y sede o una) */
-  const deDest = (k, v) => { const D = G.DSP; return Object.keys(D).filter(i => !k || k === 'todos' || (k === 'd' ? i === v : k === 'gs' ? D[i].g + '@' + D[i].s === v : D[i][k] === v)); };
-  const nomDest = (k, v) => !k || k === 'todos' ? T('Todos') : k === 'd' ? (G.DSP[v] ? G.DSP[v].n : v) : k === 'gs' ? v.replace('@', ' · ') : v;
+  const deDest = (k, v) => { const D = G.DSP; return Object.keys(D).filter(i => !k || k === 'todos' || (k === 'd' ? i === v : k === 'gs' ? D[i].g + '@' + D[i].s === v : k === 'et' ? (D[i].et || []).includes(v) : D[i][k] === v)); };
+  const nomDest = (k, v) => !k || k === 'todos' ? T('Todos') : k === 'd' ? (G.DSP[v] ? G.DSP[v].n : v) : k === 'gs' ? v.replace('@', ' · ') : k === 'et' ? '#' + v : v;
   /* aviso si la orientación de la lista no casa con la de las pantallas */
   function avisoOri(lista, ids) { const p = G.B.playlists[lista]; if (!p || p.medida) return ''; const hor = p.formato === 'horizontal', n = ids.filter(i => G.horD(G.DSP[i]) !== hor).length; return n ? `<div class="nota mal">⚠ ${esc(T(hor ? '{n} pantallas son verticales y la lista es horizontal.' : '{n} pantallas son horizontales y la lista es vertical.').replace('{n}', n))}</div>` : ''; }
   /* las teclas de destino: Todos, grupos (◫), sedes (⌂), grupo y sede (◫⌂) y pantallas (▭) */
   function teclasDest(a, k, v, conCombos) { const D = G.DSP, ids = Object.keys(D), ag = G.B.agenda || [], gs = [...new Set(ids.map(i => D[i].g).concat(ag.filter(r => r.k === 'g').map(r => G.slug(r.v))).filter(Boolean))].sort(), ss = [...new Set(ids.map(i => D[i].s).concat(ag.filter(r => r.k === 's').map(r => G.slug(r.v))).filter(Boolean))].sort(),
-      cs = conCombos ? [...new Set(ids.filter(i => D[i].g && D[i].s).map(i => D[i].g + '@' + D[i].s))].sort() : [];
+      cs = conCombos ? [...new Set(ids.filter(i => D[i].g && D[i].s).map(i => D[i].g + '@' + D[i].s))].sort() : [], es = [...new Set(ids.flatMap(i => D[i].et || []).concat(ag.filter(r => r.k === 'et').map(r => G.slug(r.v))).filter(Boolean))].sort();
     return tecla(a, 'todos:', T('Todos'), k === 'todos', `<small>${ids.length}</small>`) + gs.map(g => tecla(a, 'g:' + g, esc(g), k === 'g' && v === g, G.icD('g'))).join('') + ss.map(x => tecla(a, 's:' + x, esc(x), k === 's' && v === x, G.icD('s'))).join('')
-      + (cs.length > 1 ? cs.map(x => tecla(a, 'gs:' + x, esc(x.replace('@', ' · ')), k === 'gs' && v === x, G.icD('gs'))).join('') : '') + ids.sort((x, y) => D[x].n.localeCompare(D[y].n)).map(i => tecla(a, 'd:' + i, esc(D[i].n), k === 'd' && v === i, G.icD('d'))).join(''); }
+      + (cs.length > 1 ? cs.map(x => tecla(a, 'gs:' + x, esc(x.replace('@', ' · ')), k === 'gs' && v === x, G.icD('gs'))).join('') : '') + es.map(x => tecla(a, 'et:' + x, esc(x), k === 'et' && v === x, G.icD('et'))).join('') + ids.sort((x, y) => D[x].n.localeCompare(D[y].n)).map(i => tecla(a, 'd:' + i, esc(D[i].n), k === 'd' && v === i, G.icD('d'))).join(''); }
 
   /* ================= SIMPLE / PRO ================= */
   /* v1.23 · la vista se guarda desde la primera visita: quien empieza en SIMPLE sigue en SIMPLE al volver (antes, al recargar, pasaba a PRO) */
@@ -193,11 +193,11 @@
 
   /* ================= AÑADIR PANTALLA ================= */
   let al = null;
-  function alPinta() { const m = $('#modal .m-caja'); if (!m || !al) return; const pl = G.B.playlists, med = pl[al.l] && pl[al.l].medida, o = { rot: al.rot, lang: al.lang, nombre: al.n, grupo: al.g, sede: al.s }; if (med && al.px) Object.assign(o, { px: 1, ox: al.ox, oy: al.oy }); const u = G.urlKiosco(al.l, o), alta = new URL('tv', G.urlKiosco(al.l).split('p/?')[0]).href;   /* v1.32 · dirección corta: …/tv abre lo mismo que …/p/?alta */
+  function alPinta() { const m = $('#modal .m-caja'); if (!m || !al) return; const pl = G.B.playlists, med = pl[al.l] && pl[al.l].medida, o = { rot: al.rot, lang: al.lang, nombre: al.n, grupo: al.g, sede: al.s, etiq: al.et }; if (med && al.px) Object.assign(o, { px: 1, ox: al.ox, oy: al.oy }); const u = G.urlKiosco(al.l, o), alta = new URL('tv', G.urlKiosco(al.l).split('p/?')[0]).href;   /* v1.32 · dirección corta: …/tv abre lo mismo que …/p/?alta */
     const nota = `<div class="nota">${esc(T('En la tele, abre el navegador (o la app Kiosk del stick) y entra en {u}. Saldrá un código de 6 caracteres: escríbelo aquí y la pantalla se configura sola.').replace('{u}', alta))}</div>`,
       codigo = `<div class="fila">${campo('al-cod', al.cod, T('código'), ' maxlength="6" autocapitalize="characters" data-al="cod" style="text-transform:uppercase;letter-spacing:.3em;text-align:center"')}<button type="button" class="tecla pri" data-a="alEmpareja">${T('Emparejar')}</button></div><div class="lcd url${al.ok ? ' ok' : ''}" id="al-msg">${esc(al.msg || '')}</div>`,
       listas = `<div class="rej env">${G.listasVis().map(id => tecla('alL', id, nombreL(id), al.l === id)).join('')}</div>`,
-      gs = `<div class="fila">${campo('al-g', al.g, T('grupo (p. ej. menu)'), ' maxlength="24" data-al="g"')}${campo('al-s', al.s, T('sede (p. ej. centro)'), ' maxlength="24" data-al="s"')}</div>`,
+      gs = `<div class="fila">${campo('al-g', al.g, T('grupo (p. ej. menu)'), ' maxlength="24" data-al="g"')}${campo('al-s', al.s, T('sede (p. ej. centro)'), ' maxlength="24" data-al="s"')}</div>${campo('al-et', al.et, T('etiquetas, separadas por comas (p. ej. barra, terraza)'), ' maxlength="120" data-al="et"')}`,
       giro = `<h2>${T('Giro')}</h2><div class="fila giro">${[0, 90, 180, 270].map(g => tecla('alRot', g, g + '°', al.rot === g)).join('')}</div>`,
       idi = `<h2>${T('Idioma')}</h2><div class="fila">${['es', 'en', 'ca'].map(l => tecla('alLang', l, l.toUpperCase(), al.lang === l)).join('')}</div>`;
     /* v1.32 · SIMPLE: en tres pasos y en una columna; grupo, sede, giro e idioma, plegados en «Más opciones» */
@@ -207,7 +207,7 @@
       <div class="fila"><button type="button" class="tecla al-mas" data-a="alMas" aria-expanded="${!!al.mas}">${al.mas ? '▾' : '▸'} ${T('Más opciones')} <small>${T('grupo, sede, giro, idioma')}</small></button></div>${al.mas ? gs + giro + idi : ''}
       <h2>3 · ${T('Escribe el código de la tele')}</h2>${codigo}</div>`); return; }
     G.pon('#modal .m-caja', X.cabModal('+ ' + T('Añadir pantalla')) + `<div class="alta"><div class="alta-izq">
-      ${campo('al-n', al.n, T('Nombre de la pantalla'), ' maxlength="32" data-al="n"')}<div class="fila">${campo('al-g', al.g, T('grupo (p. ej. menu)'), ' maxlength="24" data-al="g"')}${campo('al-s', al.s, T('sede (p. ej. centro)'), ' maxlength="24" data-al="s"')}</div>
+      ${campo('al-n', al.n, T('Nombre de la pantalla'), ' maxlength="32" data-al="n"')}<div class="fila">${campo('al-g', al.g, T('grupo (p. ej. menu)'), ' maxlength="24" data-al="g"')}${campo('al-s', al.s, T('sede (p. ej. centro)'), ' maxlength="24" data-al="s"')}</div>${campo('al-et', al.et, T('etiquetas, separadas por comas (p. ej. barra, terraza)'), ' maxlength="120" data-al="et"')}
       <h2>${T('Lista')}</h2><div class="rej env">${G.listasVis().map(id => tecla('alL', id, nombreL(id), al.l === id)).join('')}</div>
       <h2>${T('Giro')}</h2><div class="fila giro">${[0, 90, 180, 270].map(g => tecla('alRot', g, g + '°', al.rot === g)).join('')}</div>
       <h2>${T('Idioma')}</h2><div class="fila">${['es', 'en', 'ca'].map(l => tecla('alLang', l, l.toUpperCase(), al.lang === l)).join('')}</div>
@@ -222,7 +222,7 @@
   function empareja() { const c = String(al.cod || '').toLowerCase().replace(/[^a-z0-9]/g, ''); const msg = (t, ok) => { al.msg = t; al.ok = !!ok; const e = $('#al-msg'); if (e) { e.textContent = t; e.classList.toggle('ok', !!ok); } };
     if (c.length !== 6) { msg(T('El código tiene 6 letras o números.')); return; } if (!G.canal) ACC.canalNuevo();
     if (alCon) alCon.cierra(); clearTimeout(alT); clearTimeout(alT2); msg(T('Esperando a la pantalla…'));
-    const cfg = { canal: G.canal, l: al.l, n: al.n.trim(), g: al.g.trim(), s: al.s.trim(), rot: al.rot, lang: al.lang, origen: G.ORIG || '', t: Date.now(), datos: datosVivo() }; if (JSON.stringify(cfg).length > 700000) delete cfg.datos;
+    const cfg = { canal: G.canal, l: al.l, n: al.n.trim(), g: al.g.trim(), s: al.s.trim(), et: String(al.et || '').trim(), rot: al.rot, lang: al.lang, origen: G.ORIG || '', t: Date.now(), datos: datosVivo() }; if (JSON.stringify(cfg).length > 700000) delete cfg.datos;
     let visto = false; const nom = cfg.n || c.toUpperCase();
     alCon = window.ADDIRECTO.conecta('alta' + c, { temas: ['ok', 'hola'], alMensaje: (t, d) => { if (t === 'hola') { if (!visto) { visto = true; msg(T('Pantalla encontrada: emparejando…')); } return; } if (t !== 'ok' || !d) return;
       alCon.borra('cfg'); setTimeout(() => { alCon && alCon.cierra(); alCon = null; }, 800); clearTimeout(alT); clearTimeout(alT2); mandaDatos();
@@ -299,7 +299,7 @@
       <div class="fila"><button type="button" class="tecla pri" data-a="fmPon">${T('Aplicar')}</button><button type="button" class="tecla reset" data-a="fmQuita"${G.P().medida ? '' : ' disabled'}>${T('Quitar')}</button></div></div>`); }
   document.addEventListener('input', e => { const t = e.target, d = t.dataset || {};
     if (d.fm && fm) { const v = Math.round(+t.value || 0); fm[d.fm] = v; if (['c', 'f', 'pw', 'ph'].includes(d.fm) && fm.c > 0 && fm.f > 0 && fm.pw > 0 && fm.ph > 0) { fm.w = fm.c * fm.pw; fm.h = fm.f * fm.ph; const a = $('#fm-w'), b = $('#fm-h'); if (a) a.value = fm.w; if (b) b.value = fm.h; } }
-    else if (d.al && al) { al[d.al] = ['ox', 'oy'].includes(d.al) ? Math.max(0, Math.round(+t.value || 0)) : t.value; if (d.al !== 'cod') { const pl = G.B.playlists, o = { rot: al.rot, lang: al.lang, nombre: al.n, grupo: al.g, sede: al.s }; if (pl[al.l] && pl[al.l].medida && al.px) Object.assign(o, { px: 1, ox: al.ox, oy: al.oy }); const u = G.urlKiosco(al.l, o), q = $('.alta-qr'), l = $('#al-url'); if (q) q.innerHTML = qrSvg(u); if (l) l.textContent = u; const a = $('.alta-url a.tecla'); if (a) a.href = u; } }
+    else if (d.al && al) { al[d.al] = ['ox', 'oy'].includes(d.al) ? Math.max(0, Math.round(+t.value || 0)) : t.value; if (d.al !== 'cod') { const pl = G.B.playlists, o = { rot: al.rot, lang: al.lang, nombre: al.n, grupo: al.g, sede: al.s, etiq: al.et }; if (pl[al.l] && pl[al.l].medida && al.px) Object.assign(o, { px: 1, ox: al.ox, oy: al.oy }); const u = G.urlKiosco(al.l, o), q = $('.alta-qr'), l = $('#al-url'); if (q) q.innerHTML = qrSvg(u); if (l) l.textContent = u; const a = $('.alta-url a.tecla'); if (a) a.href = u; } }
     else if (d.as && as) as[d.as] = t.value;
     else if (d.tu) { TU[d.tu] = d.tu === 'serie' ? t.value.toUpperCase().replace(/[^A-Z0-9]/g, '') : t.value; guarda('g-turno', TU); const l = $('#tu-lcd'); if (l) l.textContent = numT(TU.num); }
     else if (t.id === 'em-x' && em) { em.x = t.value; }
@@ -373,7 +373,7 @@
         txt = (r === 'ok' ? T('Enviado') : T('Sin conexión: se enviará al volver.')) + ' · ' + nombreL(ap.l) + ' → ' + nomDest(ap.k, ap.v) + ' (' + n + ')' + (ap.c === 'durante' ? ' · ' + ap.min + ' min' : ''); } else if (rd !== 'ok') txt += ' · ' + T('Sin conexión: se enviará al volver.'); }
       else if (ap.c !== 'desde') txt = T('Sin directo, las pantallas solo cambian al publicar playlists.json. Activa el directo y llegará todo al momento.');
       if (G.puedePublicar) ACC.guarda(); ap.seguro = false; apPinta(); msg(txt || ''); },
-    altaPantalla(cod) { const ant = lee('g-alta') || {}; al = { n: '', g: ant.g || '', s: ant.s || '', l: G.listasVis().includes(G.sel) ? G.sel : G.listasVis()[0], rot: G.giro || 0, lang: G.lang, cod: typeof cod === 'string' ? cod : '', msg: '', px: false, ox: 0, oy: 0 }; X.abreModal('', 'm-alta', () => { if (al) guarda('g-alta', { g: al.g, s: al.s }); al = null; }); alPinta(); },
+    altaPantalla(cod) { const ant = lee('g-alta') || {}; al = { n: '', g: ant.g || '', s: ant.s || '', et: ant.et || '', l: G.listasVis().includes(G.sel) ? G.sel : G.listasVis()[0], rot: G.giro || 0, lang: G.lang, cod: typeof cod === 'string' ? cod : '', msg: '', px: false, ox: 0, oy: 0 }; X.abreModal('', 'm-alta', () => { if (al) guarda('g-alta', { g: al.g, s: al.s, et: al.et }); al = null; }); alPinta(); },
     alL(v) { al.l = v; alPinta(); }, alRot(v) { al.rot = +v; alPinta(); }, alLang(v) { al.lang = v; alPinta(); }, alEmpareja() { empareja(); }, alPx() { al.px = !al.px; alPinta(); },
     alCopia() { const u = $('#al-url').textContent; (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(() => G.estado(T('Copiada')), () => {}); },
     tuPaso(v) { TU.num = Math.max(0, TU.num + +v); guarda('g-turno', TU); const l = $('#tu-lcd'); if (l) l.textContent = numT(TU.num); },

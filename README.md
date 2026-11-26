@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.38**
+**Versión actual: v1.39**
 
 
 ## Icono
@@ -161,7 +161,12 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.38)
+## Cambios de la versión actual (v1.39)
+- **Etiquetas por pantalla:** al añadir una pantalla (en «Más opciones») puedes darle una o varias etiquetas separadas por comas, como «barra, terraza». Después, en A PANTALLAS y en las reglas del calendario, puedes mandar un aviso, una lista o un turno solo a las pantallas con esa etiqueta (por ejemplo, todas las de la barra aunque estén en grupos distintos). Hasta 8 etiquetas por pantalla.
+- Si cambias las etiquetas de una pantalla, se vuelve a conectar sola para recibir las órdenes nuevas.
+- Caché nueva de la app (`adposter-v34`).
+
+## Cambios de la v1.38
 - **Posición y tamaño en píxeles en los lienzos A MEDIDA (LED):** al elegir una pieza, X, Y, ancho y alto van en píxeles reales del controlador (por ejemplo, de 0 a 1500 × 0 a 1000), para cuadrar las piezas con los módulos. En los lienzos normales siguen en %.
 - **Miniaturas más grandes** en la tira de carteles y de escenas, en SIMPLE y en pantallas de escritorio altas (sin desplazar la página).
 - Caché nueva de la app (`adposter-v33`).
@@ -553,7 +558,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.38 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.39 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

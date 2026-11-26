@@ -16,7 +16,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.38';
+  const VERSION = '1.39';
   const SC = document.currentScript, Q = new URLSearchParams(location.search);
   const BASE = new URL(SC.dataset.base || '../', location.href).href;
   const ID = (SC.dataset.playlist || Q.get('l') || 'demo').toLowerCase().replace(/[^a-z0-9_-]/g, '');
@@ -34,7 +34,7 @@
   const slug = s => String(s || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 24);
   /* identidad del display: un código propio y, si se quiere, nombre, grupo y sede (?nombre= ?grupo= ?sede=). ?canal=código lo une al directo (?canal=no lo quita) */
   const DISP = (() => { let d = leeG('disp'); if (!/^[a-z0-9]{6}$/.test(d)) { d = (Math.random().toString(36) + '000000').slice(2, 8); guardaG('disp', d); } return d; })();
-  if (!PREV) ['nombre', 'grupo', 'sede', 'canal', 'lang'].forEach(k => { const v = Q.get(k); if (v !== null) guardaG(k, k === 'canal' ? (/^[a-z0-9]{6,40}$/i.test(v) ? v : '') : v.trim().slice(0, 32)); });
+  if (!PREV) ['nombre', 'grupo', 'sede', 'etiq', 'canal', 'lang'].forEach(k => { const v = Q.get(k); if (v !== null) guardaG(k, k === 'canal' ? (/^[a-z0-9]{6,40}$/i.test(v) ? v : '') : v.trim().slice(0, k === 'etiq' ? 120 : 32)); });   // v1.39 · etiq: etiquetas separadas por comas
   const DEF = { nombre: ID.toUpperCase(), fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7],
     fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, desenf: false, brillo: true, horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '',
     formato: 'vertical', qr: { activo: false, modo: 'url', url: '', texto: '', pos: 'bd' }, cinta: { activo: false, texto: '', rss: '' }, publico: false, modo: 'carteles', escenas: [], orden: 'azar', secuencia: [], archivos: {}, sueltos: [], adsS: [], tactil: { activo: false, vuelta: 30 } };
@@ -62,7 +62,7 @@
     if (!window.ADDIRECTO) return; let ok = false; const est = t => { d.querySelector('.est').textContent = t; };
     /* v1.23 · «hola» retenido: el gestor sabe al momento si el código existe (un código mal tecleado se avisa en segundos, no a los 90 s) */
     const c = window.ADDIRECTO.conecta('alta' + DISP, { temas: ['cfg'], alCambiar: v => { if (v && !ok) c.pub('hola', { d: DISP, t: Date.now() }, true); if (!ok) est(T(v ? 'Esperando…' : 'Sin conexión con el repetidor: reintentando…')); }, alMensaje: (t, x) => { if (t !== 'cfg' || ok || !x || !window.ADDIRECTO.canalOk(x.canal)) return; ok = true;
-      guardaG('canal', x.canal); [['n', 'nombre'], ['g', 'grupo'], ['s', 'sede']].forEach(([a, k]) => guardaG(k, String(x[a] || '').trim().slice(0, 32))); if (/^(es|en|ca)$/.test(x.lang || '')) guardaG('lang', x.lang); if (x.origen && URL_OK.test(x.origen)) guardaG('origen', x.origen.replace(/\/*$/, '/'));
+      guardaG('canal', x.canal); [['n', 'nombre'], ['g', 'grupo'], ['s', 'sede']].forEach(([a, k]) => guardaG(k, String(x[a] || '').trim().slice(0, 32))); guardaG('etiq', String(x.et || '').trim().slice(0, 120)); if (/^(es|en|ca)$/.test(x.lang || '')) guardaG('lang', x.lang); if (x.origen && URL_OK.test(x.origen)) guardaG('origen', x.origen.replace(/\/*$/, '/'));
       /* v1.23 · las listas llegan con el emparejado: la pantalla enseña su lista al momento, sin esperar a que nadie pulse nada */
       if (x.datos && typeof x.datos === 'object' && x.datos.playlists) try { localStorage.setItem(G + 'vivo', JSON.stringify(x.datos)); } catch (e) {}
       c.borra('hola'); c.pub('ok', { d: DISP, t: Date.now() }); est('✓ ' + T('¡Emparejada!')); const p = new URLSearchParams(); p.set('l', String(x.l || 'demo').toLowerCase().replace(/[^a-z0-9_-]/g, '')); if (+x.rot) p.set('rot', +x.rot); if (x.lang) p.set('lang', String(x.lang).slice(0, 2)); p.set('canal', x.canal);   // el canal va también en la dirección: sirve de página de inicio del kiosco aunque se borre la memoria del aparato
@@ -254,7 +254,7 @@
     const m = A.filter(ok); return m.length ? m[m.length - 1].lista : ''; }                                       // si coinciden varias, manda la última de la lista
   /* v1.23 · A PANTALLAS «durante N minutos»: la URL lleva tk (hasta cuándo); mientras dura no manda el calendario y luego se vuelve sola */
   /* v1.23 · destinos: todos, grupo (g), sede (s), grupo Y sede (gs: «grupo@sede») o una pantalla (d) */
-  function paraMi(k, v, y) { y = y || yo(); v = String(v || ''); if (!k || k === 'todos') return true; if (k === 'g') return !!y.g && y.g === slug(v); if (k === 's') return !!y.s && y.s === slug(v); if (k === 'd') return v.toLowerCase() === DISP;
+  function paraMi(k, v, y) { y = y || yo(); v = String(v || ''); if (!k || k === 'todos') return true; if (k === 'g') return !!y.g && y.g === slug(v); if (k === 's') return !!y.s && y.s === slug(v); if (k === 'd') return v.toLowerCase() === DISP; if (k === 'et') return (y.et || []).includes(slug(v));   // v1.39 · por etiqueta
     if (k === 'gs') { const i = v.indexOf('@'); return i > 0 && !!y.g && !!y.s && y.g === slug(v.slice(0, i)) && y.s === slug(v.slice(i + 1)); } return false; }
   /* «durante N minutos» (tk) se recuerda en el aparato: si la pantalla se reinicia con su dirección de siempre, sigue con la orden hasta que caduque.
      Un cambio «puntual» (punt) no toca la lista de casa: se queda mientras el calendario no cambie de franja */
@@ -289,9 +289,9 @@
 
   /* ---------- directo: el display obedece al gestor al momento y le cuenta cómo está ---------- */
   let dir = null, dirP = null, dirK = null, canalP = '', uPide = 0;
-  const yo = () => ({ n: leeG('nombre') || 'DISPLAY ' + DISP.toUpperCase(), g: slug(leeG('grupo')), s: slug(leeG('sede')) });
+  const yo = () => ({ n: leeG('nombre') || 'DISPLAY ' + DISP.toUpperCase(), g: slug(leeG('grupo')), s: slug(leeG('sede')), et: [...new Set(String(leeG('etiq') || '').split(',').map(slug).filter(Boolean))].slice(0, 8) });
   const canalAct = () => leeG('canal') || (LISTAS && typeof LISTAS.canal === 'string' ? LISTAS.canal : '');
-  const estadoDe = () => { const y = yo(); return { n: y.n, g: y.g, s: y.s, l: ID, ln: cfg.nombre, f: cfg.formato, md: cfg.medida ? cfg.medida.w + '×' + cfg.medida.h : '', w: innerWidth, h: innerHeight, v: VERSION, off: offR ? 2 : enHorario() && !offA ? 0 : 1, i: actual.ads || actual.feed || '', p: ORIGEN ? 1 : 0, c: CASA, e: EMR ? (EMR.sc ? 2 : 1) : 0, ei: EMR ? emId(EMR) : '', dv: VIVOL ? +VIVOL.t || 0 : 0, mf: faltan(), t: Date.now() }; };   // v1.23 · dv: qué envío de listas tiene; mf: imágenes que aún no le han llegado
+  const estadoDe = () => { const y = yo(); return { n: y.n, g: y.g, s: y.s, et: y.et, l: ID, ln: cfg.nombre, f: cfg.formato, md: cfg.medida ? cfg.medida.w + '×' + cfg.medida.h : '', w: innerWidth, h: innerHeight, v: VERSION, off: offR ? 2 : enHorario() && !offA ? 0 : 1, i: actual.ads || actual.feed || '', p: ORIGEN ? 1 : 0, c: CASA, e: EMR ? (EMR.sc ? 2 : 1) : 0, ei: EMR ? emId(EMR) : '', dv: VIVOL ? +VIVOL.t || 0 : 0, mf: faltan(), t: Date.now() }; };   // v1.23 · dv: qué envío de listas tiene; mf: imágenes que aún no le han llegado
   function estado() { if (!dir || !cfg) return; dir.pub('estado/' + DISP, estadoDe(), true); }
   function menu() { if (!dirP || !LISTAS) return; const pl = LISTAS.playlists || {}; dirP.pub('menu/' + DISP, { n: leeG('nombre') || cfg.nombre, l: ID, listas: Object.keys(pl).filter(k => pl[k] && pl[k].publico).slice(0, 24).map(k => ({ id: k, n: String(pl[k].nombre || k.toUpperCase()).slice(0, 40) })), t: Date.now() }, true); }
   function ir(id, porAgenda, hasta) { id = String(id || '').toLowerCase().replace(/[^a-z0-9_-]/g, ''); if (PREV || !id || !LISTAS || !LISTAS.playlists || !LISTAS.playlists[id]) return false; if (hasta) guardaG('tk', JSON.stringify({ id, h: hasta })); if (id === ID) { if (hasta) TK = hasta; return false; }
@@ -306,10 +306,10 @@
     else if (o.t === 'apaga') { offR = !!o.v; if (!PREV) guardaG('off', offR ? '1' : ''); gen++; estado(); }
     else if (o.t === 'recarga') { if (!PREV) location.reload(); }
     else if (o.t === 'ident') { const y = yo(); alerta(y.n + '\n' + DISP.toUpperCase() + (y.g ? ' · ' + y.g : '') + (y.s ? ' · ' + y.s : ''), 8, 'azul'); }
-    else if (o.t === 'pon' && !PREV) { [['n', 'nombre'], ['g', 'grupo'], ['s', 'sede']].forEach(([a, k]) => { if (typeof o[a] === 'string') guardaG(k, o[a].trim().slice(0, 32)); }); enlaza(); estado(); menu(); } }
-  function enlaza() { if (PREV || !window.ADDIRECTO) return; const c = canalAct(), y = yo(), k = c + '|' + y.g + '|' + y.s; if (k === dirK) return; dirK = k;
+    else if (o.t === 'pon' && !PREV) { [['n', 'nombre'], ['g', 'grupo'], ['s', 'sede'], ['et', 'etiq']].forEach(([a, k]) => { if (typeof o[a] === 'string') guardaG(k, o[a].trim().slice(0, k === 'etiq' ? 120 : 32)); }); enlaza(); estado(); menu(); } }
+  function enlaza() { if (PREV || !window.ADDIRECTO) return; const c = canalAct(), y = yo(), k = c + '|' + y.g + '|' + y.s + '|' + (y.et || []).join(','); if (k === dirK) return; dirK = k;
     if (dir) { dir.cierra(); dir = null; } if (dirP) { dirP.cierra(); dirP = null; } canalP = ''; if (!window.ADDIRECTO.canalOk(c)) { if (cfg) qr(); return; }
-    dir = window.ADDIRECTO.conecta(c, { temas: ['orden/todos', 'orden/d/' + DISP, 'emergencia', 'turno', 'pedidos', 'datos', 'm/+'].concat(y.g ? ['orden/g/' + y.g] : [], y.s ? ['orden/s/' + y.s] : [], y.g && y.s ? ['orden/gs/' + y.g + '@' + y.s] : []), alMensaje: (t, d, ret) => { if (t === 'emergencia') emergencia(d); else if (t === 'turno') turnoLlega(d, ret); else if (t === 'pedidos') pedidosLlega(d, ret); else if (t === 'datos') datosLlega(d); else if (t.indexOf('m/') === 0) medioLlega(t.slice(2), d); else orden(d, ret); }, alCambiar: v => { if (v) { estado(); emVigila(); } } });
+    dir = window.ADDIRECTO.conecta(c, { temas: ['orden/todos', 'orden/d/' + DISP, 'emergencia', 'turno', 'pedidos', 'datos', 'm/+'].concat(y.g ? ['orden/g/' + y.g] : [], y.s ? ['orden/s/' + y.s] : [], y.g && y.s ? ['orden/gs/' + y.g + '@' + y.s] : [], (y.et || []).map(e => 'orden/et/' + e)), alMensaje: (t, d, ret) => { if (t === 'emergencia') emergencia(d); else if (t === 'turno') turnoLlega(d, ret); else if (t === 'pedidos') pedidosLlega(d, ret); else if (t === 'datos') datosLlega(d); else if (t.indexOf('m/') === 0) medioLlega(t.slice(2), d); else orden(d, ret); }, alCambiar: v => { if (v) { estado(); emVigila(); } } });
     /* el público entra por un canal aparte, derivado del principal: solo puede pedir una de las listas marcadas como elegibles, y no más de una cada pocos segundos */
     window.ADDIRECTO.publico(c).then(p => { if (!p || dirK !== k) return; canalP = p;
       dirP = window.ADDIRECTO.conecta(p, { temas: ['pide/' + DISP], alMensaje: (t, d) => { const id = d && d.t === 'lista' ? String(d.id || '').toLowerCase().replace(/[^a-z0-9_-]/g, '') : '', pl = (LISTAS && LISTAS.playlists) || {}; if (id && pl[id] && pl[id].publico && Date.now() - uPide > 8000) { uPide = Date.now(); ir(id, true, Date.now() + 5 * 60000); }   // v1.23 · lo que elige el público dura 5 minutos y la pantalla vuelve sola a la lista del dueño (nunca cambia la lista de casa)
