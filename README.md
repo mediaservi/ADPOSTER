@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.24**
+**Versión actual: v1.25**
 
 
 ## Icono
@@ -161,7 +161,24 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.24)
+## Cambios de la versión actual (v1.25)
+Más fácil para quien empieza, sin mover nada de sitio. Todo lo de la v1.24 sigue igual.
+
+- **Restablecer pide un segundo toque**, como Borrar la lista: antes, en una composición, borraba todas las escenas de golpe.
+- **El estado dice la verdad** (SIMPLE): «Sin enviar a las pantallas» en lugar de «Cambios sin guardar», porque lo hecho ya queda guardado en el aparato.
+- **SIMPLE con palabras de tienda:** la pestaña DIRECTO se llama **AVISOS**; fuera «displays» en el calendario y en TIEMPOS; la emergencia sin pantallas dice «Sin pantallas conectadas: solo se ve aquí»; «Pantalla en negro» y «Quitar el negro»; «Hacer parpadear»; «Ya tengo pantallas en otro aparato».
+- **Conectar la primera pantalla:** en SIMPLE, el botón amarillo es «+ Añadir pantalla» (emparejar ya conecta solo). La ventana dice con qué se abre la dirección en la tele (el navegador o la app Kiosk del stick); el campo del código ya no se corta y no queda un cuadro negro vacío debajo. Corregida la errata «Lista:» → «Listo:» al emparejar.
+- **Tus fotos primero:** al añadir carteles, «Mis imágenes» es la primera carpeta y, en SIMPLE, la que se abre; si está vacía, dice qué pulsar.
+- **Lista nueva a pantalla completa en SIMPLE:** la foto ya no sale encogida bajo una cabecera.
+- **Una lista vacía dice qué hacer** («Esta lista aún no tiene carteles: añádelos desde el gestor»), también en la tele.
+- **Asistente:** «Siguiente ▶» en lugar de solo «▶»; en cafetería, comida rápida y oficina propone la pantalla en horizontal; «Lista creada» en singular. «1 escena» y «1 pieza» en LISTAS.
+- **A PANTALLAS** explica qué hace al pasar por encima, y la nota de «Que sea su lista de siempre» es más llana.
+- **Avisos:** duran 30 s por defecto (antes 10) y el campo de hora lleva su rótulo, «o hasta las».
+- **Horario de encendido:** «Usar horario» en lugar de «En horario», que parecía un estado.
+- **Imagen:** «Llenar (recorta)» y «Entera» en lugar de «Cubrir» y «Contener». **Precios:** el campo vacío enseña un ejemplo, «Café con leche;1,60».
+- Caché nueva de la app (`adposter-v20`); las imágenes guardadas se conservan.
+
+## Cambios de la v1.24
 - **Calendario: aviso al salir con reglas sin guardar.** Una regla nueva sigue naciendo en borrador y no se aplica hasta pulsar «Guardar la regla»; ahora, si cierras el calendario con reglas en borrador, un aviso te lo recuerda y deja elegir **Guardar y salir**, **Salir sin guardar** (se quedan en borrador) o **Seguir aquí**. En español, inglés y catalán.
 - **Direcciones de carpeta sin la barra final (24-11-2026):** con la app ya visitada o instalada, abrir una dirección como `/p` daba «No se puede acceder a este sitio web» (ERR_FAILED), porque el service worker entregaba tal cual la respuesta redirigida por el servidor. Ahora devuelve una redirección limpia; caché renovada (`adposter-v18`).
 
@@ -468,7 +485,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.24 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.25 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

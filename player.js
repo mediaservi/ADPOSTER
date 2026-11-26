@@ -16,7 +16,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.24';
+  const VERSION = '1.25';
   const SC = document.currentScript, Q = new URLSearchParams(location.search);
   const BASE = new URL(SC.dataset.base || '../', location.href).href;
   const ID = (SC.dataset.playlist || Q.get('l') || 'demo').toLowerCase().replace(/[^a-z0-9_-]/g, '');
@@ -44,7 +44,7 @@
   const LANG = (Q.get('lang') || (PREV ? '' : leeG('lang')) || navigator.language || 'es').slice(0, 2).toLowerCase();   // v1.23 · el idioma de la URL del kiosco se queda guardado en el display
   const TX = { 'Duración de cada póster': ['Time per poster', 'Durada de cada pòster'], 'Transición': ['Transition', 'Transició'], 'Carpetas de contenido': ['Content folders', 'Carpetes de contingut'], 'Carpetas de anuncios': ['Ad folders', "Carpetes d'anuncis"],
     'Aceptar y reproducir': ['Apply and play', 'Accepta i reprodueix'], 'Restablecer': ['Reset', 'Restableix'], 'Cerrar': ['Close', 'Tanca'], 'fundido': ['fade', 'fosa'], 'zoom': ['zoom', 'zoom'], 'desliza': ['slide', 'llisca'], 'cortina': ['wipe', 'cortina'], 'corte': ['cut', 'tall'],
-    'Sin conexión: reintentando…': ['Offline: retrying…', 'Sense connexió: reintentant…'], 'Esta playlist no tiene imágenes todavía.': ['This playlist has no images yet.', 'Aquesta playlist encara no té imatges.'], 'No existe la playlist': ['Playlist not found', 'No existeix la playlist'],
+    'Sin conexión: reintentando…': ['Offline: retrying…', 'Sense connexió: reintentant…'], 'Esta lista aún no tiene carteles: añádelos desde el gestor.': ['This list has no posters yet: add them from the manager.', 'Aquesta llista encara no té cartells: afegeix-los des del gestor.'], 'No existe la playlist': ['Playlist not found', 'No existeix la playlist'],
     'es un proyecto hecho con': ['is a project made with', 'és un projecte fet amb'], 'imágenes': ['images', 'imatges'], 'Contenido privado de este display': ['Private content of this display', 'Contingut privat d’aquest display'], 'Estos ajustes se guardan solo en este display.': ['These settings are saved on this display only.', 'Aquests ajustos es desen només en aquest display.'],
     'Directo': ['Live', 'Directe'], 'conectado': ['connected', 'connectat'], 'sin conexión': ['offline', 'sense connexió'], 'imágenes guardadas en este display': ['images saved on this display', 'imatges desades en aquest display'], 'descargando': ['downloading', 'descarregant'],
     'EMERGENCIA': ['EMERGENCY', 'EMERGÈNCIA'], 'TURNO': ['NOW SERVING', 'TORN'], 'PANTALLA NUEVA': ['NEW SCREEN', 'PANTALLA NOVA'], 'Código de esta pantalla': ['This screen’s code', 'Codi d’aquesta pantalla'],
@@ -202,7 +202,7 @@
       if (!cfg.existe) { if (!PREV) aviso(T('Esperando el contenido del gestor…') + '\n' + T('En el gestor, pulsa «✓ Enviar cambios».')); await espera(PREV ? 300 : 1000); continue; }   // v1.23 · nunca «No existe la playlist»: la lista llega por el directo en cuanto el gestor la manda
       if (!activo()) { $('.apagado').classList.add('on'); aviso(''); await espera(PREV ? 600 : offR ? 1500 : 20000); continue; } $('.apagado').classList.remove('on');
       if (ESC()) { aviso(''); await escenas(); continue; }
-      if (!pool.feed.length && !pool.ads.length) { aviso(T('Esta playlist no tiene imágenes todavía.')); await espera(PREV ? 500 : 3000); continue; } aviso('');
+      if (!pool.feed.length && !pool.ads.length) { aviso(T('Esta lista aún no tiene carteles: añádelos desde el gestor.')); await espera(PREV ? 500 : 3000); continue; } aviso('');
       if (HOR() && pool.feed.length && pool.ads.length) { const g = gen; await Promise.all([serie('feed', g), serie('ads', g)]); continue; }   // en horizontal, póster y anuncio conviven: cada uno lleva su ritmo
       /* v1.23 · primero una tanda de carteles y después el anuncio: la pantalla nunca arranca con un anuncio */
       if (pool.feed.length) { const n = entre(cfg.anunciosCada[0], cfg.anunciosCada[1]); for (let i = 0; i < n && pool.feed.length && activo() && !ESC(); i++) await paso('feed'); }   // si la lista pasa a ser una composición, se deja la tanda

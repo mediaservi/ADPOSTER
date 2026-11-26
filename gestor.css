@@ -703,3 +703,8 @@ html.md-simple.alarma .tecla.emer-bt { background: linear-gradient(180deg, #d837
 .cal-sale span { flex: 1 1 260px; min-width: 0; line-height: 1.3; }
 .cal-sale .tecla { flex: 0 0 auto; }
 @media (max-width: 640px) { .cal-sale .tecla { flex: 1 1 100%; } }
+
+/* v1.25 · auditoría de facilidad */
+#al-msg:empty { display: none; }
+#al-cod::placeholder { letter-spacing: normal; text-transform: none; }
+.o-hasta { align-self: center; white-space: nowrap; opacity: .8; }

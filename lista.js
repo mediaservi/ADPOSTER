@@ -9,6 +9,7 @@
   'use strict';
   const G = window.ADG; if (!G || !G.ext || !G.ext.abreModal) return;
   const { T, TX, $, esc, tecla, lim } = G, P = () => G.P(), X = G.ext;
+  Object.assign(TX, { 'Aún no hay fotos tuyas: pulsa «Subir imagen» (también desde el móvil).': ['No photos of yours yet: press “Upload image” (from your phone too).', 'Encara no hi ha fotos teves: prem «Puja una imatge» (també des del mòbil).'] });
   Object.assign(TX, {
     'Añadir carteles': ['Add posters', 'Afegeix cartells'], 'Añadir': ['Add', 'Afegeix'], 'Toda la carpeta': ['Whole folder', 'Tota la carpeta'], 'ya está en la lista': ['already in the list', 'ja és a la llista'],
     'Elige los carteles que quieras y pulsa «Añadir». Con «Toda la carpeta» entra la carpeta entera, también lo que le añadas más adelante.': ['Pick the posters you want and press “Add”. “Whole folder” brings in the whole folder, including anything you add to it later.', 'Tria els cartells que vulguis i prem «Afegeix». Amb «Tota la carpeta» hi entra la carpeta sencera, també el que hi afegeixis més endavant.'],
@@ -85,13 +86,13 @@
   /* ---------- «+»: carteles sueltos de cualquier carpeta o de «Mis imágenes» ---------- */
   let pk = null;
   function anade() { const cs = Object.keys(G.MAN.carpetas || {}).filter(c => c !== 'fondos'), p = P(), libre = cs.find(c => !(p.contenido || []).includes(c) && !G.esAds(c) && (G.MAN.carpetas[c] || []).length);
-    pk = { carp: libre || cs.find(c => !G.esAds(c)) || cs[0] || '@mias', sel: new Set() }; X.abreModal('', 'm-bib m-anade', () => { pk = null; }); pkPinta(); }
+    pk = { carp: G.SIMPLE() ? '@mias' : libre || cs.find(c => !G.esAds(c)) || cs[0] || '@mias', sel: new Set() }; X.abreModal('', 'm-bib m-anade', () => { pk = null; }); pkPinta(); }
   function pkPinta() { const m = $('#modal .m-caja'); if (!m || !pk) return; const p = P(), car = G.MAN.carpetas || {}, cs = Object.keys(car).filter(c => c !== 'fondos'), ya = new Set(todos(p)), st = m.querySelector('.bib-der') ? m.querySelector('.bib-der').scrollTop : 0;
     const fs = pk.carp === '@mias' ? Object.keys(G.B.medios).map(k => 'm:' + k) : (car[pk.carp] || []).map(f => pk.carp + '/' + f), entera = pk.carp !== '@mias' && (p.contenido || []).includes(pk.carp);
     const der = `<div class="fila">${pk.carp === '@mias' ? `<button type="button" class="tecla" data-a="pkSube">${T('Subir imagen')}</button>` : `<button type="button" class="tecla" data-a="pkCarpeta"${entera || !fs.length ? ' disabled' : ''}>${T('Toda la carpeta')}</button>`}<button type="button" class="tecla pri" data-a="pkAnade"${pk.sel.size ? '' : ' disabled'}>${T('Añadir')}${pk.sel.size ? ' (' + pk.sel.size + ')' : ''}</button></div>
       <div class="nota">${T('Elige los carteles que quieras y pulsa «Añadir». Con «Toda la carpeta» entra la carpeta entera, también lo que le añadas más adelante.')}</div>
-      ${fs.length ? `<div class="bib-rej">${fs.map(f => { const dentro = ya.has(f), on = pk.sel.has(f); return `<button type="button" class="bf pk${on ? ' on' : ''}${dentro ? ' ya' : ''}" data-a="pkTog" data-v="${esc(f)}" aria-pressed="${on}"${dentro ? ' disabled' : ''}><span class="bf-m">${mini(f, urlDe(f))}${on ? '<b>✓</b>' : ''}</span><span class="bf-n">${esc(dentro ? T('ya está en la lista') : nombre(f))}</span></button>`; }).join('')}</div>` : `<div class="nota">${T(pk.carp === '@mias' ? 'Aún no has subido ninguna imagen.' : 'Esta carpeta no tiene archivos de ese tipo.')}</div>`}`;
-    G.pon('#modal .m-caja', X.cabModal(T('Añadir carteles')) + `<div class="bib"><div class="bib-izq">${cs.map(c => tecla('pkCarp', c, esc(c), pk.carp === c, `<small>${(car[c] || []).length}</small>`)).join('')}${tecla('pkCarp', '@mias', T('Mis imágenes'), pk.carp === '@mias', `<small>${Object.keys(G.B.medios).length}</small>`)}</div><div class="bib-der">${der}</div></div>`);
+      ${fs.length ? `<div class="bib-rej">${fs.map(f => { const dentro = ya.has(f), on = pk.sel.has(f); return `<button type="button" class="bf pk${on ? ' on' : ''}${dentro ? ' ya' : ''}" data-a="pkTog" data-v="${esc(f)}" aria-pressed="${on}"${dentro ? ' disabled' : ''}><span class="bf-m">${mini(f, urlDe(f))}${on ? '<b>✓</b>' : ''}</span><span class="bf-n">${esc(dentro ? T('ya está en la lista') : nombre(f))}</span></button>`; }).join('')}</div>` : `<div class="nota">${T(pk.carp === '@mias' ? 'Aún no hay fotos tuyas: pulsa «Subir imagen» (también desde el móvil).' : 'Esta carpeta no tiene archivos de ese tipo.')}</div>`}`;
+    G.pon('#modal .m-caja', X.cabModal(T('Añadir carteles')) + `<div class="bib"><div class="bib-izq">${tecla('pkCarp', '@mias', T('Mis imágenes'), pk.carp === '@mias', `<small>${Object.keys(G.B.medios).length}</small>`)}${cs.map(c => tecla('pkCarp', c, esc(c), pk.carp === c, `<small>${(car[c] || []).length}</small>`)).join('')}</div><div class="bib-der">${der}</div></div>`);
     const d = m.querySelector('.bib-der'); d.scrollTop = st; }
 
   /* ---------- ver un cartel en grande ---------- */
