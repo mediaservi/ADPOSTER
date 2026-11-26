@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.44**
+**Versión actual: v1.45**
 
 
 ## Icono
@@ -161,7 +161,13 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.44)
+## Cambios de la versión actual (v1.45)
+- **Lo que sale ahora, en grande:** en «Ver todas», tocar la miniatura de una pantalla la abre en grande, con la escena o la foto que está enseñando en ese momento, su nombre, su lista y su estado. Tocar el nombre sigue sirviendo para mandarle avisos.
+- Cada pantalla informa de la escena exacta que tiene puesta, así que la miniatura acierta aunque dos escenas se llamen igual (las pantallas con versiones anteriores siguen funcionando por el nombre).
+- La guía (AYUDA) lo explica en el apartado Pantallas.
+- Caché nueva de la app (`adposter-v40`).
+
+## Cambios de la v1.44
 - **Pieza Agenda:** enseña los próximos eventos con la fecha en un bloque del color de acento, el día («Hoy», «Mañana» o el día de la semana), la hora y el lugar. Los eventos pasados se quitan solos. Dos fuentes:
   - **Escritos aquí:** una línea por evento, por ejemplo `28/11 19:00-21:00;Concierto;Sala 2` o `24/12;Nochebuena` (sin hora, todo el día).
   - **Calendario (ICS):** la dirección pública de un calendario (en Google Calendar, «Dirección pública en formato iCal»). Entiende eventos que se repiten (cada día, cada semana con sus días, cada mes o cada año) y salta los cancelados. Solo funcionan los calendarios que se dejan leer desde otra web; sin red, la pantalla usa la última copia.
@@ -587,7 +593,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.44 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.45 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

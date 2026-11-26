@@ -16,7 +16,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.44';
+  const VERSION = '1.45';
   const SC = document.currentScript, Q = new URLSearchParams(location.search);
   const BASE = new URL(SC.dataset.base || '../', location.href).href;
   const ID = (SC.dataset.playlist || Q.get('l') || 'demo').toLowerCase().replace(/[^a-z0-9_-]/g, '');
@@ -293,7 +293,7 @@
   let dir = null, dirP = null, dirK = null, canalP = '', uPide = 0;
   const yo = () => ({ n: leeG('nombre') || 'DISPLAY ' + DISP.toUpperCase(), g: slug(leeG('grupo')), s: slug(leeG('sede')), et: [...new Set(String(leeG('etiq') || '').split(',').map(slug).filter(Boolean))].slice(0, 8) });
   const canalAct = () => leeG('canal') || (LISTAS && typeof LISTAS.canal === 'string' ? LISTAS.canal : '');
-  const estadoDe = () => { const y = yo(); return { n: y.n, g: y.g, s: y.s, et: y.et, l: ID, ln: cfg.nombre, f: cfg.formato, md: cfg.medida ? cfg.medida.w + '×' + cfg.medida.h : '', w: innerWidth, h: innerHeight, v: VERSION, off: offR ? 2 : enHorario() && !offA ? 0 : 1, i: actual.ads || actual.feed || '', p: ORIGEN ? 1 : 0, c: CASA, e: EMR ? (EMR.sc ? 2 : 1) : 0, ei: EMR ? emId(EMR) : '', dv: VIVOL ? +VIVOL.t || 0 : 0, mf: faltan(), t: Date.now() }; };   // v1.23 · dv: qué envío de listas tiene; mf: imágenes que aún no le han llegado
+  const estadoDe = () => { const y = yo(); return { n: y.n, g: y.g, s: y.s, et: y.et, l: ID, ln: cfg.nombre, f: cfg.formato, md: cfg.medida ? cfg.medida.w + '×' + cfg.medida.h : '', w: innerWidth, h: innerHeight, v: VERSION, off: offR ? 2 : enHorario() && !offA ? 0 : 1, i: actual.ads || actual.feed || '', es: !actual.ads && escAct && ESC() ? String(escAct.id || '').slice(0, 40) : '', p: ORIGEN ? 1 : 0, c: CASA, e: EMR ? (EMR.sc ? 2 : 1) : 0, ei: EMR ? emId(EMR) : '', dv: VIVOL ? +VIVOL.t || 0 : 0, mf: faltan(), t: Date.now() }; };   // v1.23 · dv: qué envío de listas tiene; mf: imágenes que aún no le han llegado
   function estado() { if (!dir || !cfg) return; dir.pub('estado/' + DISP, estadoDe(), true); }
   function menu() { if (!dirP || !LISTAS) return; const pl = LISTAS.playlists || {}; dirP.pub('menu/' + DISP, { n: leeG('nombre') || cfg.nombre, l: ID, listas: Object.keys(pl).filter(k => pl[k] && pl[k].publico).slice(0, 24).map(k => ({ id: k, n: String(pl[k].nombre || k.toUpperCase()).slice(0, 40) })), t: Date.now() }, true); }
   function ir(id, porAgenda, hasta) { id = String(id || '').toLowerCase().replace(/[^a-z0-9_-]/g, ''); if (PREV || !id || !LISTAS || !LISTAS.playlists || !LISTAS.playlists[id]) return false; if (hasta) guardaG('tk', JSON.stringify({ id, h: hasta })); if (id === ID) { if (hasta) TK = hasta; return false; }

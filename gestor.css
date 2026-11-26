@@ -783,3 +783,11 @@ html.md-op body { padding-bottom: 0; }
 .op-pie .tecla { flex: none; min-height: 0; padding: 6px 12px; font-size: .85em; }
 @media (max-width: 900px) { html.md-op .consola { grid-template-columns: minmax(0, 1fr) !important; } }
 @media (max-height: 520px) and (orientation: landscape) { .m-mm .m-caja { width: min(780px, 100%); } .mm-qr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; overflow: visible; } .mm-qr > .fila:first-child { grid-column: 1 / -1; } .mm-qr .alta-qr { width: min(200px, 100%); grid-row: 2 / span 4; justify-self: center; } .mm-qr .nota { font-size: 12.5px; } }   /* v1.43 · móvil apaisado: QR a la izquierda, textos a la derecha */
+
+/* v1.45 · lo que sale ahora en una pantalla, en grande (desde «Ver todas») */
+.vp-m[data-a] { cursor: zoom-in; }
+.vg { display: flex; justify-content: center; min-height: 0; }
+.vg-m { position: relative; height: min(60vh, 640px); aspect-ratio: 9 / 16; max-width: 100%; background: #000; border-radius: 8px; overflow: hidden; color: var(--ambar); font: 400 .9em 'Share Tech Mono', monospace; display: grid; place-items: center; }
+.vg.hor .vg-m { height: auto; width: min(100%, 980px, calc(60vh * 16 / 9)); aspect-ratio: 16 / 9; }
+.vg-m > span { position: absolute; inset: 0; } .vg-m img { width: 100%; height: 100%; object-fit: contain; }
+.m-caja:has(> .vg), .m-caja:has(.vg) { height: auto; max-height: 100%; }

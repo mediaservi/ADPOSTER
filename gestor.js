@@ -10,7 +10,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.44', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS_C = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'], TABS_E = ['piezas', 'escena', 'tiempos', 'directo', 'publicar'];
+  const VERSION = '1.45', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS_C = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'], TABS_E = ['piezas', 'escena', 'tiempos', 'directo', 'publicar'];
   const DEF = { nombre: '', fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7], fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, desenf: false, brillo: true,
     horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '', formato: 'vertical', qr: { activo: false, modo: 'url', url: '', texto: '', pos: 'bd' }, cinta: { activo: false, texto: '', rss: '' }, publico: false, modo: 'carteles', escenas: [], orden: 'azar', secuencia: [], archivos: {}, sueltos: [], adsS: [], tactil: { activo: false, vuelta: 30, portada: false } };
   const ESCM = p => !!p && p.modo === 'escenas', SIMPLE = () => document.documentElement.classList.contains('md-simple'), tabsDe = p => ESCM(p) ? TABS_E : SIMPLE() ? TABS_C.filter(t => t !== 'diseno') : TABS_C, X = () => window.ADG.ext || {};
@@ -192,7 +192,7 @@
        y, si este aparato se acaba de unir a las pantallas, las listas y las imágenes que ya tienen */
     const trae = !!lee('g-trae');
     dir = window.ADDIRECTO.conecta(canal, { temas: ['estado/+', 'emergencia', 'turno'].concat(trae ? ['datos', 'm/+'] : []), alCambiar: v => { pintaD(); X().alConecta && X().alConecta(v); }, alMensaje: (t, x, ret) => { if (t.indexOf('estado/') !== 0) { X().alVivo && X().alVivo(t, x, ret); return; } const id = (t.split('/')[1] || ''); if (!/^[a-z0-9]{6}$/.test(id) || !x || typeof x !== 'object') return; const era = !!DSP[id];
-      DSP[id] = { n: String(x.n || id).slice(0, 32), g: slug(x.g), s: slug(x.s), et: Array.isArray(x.et) ? [...new Set(x.et.map(slug).filter(Boolean))].slice(0, 8) : [], l: String(x.l || '').slice(0, 24), ln: String(x.ln || '').slice(0, 32), f: x.f === 'horizontal' ? 'horizontal' : 'vertical', w: +x.w || 0, h: +x.h || 0, v: String(x.v || '').slice(0, 8), off: +x.off || 0, i: String(x.i || '').slice(0, 120), c: String(x.c || '').slice(0, 24), e: +x.e || 0, ei: String(x.ei || '').slice(0, 40), md: String(x.md || '').slice(0, 12), dv: +x.dv || 0, mf: +x.mf || 0, visto: ret ? (+x.t || 0) : Date.now() };
+      DSP[id] = { n: String(x.n || id).slice(0, 32), g: slug(x.g), s: slug(x.s), et: Array.isArray(x.et) ? [...new Set(x.et.map(slug).filter(Boolean))].slice(0, 8) : [], l: String(x.l || '').slice(0, 24), ln: String(x.ln || '').slice(0, 32), f: x.f === 'horizontal' ? 'horizontal' : 'vertical', w: +x.w || 0, h: +x.h || 0, v: String(x.v || '').slice(0, 8), off: +x.off || 0, i: String(x.i || '').slice(0, 120), es: String(x.es || '').slice(0, 40), c: String(x.c || '').slice(0, 24), e: +x.e || 0, ei: String(x.ei || '').slice(0, 40), md: String(x.md || '').slice(0, 12), dv: +x.dv || 0, mf: +x.mf || 0, visto: ret ? (+x.t || 0) : Date.now() };
       if (!ret && x.inf && X().alInforme) X().alInforme(id, x.inf);
       pintaD(); if (!era && tab === 'directo') pintaT(); } }); pintaD(); }
   setInterval(() => { if (canal && B) { vigila(); pintaD(); } }, 10000);
