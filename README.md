@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.29**
+**Versión actual: v1.30**
 
 
 ## Icono
@@ -161,7 +161,12 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.29)
+## Cambios de la versión actual (v1.30)
+- **«Qué sale y cuándo», en un solo sitio:** la vista **SEMANA** del calendario enseña, junto a las reglas, lo que de verdad sale en cada cuarto de hora: las horas en que la lista que manda está **cerrada** por su horario de encendido (rayado, «Cerrado») y, en una franja azul a la derecha, sus **escenas con hora** (por ejemplo, Cafetería de 7 a 12). Con «Ver» puesto en una pantalla, cuenta también su lista de siempre. Leyenda debajo. Los tres ajustes siguen donde estaban: ESCENA, TIEMPOS y las reglas del calendario.
+- **«Ver en el calendario»** en la pestaña ESCENA (bajo «Días y horas») y en TIEMPOS (junto a «Horario de encendido»): abre el calendario en la vista SEMANA.
+- Caché nueva de la app (`adposter-v25`).
+
+## Cambios de la v1.29
 - **«Mis fotos»** (SIMPLE): botón en LISTAS, junto a Calendario y ASISTENTE, que abre tus imágenes para subirlas, verlas y quitarlas, con su contador. Sin hablar de archivos: «Tus fotos viajan con tus listas a las pantallas».
 - **Carpetas de ejemplo fuera de la vista** (SIMPLE): en CONTENIDO, cuando ya tienes fotos tuyas, las carpetas de muestra que no usa la lista dejan de salir, y la nota dice dónde añadir las tuyas.
 - **LISTAS en tablet:** la fila Biblioteca / Mis fotos · Calendario · ASISTENTE pasa a dos líneas por debajo de 1180 px (antes se cortaban los rótulos).
@@ -504,7 +509,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.29 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.30 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 
