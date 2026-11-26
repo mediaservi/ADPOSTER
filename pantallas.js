@@ -17,6 +17,7 @@
   'use strict';
   const G = window.ADG; if (!G || !G.ext.abreModal) return;
   const { T, TX, $, esc, tecla, campo, lim, copia } = G, X = G.ext, ACC = G.ACC, html = document.documentElement;
+  Object.assign(TX, { 'En la tele': ['On the TV', 'A la tele'], 'Cómo se llama y qué enseña': ['Its name and what it shows', 'Com es diu i què ensenya'], 'Más opciones': ['More options', 'Més opcions'], 'grupo, sede, giro, idioma': ['group, site, rotation, language', 'grup, seu, gir, idioma'], 'Escribe el código de la tele': ['Type the code shown on the TV', 'Escriu el codi de la tele'] });
   Object.assign(TX, { 'Poner otra lista un rato o desde una fecha': ['Show another list for a while or from a date', 'Posa una altra llista una estona o des d’una data'], 'Siguiente': ['Next', 'Següent'], 'código': ['code', 'codi'], 'Lista creada: toca un texto del lienzo para cambiarlo y, cuando esté, «✓ Publicar».': ['List created: tap a text on the canvas to change it and, when ready, “✓ Publish”.', 'Llista creada: toca un text del llenç per canviar-lo i, quan estigui, «✓ Publica».'],
     'Pon otra lista en algunas pantallas: ahora, un rato o desde una fecha.': ['Put another list on some screens: now, for a while or from a date.', 'Posa una altra llista en algunes pantalles: ara, una estona o des d’una data.'],
     'Si no lo marcas, es solo por un rato: luego cada pantalla vuelve a su lista.': ['If unticked, it’s only for a while: each screen then goes back to its list.', 'Si no ho marques, és només una estona: després cada pantalla torna a la seva llista.'],
@@ -171,7 +172,19 @@
 
   /* ================= AÑADIR PANTALLA ================= */
   let al = null;
-  function alPinta() { const m = $('#modal .m-caja'); if (!m || !al) return; const pl = G.B.playlists, med = pl[al.l] && pl[al.l].medida, o = { rot: al.rot, lang: al.lang, nombre: al.n, grupo: al.g, sede: al.s }; if (med && al.px) Object.assign(o, { px: 1, ox: al.ox, oy: al.oy }); const u = G.urlKiosco(al.l, o), alta = new URL('p/?alta', G.urlKiosco(al.l).split('p/?')[0]).href;
+  function alPinta() { const m = $('#modal .m-caja'); if (!m || !al) return; const pl = G.B.playlists, med = pl[al.l] && pl[al.l].medida, o = { rot: al.rot, lang: al.lang, nombre: al.n, grupo: al.g, sede: al.s }; if (med && al.px) Object.assign(o, { px: 1, ox: al.ox, oy: al.oy }); const u = G.urlKiosco(al.l, o), alta = new URL('tv', G.urlKiosco(al.l).split('p/?')[0]).href;   /* v1.32 · dirección corta: …/tv abre lo mismo que …/p/?alta */
+    const nota = `<div class="nota">${esc(T('En la tele, abre el navegador (o la app Kiosk del stick) y entra en {u}. Saldrá un código de 6 caracteres: escríbelo aquí y la pantalla se configura sola.').replace('{u}', alta))}</div>`,
+      codigo = `<div class="fila">${campo('al-cod', al.cod, T('código'), ' maxlength="6" autocapitalize="characters" data-al="cod" style="text-transform:uppercase;letter-spacing:.3em;text-align:center"')}<button type="button" class="tecla pri" data-a="alEmpareja">${T('Emparejar')}</button></div><div class="lcd url${al.ok ? ' ok' : ''}" id="al-msg">${esc(al.msg || '')}</div>`,
+      listas = `<div class="rej env">${G.listasVis().map(id => tecla('alL', id, nombreL(id), al.l === id)).join('')}</div>`,
+      gs = `<div class="fila">${campo('al-g', al.g, T('grupo (p. ej. menu)'), ' maxlength="24" data-al="g"')}${campo('al-s', al.s, T('sede (p. ej. centro)'), ' maxlength="24" data-al="s"')}</div>`,
+      giro = `<h2>${T('Giro')}</h2><div class="fila giro">${[0, 90, 180, 270].map(g => tecla('alRot', g, g + '°', al.rot === g)).join('')}</div>`,
+      idi = `<h2>${T('Idioma')}</h2><div class="fila">${['es', 'en', 'ca'].map(l => tecla('alLang', l, l.toUpperCase(), al.lang === l)).join('')}</div>`;
+    /* v1.32 · SIMPLE: en tres pasos y en una columna; grupo, sede, giro e idioma, plegados en «Más opciones» */
+    if (G.SIMPLE()) { G.pon('#modal .m-caja', X.cabModal('+ ' + T('Añadir pantalla')) + `<div class="alta alta-s">
+      <h2>1 · ${T('En la tele')}</h2>${nota}
+      <h2>2 · ${T('Cómo se llama y qué enseña')}</h2>${campo('al-n', al.n, T('Nombre de la pantalla'), ' maxlength="32" data-al="n"')}${listas}
+      <div class="fila"><button type="button" class="tecla al-mas" data-a="alMas" aria-expanded="${!!al.mas}">${al.mas ? '▾' : '▸'} ${T('Más opciones')} <small>${T('grupo, sede, giro, idioma')}</small></button></div>${al.mas ? gs + giro + idi : ''}
+      <h2>3 · ${T('Escribe el código de la tele')}</h2>${codigo}</div>`); return; }
     G.pon('#modal .m-caja', X.cabModal('+ ' + T('Añadir pantalla')) + `<div class="alta"><div class="alta-izq">
       ${campo('al-n', al.n, T('Nombre de la pantalla'), ' maxlength="32" data-al="n"')}<div class="fila">${campo('al-g', al.g, T('grupo (p. ej. menu)'), ' maxlength="24" data-al="g"')}${campo('al-s', al.s, T('sede (p. ej. centro)'), ' maxlength="24" data-al="s"')}</div>
       <h2>${T('Lista')}</h2><div class="rej env">${G.listasVis().map(id => tecla('alL', id, nombreL(id), al.l === id)).join('')}</div>
@@ -307,6 +320,7 @@
   /* ================= acciones ================= */
   Object.assign(ACC, {
     vista(v) { const s = v === 'simple'; html.classList.toggle('md-simple', s); guarda('g-vista', s ? 'simple' : 'pro'); pintaSw(); G.repinta(); X.alLista && X.alLista(); },
+    alMas() { if (al) { al.mas = !al.mas; alPinta(); } },   /* v1.32 */
     bvVe(v) { guarda('g-bv', 1); X.cierraModal ? X.cierraModal() : ACC.modalCierra(); if (v === 'as') ACC.asistente(); else if (v === 'tv') ACC.altaPantalla(); },   /* v1.25 · bienvenida */
     asistente() { as = { paso: 1, neg: '', f: 'vertical', nom: '' }; X.abreModal('', 'm-as', () => { as = null; }); asPinta(); },
     asNeg(v) { as.neg = v; as.f = ['cafe', 'rapida', 'oficina'].includes(v) ? 'horizontal' : 'vertical'; asPinta(); }, asFor(v) { as.f = v; asPinta(); }, asPaso(v) { as.paso = lim(as.paso + +v, 1, 3); asPinta(); }, asCrea() { asCrea(); },

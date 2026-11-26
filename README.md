@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.31**
+**Versión actual: v1.32**
 
 
 ## Icono
@@ -161,7 +161,13 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.31)
+## Cambios de la versión actual (v1.32)
+- **Dirección corta para la tele: `adposter.mediaservi.com/tv`**, fácil de teclear con el mando; abre la página de alta con código (lo mismo que `…/p/?alta`). «Añadir pantalla» la enseña en su lugar. Ojo: una lista que se llamara «tv» ya no tendría la dirección corta `/tv` (usa `…/p/?l=tv`).
+- **«Añadir pantalla» en SIMPLE, en tres pasos y en una columna:** 1 · en la tele (qué abrir), 2 · cómo se llama y qué lista enseña, 3 · el código y EMPAREJAR. Grupo, sede, giro e idioma, plegados en **«Más opciones»**. En PRO, igual que antes.
+- Los ejemplos de los campos de nombre, grupo y sede ya no se cortan en el móvil.
+- Caché nueva de la app (`adposter-v27`), que guarda también `tv/` para usarla sin conexión.
+
+## Cambios de la v1.31
 - **Cartas con la pieza PRECIOS:** las plantillas **Cafetería**, **Pizarra** («Hoy recomendamos») y **Lista de precios** ya no llevan los productos y los precios en dos textos sueltos que había que cuadrar a mano: usan la pieza Precios, una línea por producto («Café con leche;1,60»), que alinea sola y une nombre y precio con una línea de puntos. El aspecto se mantiene (mismos tipos de letra, colores y sitio). Vale para las listas nuevas y para el asistente de cafetería; las listas ya hechas no cambian.
 - La pieza Precios respeta el **grosor de letra** que traiga (`peso`); sin él, sigue en negrita como antes.
 - Caché nueva de la app (`adposter-v26`).
@@ -514,7 +520,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.31 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.32 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

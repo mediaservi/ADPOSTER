@@ -734,3 +734,6 @@ html:not(.md-simple) .bt-simple { display: none !important; }
 h2 .h2-enl { float: right; min-height: 0; height: auto; padding: 3px 8px; font-size: 10px; letter-spacing: .06em; margin-top: -3px; }
 .sc .sb-off span { max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: clip; letter-spacing: .06em; padding: 0 2px; }
 @media (max-width: 700px) { .sc .sb-off span, .sc .sb-esc span { display: none; } .sc .sb-esc { width: 6px; right: 1px; } }
+.alta.alta-s { grid-template-columns: minmax(0, 1fr); max-width: 680px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: var(--sep); }
+.alta-s .al-mas { justify-content: flex-start; } .alta-s .al-mas small { margin-left: .8em; }
+#al-g::placeholder, #al-s::placeholder, #al-n::placeholder { letter-spacing: normal; }
