@@ -19,6 +19,9 @@
   const ti = (r, o) => pz('tiempo', r, Object.assign({ lat: 41.39, lon: 2.17, lugar: 'Barcelona', dias: true, col: '#ffffff', fam: 'Inter' }, o));
   const rs = (r, o) => pz('rss', r, Object.assign({ url: '', modo: 'cinta', n: 4, fam: 'Inter', col: '#ffffff', tam: 3 }, o));
   const qr = (r, u, o) => pz('qr', r, Object.assign({ url: u || '', col: '#000000', cfondo: '#ffffff', radio: 1.5 }, o));
+  /* v1.31 · cartas con la pieza PRECIOS (una línea por producto, «nombre;precio»): se edita en una sola caja y alinea sola */
+  const zp = (a, b) => a.split('\n').map((x, k) => x + ';' + (b.split('\n')[k] || '')).join('\n');
+  const pr = (a, b, r, o) => pz('precios', r, Object.assign({ filas: zp(a, b), fam: 'Montserrat', col: '#ffffff', acento: '#ffb000', cols: 1 }, o));
   /* un cuadrado centrado en (cx, cy) con lado «l» en centésimas del lado corto */
   const cu = (cx, cy, l) => H ? [cx - l * 9 / 32, cy - l / 2, l * 9 / 16, l] : [cx - l / 2, cy - l * 9 / 32, l, l * 9 / 16];
 
@@ -38,8 +41,7 @@
       fo(R([3, 5, 94, 90], [5, 3, 90, 94]), '#00000000', { borde: .5, bcol: '#f4f1e8', radio: 2, o: .85 }),
       tx(L('Hoy recomendamos', 'Today we recommend', 'Avui recomanem'), R([10, 9, 80, 20], [10, 7, 80, 12]), { fam: 'Caveat', col: '#ffe9a8', r: -2, an: 'aparece' }),
       fo(R([30, 30, 40, .6], [25, 20.5, 50, .3]), '#ffe9a8', { r: -2 }),
-      tf(L('Tostada de aguacate y huevo\nCroquetas caseras de jamón\nBurrata con tomate y albahaca\nTortilla de patatas recién hecha\nTarta de zanahoria', 'Avocado & egg toast\nHomemade ham croquettes\nBurrata with tomato & basil\nFreshly made potato omelette\nCarrot cake', 'Torrada d’alvocat i ou\nCroquetes casolanes de pernil\nBurrata amb tomàquet i alfàbrega\nTruita de patates acabada de fer\nPastís de pastanaga'), R([10, 36, 58, 52], [10, 26, 64, 56]), R(5.6, 5.8), { fam: 'Caveat', col: '#f4f1e8', ali: 'izq', val: 'arr', lh: R(1.5, 2.7), an: 'aparece', ret: .3 }),
-      tf('6,50\n8,00\n9,50\n4,00\n4,50', R([70, 36, 20, 52], [72, 26, 18, 56]), R(5.6, 5.8), { fam: 'Caveat', col: '#ffe9a8', ali: 'der', val: 'arr', lh: R(1.5, 2.7), an: 'aparece', ret: .3 }),
+      pr(L('Tostada de aguacate y huevo\nCroquetas caseras de jamón\nBurrata con tomate y albahaca\nTortilla de patatas recién hecha\nTarta de zanahoria', 'Avocado & egg toast\nHomemade ham croquettes\nBurrata with tomato & basil\nFreshly made potato omelette\nCarrot cake', 'Torrada d’alvocat i ou\nCroquetes casolanes de pernil\nBurrata amb tomàquet i alfàbrega\nTruita de patates acabada de fer\nPastís de pastanaga'), '6,50\n8,00\n9,50\n4,00\n4,50', R([10, 36, 80, 52], [10, 26, 80, 56]), { fam: 'Caveat', col: '#f4f1e8', acento: '#ffe9a8', an: 'aparece', ret: .3 }),
       tx(L('¡Buen provecho!', 'Enjoy your meal!', 'Bon profit!'), R([56, 80, 36, 12], [30, 86, 60, 7]), { fam: 'Caveat', col: '#9fe0c0', r: -4, an: 'aparece', ret: .6 }) ] })],
 
     ['happy-hour', 'hosteleria', ['Happy hour', 'Happy hour', 'Happy hour'], () => ({ fondo: { t: 'deg', c: '#ff2d75', c2: '#ff9d2e', a: 150, tr: 'puntos' }, piezas: [
@@ -55,8 +57,7 @@
       fo(R([0, 0, 38, 100], [0, 0, 100, 30]), '#3b2518'),
       tx(L('Café\n& desayunos', 'Coffee\n& breakfast', 'Cafè\n& esmorzars'), R([4, 22, 30, 36], [10, 6, 80, 16]), { fam: 'Abril Fatface', col: '#efe3d0', lh: 1.02, an: 'aparece' }),
       tx(L('HASTA LAS 12:00', 'UNTIL 12:00', 'FINS A LES 12:00'), R([8, 62, 22, 5], [28, 23.4, 44, 2.6]), { fam: 'Montserrat', col: '#d9a15b', esp: .18 }),
-      tf(L('Espresso\nCortado\nCafé con leche\nCapuchino\nTé o infusión\nZumo natural\nTostada con tomate\nCruasán de mantequilla', 'Espresso\nCortado\nCaffè latte\nCappuccino\nTea or infusion\nFresh juice\nTomato toast\nButter croissant', 'Espresso\nTallat\nCafè amb llet\nCaputxino\nTe o infusió\nSuc natural\nTorrada amb tomàquet\nCroissant de mantega'), R([44, 12, 34, 76], [10, 34, 62, 60]), R(4.6, 4.3), { fam: 'Montserrat', peso: 400, col: '#3b2518', ali: 'izq', val: 'cen', lh: R(1.7, 2.8), an: 'aparece', ret: .2 }),
-      tf('1,40\n1,50\n1,70\n2,20\n1,80\n3,00\n2,50\n1,90', R([78, 12, 16, 76], [72, 34, 18, 60]), R(4.6, 4.3), { fam: 'Montserrat', col: '#b0672a', ali: 'der', val: 'cen', lh: R(1.7, 2.8), an: 'aparece', ret: .2 }) ] })],
+      pr(L('Espresso\nCortado\nCafé con leche\nCapuchino\nTé o infusión\nZumo natural\nTostada con tomate\nCruasán de mantequilla', 'Espresso\nCortado\nCaffè latte\nCappuccino\nTea or infusion\nFresh juice\nTomato toast\nButter croissant', 'Espresso\nTallat\nCafè amb llet\nCaputxino\nTe o infusió\nSuc natural\nTorrada amb tomàquet\nCroissant de mantega'), '1,40\n1,50\n1,70\n2,20\n1,80\n3,00\n2,50\n1,90', R([44, 12, 50, 76], [10, 34, 80, 60]), { peso: 400, col: '#3b2518', acento: '#b0672a', an: 'aparece', ret: .2 }) ] })],
 
     ['especialidad', 'hosteleria', ['Especialidad de la casa', 'House speciality', 'Especialitat de la casa'], () => ({ fondo: { t: 'color', c: '#141414' }, piezas: [
       zn(R([0, 0, 56, 100], [0, 0, 100, 58]), { aj: 'cubrir' }),
@@ -107,8 +108,7 @@
     ['precios', 'comercio', ['Lista de precios', 'Price list', 'Llista de preus'], () => ({ fondo: { t: 'color', c: '#101014' }, piezas: [
       fo(R([0, 0, 100, 22], [0, 0, 100, 14]), '#ffb000'),
       tx(L('LISTA DE PRECIOS', 'PRICE LIST', 'LLISTA DE PREUS'), R([6, 4, 88, 14], [8, 3.5, 84, 7]), { fam: 'Archivo Black', col: '#101014', ali: 'izq' }),
-      tf(L('Servicio básico\nServicio completo\nServicio exprés\nRevisión\nPresupuesto', 'Basic service\nFull service\nExpress service\nCheck-up\nQuote', 'Servei bàsic\nServei complet\nServei exprés\nRevisió\nPressupost'), R([6, 28, 60, 64], [8, 20, 60, 70]), R(6, 5.6), { fam: 'Montserrat', peso: 400, ali: 'izq', val: 'cen', lh: R(1.95, 3.6) }),
-      tf(L('15 €\n29 €\n39 €\n10 €\nGratis', '€15\n€29\n€39\n€10\nFree', '15 €\n29 €\n39 €\n10 €\nGratis'), R([68, 28, 26, 64], [68, 20, 24, 70]), R(6, 5.6), { fam: 'Montserrat', col: '#ffb000', ali: 'der', val: 'cen', lh: R(1.95, 3.6) }) ] })],
+      pr(L('Servicio básico\nServicio completo\nServicio exprés\nRevisión\nPresupuesto', 'Basic service\nFull service\nExpress service\nCheck-up\nQuote', 'Servei bàsic\nServei complet\nServei exprés\nRevisió\nPressupost'), L('15 €\n29 €\n39 €\n10 €\nGratis', '€15\n€29\n€39\n€10\nFree', '15 €\n29 €\n39 €\n10 €\nGratis'), R([6, 28, 88, 64], [8, 20, 84, 70]), { peso: 400 }) ] })],
 
     ['inmueble', 'comercio', ['Ficha de producto', 'Product card', 'Fitxa de producte'], () => ({ fondo: { t: 'color', c: '#ffffff' }, piezas: [
       zn(R([0, 0, 60, 100], [0, 0, 100, 50]), { aj: 'cubrir' }),

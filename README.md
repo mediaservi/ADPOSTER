@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.30**
+**Versión actual: v1.31**
 
 
 ## Icono
@@ -161,7 +161,12 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.30)
+## Cambios de la versión actual (v1.31)
+- **Cartas con la pieza PRECIOS:** las plantillas **Cafetería**, **Pizarra** («Hoy recomendamos») y **Lista de precios** ya no llevan los productos y los precios en dos textos sueltos que había que cuadrar a mano: usan la pieza Precios, una línea por producto («Café con leche;1,60»), que alinea sola y une nombre y precio con una línea de puntos. El aspecto se mantiene (mismos tipos de letra, colores y sitio). Vale para las listas nuevas y para el asistente de cafetería; las listas ya hechas no cambian.
+- La pieza Precios respeta el **grosor de letra** que traiga (`peso`); sin él, sigue en negrita como antes.
+- Caché nueva de la app (`adposter-v26`).
+
+## Cambios de la v1.30
 - **«Qué sale y cuándo», en un solo sitio:** la vista **SEMANA** del calendario enseña, junto a las reglas, lo que de verdad sale en cada cuarto de hora: las horas en que la lista que manda está **cerrada** por su horario de encendido (rayado, «Cerrado») y, en una franja azul a la derecha, sus **escenas con hora** (por ejemplo, Cafetería de 7 a 12). Con «Ver» puesto en una pantalla, cuenta también su lista de siempre. Leyenda debajo. Los tres ajustes siguen donde estaban: ESCENA, TIEMPOS y las reglas del calendario.
 - **«Ver en el calendario»** en la pestaña ESCENA (bajo «Días y horas») y en TIEMPOS (junto a «Horario de encendido»): abre el calendario en la vista SEMANA.
 - Caché nueva de la app (`adposter-v25`).
@@ -509,7 +514,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.30 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.31 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

@@ -160,7 +160,8 @@
         const k = ls.join(','), nuevo = ult && ls[0] && ult.split(',').indexOf(ls[0]) < 0 ? ls[0] : ''; ult = k; col(c1, ps.slice(0, 24)); col(c2, ls.slice(0, 24), nuevo); };
       const quita = VIVO.oye(k => { if (k === 'pedidos') pinta(); }); pinta(); let n = 0; return { ajusta: pinta, tic() { if (++n % 15 === 0) pinta(); }, fin() { quita(); } }; },
     /* v1.23 · LISTA DE PRECIOS: filas escritas a mano («nombre;precio» por línea) o una hoja CSV publicada; se ajusta sola a la caja */
-    precios(p, caja, ctx) { letra(caja, p, 700); const lis = el('div', 'pr'); caja.appendChild(lis); let filas = [], vivo = true, t = 0;
+    precios(p, caja, ctx) { letra(caja, p, +p.peso || 700);   /* v1.31 · el grosor de los nombres se puede elegir (las plantillas de carta usan 400) */
+      const lis = el('div', 'pr'); caja.appendChild(lis); let filas = [], vivo = true, t = 0;
       const deTexto = () => { ej(caja, ctx, !p.filas && !(p.src === 'hoja' && p.url)); return String(p.filas || (ctx.edita ? T(ctx).precios : '')).split(/\r?\n/).map(l => l.split(/\s*[;|\t]\s*/)).filter(r => r[0] && r[0].trim()).map(r => [r[0].trim(), (r[1] || '').trim()]); };
       const deHoja = F => { const a = num(p.cn, 1, 1, 26) - 1, b = num(p.cp, 2, 1, 26) - 1; return F.slice(p.cab === false ? 0 : 1).map(r => [String(r[a] || '').trim(), String(r[b] || '').trim()]).filter(r => r[0]); };
       const pinta = () => { if (!vivo) return; lis.textContent = ''; const L = filas.slice(0, 40), nc = num(p.cols, 1, 1, 3); lis.style.gridTemplateColumns = 'repeat(' + nc + ',1fr)';
