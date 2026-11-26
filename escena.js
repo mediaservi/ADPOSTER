@@ -17,16 +17,16 @@
   'use strict';
   const FUENTES = [['Inter', 'Inter'], ['Montserrat', 'Montserrat'], ['Poppins', 'Poppins'], ['Bebas Neue', 'Bebas Neue'], ['Anton', 'Anton'], ['Oswald', 'Oswald'], ['League Gothic', 'League Gothic'], ['Archivo Black', 'Archivo Black'],
     ['Playfair', 'Playfair Display'], ['Abril', 'Abril Fatface'], ['Cinzel', 'Cinzel'], ['Marcellus', 'Marcellus'], ['Alfa Slab', 'Alfa Slab One'], ['Fredoka', 'Fredoka'], ['Righteous', 'Righteous'], ['Pacifico', 'Pacifico'], ['Caveat', 'Caveat'], ['Courier', 'Courier Prime'], ['Mono', 'Share Tech Mono']];
-  const TIPOS = ['texto', 'imagen', 'video', 'zona', 'forma', 'reloj', 'fecha', 'tiempo', 'rss', 'qr', 'web', 'turno', 'pedidos', 'precios', 'boton'];
+  const TIPOS = ['texto', 'imagen', 'video', 'zona', 'forma', 'reloj', 'fecha', 'tiempo', 'rss', 'qr', 'web', 'turno', 'pedidos', 'precios', 'boton', 'agenda'];
   const VIVO = window.ADVIVO || (window.ADVIVO = { d: {}, fs: new Set(), pon(k, v) { this.d[k] = v; this.fs.forEach(f => { try { f(k, v); } catch (e) {} }); }, oye(f) { this.fs.add(f); return () => this.fs.delete(f); } });
   const FAM = f => (FUENTES.find(x => x[1] === f) || FUENTES[0])[1];
   const col = (c, d) => typeof c === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(c) ? c : d;
   const num = (v, d, a, b) => { v = +v; return isFinite(v) ? Math.min(b, Math.max(a, v)) : d; };
   const el = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
   const U = n => 'calc(var(--u) * ' + n + ')';
-  const TXT = { es: { imagen: 'Imagen', video: 'Vídeo', zona: 'Zona de carpeta', web: 'Página web', rss: 'Noticias', sin: 'elige un archivo', sinc: 'elige una carpeta', sinu: 'escribe la dirección', tit: ['Titular de ejemplo de las noticias en directo', 'Segundo titular, tal como llegará del canal', 'Tercer titular de muestra'], lugar: 'Tu ciudad', turno: 'TURNO', prep: 'PREPARANDO', listos: 'LISTOS', precios: 'Café con leche;1,60 €\nCroissant;1,90 €\nTostada con tomate;2,40 €\nZumo natural;3,10 €', sinh: 'pega la dirección de la hoja (CSV)' },
-    en: { imagen: 'Image', video: 'Video', zona: 'Folder zone', web: 'Web page', rss: 'News', sin: 'pick a file', sinc: 'pick a folder', sinu: 'type the address', tit: ['Sample headline from the live news feed', 'Second headline, as it will arrive from the feed', 'Third sample headline'], lugar: 'Your city', turno: 'NOW SERVING', prep: 'PREPARING', listos: 'READY', precios: 'Latte;1.60\nCroissant;1.90\nToast with tomato;2.40\nFresh juice;3.10', sinh: 'paste the sheet address (CSV)' },
-    ca: { imagen: 'Imatge', video: 'Vídeo', zona: 'Zona de carpeta', web: 'Pàgina web', rss: 'Notícies', sin: 'tria un arxiu', sinc: 'tria una carpeta', sinu: "escriu l'adreça", tit: ['Titular d’exemple de les notícies en directe', 'Segon titular, tal com arribarà del canal', 'Tercer titular de mostra'], lugar: 'La teva ciutat', turno: 'TORN', prep: 'PREPARANT', listos: 'A PUNT', precios: 'Cafè amb llet;1,60 €\nCroissant;1,90 €\nTorrada amb tomàquet;2,40 €\nSuc natural;3,10 €', sinh: 'enganxa l’adreça del full (CSV)' } };
+  const TXT = { es: { imagen: 'Imagen', video: 'Vídeo', zona: 'Zona de carpeta', web: 'Página web', rss: 'Noticias', sin: 'elige un archivo', sinc: 'elige una carpeta', sinu: 'escribe la dirección', tit: ['Titular de ejemplo de las noticias en directo', 'Segundo titular, tal como llegará del canal', 'Tercer titular de muestra'], lugar: 'Tu ciudad', turno: 'TURNO', prep: 'PREPARANDO', listos: 'LISTOS', precios: 'Café con leche;1,60 €\nCroissant;1,90 €\nTostada con tomate;2,40 €\nZumo natural;3,10 €', sinh: 'pega la dirección de la hoja (CSV)', agEj: ['Concierto acústico;Sala principal', 'Cata de vinos;Terraza', 'Noche de monólogos;'], agNo: 'Sin próximos eventos', agIcs: 'pega la dirección del calendario (ICS)', hoy: 'Hoy', man: 'Mañana', todo: 'Todo el día' },
+    en: { imagen: 'Image', video: 'Video', zona: 'Folder zone', web: 'Web page', rss: 'News', sin: 'pick a file', sinc: 'pick a folder', sinu: 'type the address', tit: ['Sample headline from the live news feed', 'Second headline, as it will arrive from the feed', 'Third sample headline'], lugar: 'Your city', turno: 'NOW SERVING', prep: 'PREPARING', listos: 'READY', precios: 'Latte;1.60\nCroissant;1.90\nToast with tomato;2.40\nFresh juice;3.10', sinh: 'paste the sheet address (CSV)', agEj: ['Acoustic concert;Main room', 'Wine tasting;Terrace', 'Comedy night;'], agNo: 'No upcoming events', agIcs: 'paste the calendar address (ICS)', hoy: 'Today', man: 'Tomorrow', todo: 'All day' },
+    ca: { imagen: 'Imatge', video: 'Vídeo', zona: 'Zona de carpeta', web: 'Pàgina web', rss: 'Notícies', sin: 'tria un arxiu', sinc: 'tria una carpeta', sinu: "escriu l'adreça", tit: ['Titular d’exemple de les notícies en directe', 'Segon titular, tal com arribarà del canal', 'Tercer titular de mostra'], lugar: 'La teva ciutat', turno: 'TORN', prep: 'PREPARANT', listos: 'A PUNT', precios: 'Cafè amb llet;1,60 €\nCroissant;1,90 €\nTorrada amb tomàquet;2,40 €\nSuc natural;3,10 €', sinh: 'enganxa l’adreça del full (CSV)', agEj: ['Concert acústic;Sala principal', 'Tast de vins;Terrassa', 'Nit de monòlegs;'], agNo: 'Sense propers esdeveniments', agIcs: 'enganxa l’adreça del calendari (ICS)', hoy: 'Avui', man: 'Demà', todo: 'Tot el dia' } };
   const esVideo = f => /\.(mp4|webm|m4v|mov)(\?|$)/i.test(f || '');
 
   /* ---------- pieza nueva, con valores sensatos para cada tipo ---------- */
@@ -46,6 +46,7 @@
     if (t === 'turno') return Object.assign(b, { tit: '', nh: 3, col: '#ffffff', acento: '#ffb000', fam: 'Inter', fondo: '#000000a6', radio: 2, x: 8, w: 84, y: 18, h: hor ? 64 : 46 });
     if (t === 'pedidos') return Object.assign(b, { col: '#ffffff', fam: 'Inter', fondo: '#000000a6', radio: 2, x: 4, w: 92, y: 12, h: hor ? 80 : 76 });
     if (t === 'precios') return Object.assign(b, { src: 'texto', filas: '', url: '', cn: 1, cp: 2, cab: true, ref: 10, cols: 1, col: '#ffffff', acento: '#ffb000', fam: 'Inter', x: 8, w: 84, y: 20, h: hor ? 66 : 56 });
+    if (t === 'agenda') return Object.assign(b, { src: 'texto', filas: '', url: '', n: 4, ref: 30, col: '#ffffff', acento: '#ffb000', fam: 'Inter', x: 8, w: 84, y: 20, h: hor ? 66 : 56 });   /* v1.44 · próximos eventos */
     if (t === 'boton') return Object.assign(b, { tx: 'Ver más', fam: 'Inter', peso: 800, col: '#111111', fondo: '#ffb000', radio: 3, sombra: true, ir: '', x: 25, w: 50, y: hor ? 74 : 80, h: hor ? 14 : 8 });   /* v1.40 · botón táctil: lleva a otra escena */
     return b; }
 
@@ -73,6 +74,30 @@
     for (let i = 0; i < t.length; i++) { const ch = t[i]; if (q) { if (ch === '"') { if (t[i + 1] === '"') { c += '"'; i++; } else q = false; } else c += ch; } else if (ch === '"') q = true; else if (ch === sep) { f.push(c); c = ''; } else if (ch === '\n' || ch === '\r') { if (ch === '\r' && t[i + 1] === '\n') i++; f.push(c); F.push(f); f = []; c = ''; } else c += ch; }
     if (c || f.length) { f.push(c); F.push(f); } return F.filter(r => r.some(x => String(x).trim())); }
   const hoja = (u, base, min) => trae('hoja:' + u, Math.max(1, min || 10), async () => { const d = new URL(u, base || location.href); if (!/^https?:$/.test(d.protocol)) throw 0; const r = await fetch(d.href, { cache: 'no-store' }); if (!r.ok) throw 0; const F = csv(await r.text()); if (!F.length) throw 0; return F; });
+
+  /* v1.44 · AGENDA: eventos de un calendario ICS (Google Calendar → «Dirección pública en formato iCal», Outlook, etc.) o escritos a mano.
+     Repeticiones simples (diaria, semanal con días, mensual y anual, con INTERVAL, COUNT y UNTIL); la zona horaria es la del display */
+  const icsF = v => { const m = /^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})(\d{2})?(Z)?)?/.exec(String(v || '')); if (!m) return NaN; const a = [+m[1], +m[2] - 1, +m[3], +(m[4] || 0), +(m[5] || 0), +(m[6] || 0)]; return m[7] ? Date.UTC(...a) : +new Date(...a); };
+  const icsT = v => String(v || '').replace(/\\n/gi, ' ').replace(/\\([,;\\])/g, '$1').replace(/\s+/g, ' ').trim();
+  function eventos(L, desde, hasta) { const out = [], DS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+    L.forEach(e => { if (!isFinite(e.s) || e.x) return; const dur = isFinite(e.e) && e.e > e.s ? e.e - e.s : (e.d ? 864e5 : 0), pon = t => { if (t + Math.max(dur, 1) > desde && t <= hasta) out.push({ s: t, e: t + dur, d: !!e.d, n: e.n || '', l: e.l || '' }); };
+      if (!e.r) { pon(e.s); return; } const R = {}; String(e.r).split(';').forEach(x => { const [k, v] = x.split('='); R[k] = v; }); const fr = R.FREQ, iv = Math.max(1, +R.INTERVAL || 1), cnt = +R.COUNT || 0, un = R.UNTIL ? icsF(R.UNTIL) : Infinity, by = R.BYDAY ? R.BYDAY.split(',').map(x => DS.indexOf(x.slice(-2))).filter(x => x >= 0) : null, d0 = new Date(e.s); let n = 0;
+      for (let k = 0; k < 800; k++) { let cs = [];
+        if (fr === 'WEEKLY' && by && by.length) { const b0 = new Date(d0); b0.setDate(d0.getDate() - d0.getDay() + 7 * iv * k); cs = by.map(w => { const c = new Date(b0); c.setDate(b0.getDate() + w); return +c; }).filter(t => t >= e.s).sort((a, b) => a - b); }
+        else { const c = new Date(d0); if (fr === 'DAILY') c.setDate(d0.getDate() + iv * k); else if (fr === 'WEEKLY') c.setDate(d0.getDate() + 7 * iv * k); else if (fr === 'MONTHLY') c.setMonth(d0.getMonth() + iv * k); else if (fr === 'YEARLY') c.setFullYear(d0.getFullYear() + iv * k); else if (k) break; cs = [+c]; }
+        let fin = false; for (const t of cs) { if (t > un || (cnt && n >= cnt) || t > hasta) { fin = true; break; } n++; pon(t); } if (fin) break; } });
+    return out.sort((a, b) => a.s - b.s); }
+  function icsLee(t) { const L = String(t || '').replace(/\r?\n[ \t]/g, '').split(/\r?\n/), ev = []; let e = null;
+    for (const l of L) { if (l === 'BEGIN:VEVENT') { e = {}; continue; } if (l === 'END:VEVENT') { if (e && isFinite(e.s) && !e.rid) ev.push(e); e = null; continue; } if (!e) continue; const i = l.indexOf(':'); if (i < 0) continue; const k = l.slice(0, i), v = l.slice(i + 1), nom = k.split(';')[0];
+      if (nom === 'DTSTART') { e.s = icsF(v); e.d = /^\d{8}$/.test(v.trim()); } else if (nom === 'DTEND') e.e = icsF(v); else if (nom === 'SUMMARY') e.n = icsT(v).slice(0, 80); else if (nom === 'LOCATION') e.l = icsT(v).slice(0, 60); else if (nom === 'RRULE') e.r = v; else if (nom === 'RECURRENCE-ID') e.rid = 1; else if (nom === 'STATUS' && /CANCEL/i.test(v)) e.x = 1; }
+    return ev.slice(0, 2000); }
+  const ics = (u, base, min) => trae('ics:' + u, Math.max(5, min || 30), async () => { const d = new URL(u.replace(/^webcal:/i, 'https:'), base || location.href); if (!/^https?:$/.test(d.protocol)) throw 0; const r = await fetch(d.href, { cache: 'no-store' }); if (!r.ok) throw 0; const tx = await r.text(); if (!/BEGIN:VCALENDAR/.test(tx)) throw 0;
+    const ah = Date.now(); return eventos(icsLee(tx), ah - 864e5, ah + 180 * 864e5).slice(0, 80); });
+  /* líneas escritas: «28/11 19:00;Concierto;Sala 2», «28/11/2026 19:00-21:00;…», «2026-11-28;…» (sin hora: todo el día). Sin año: el próximo 28/11 */
+  function agLineas(t) { const hoy = new Date(); hoy.setHours(0, 0, 0, 0); return String(t || '').split(/\r?\n/).map(l => { const r = l.split(/\s*[;|\t]\s*/), m = /^\s*(?:(\d{1,2})[\/.-](\d{1,2})(?:[\/.-](\d{2,4}))?|(\d{4})-(\d{1,2})-(\d{1,2}))(?:\s+(\d{1,2})[:.h](\d{2})(?:\s*-\s*(\d{1,2})[:.h](\d{2}))?)?/.exec(r[0] || ''); if (!m) return null;
+      let a = m[4] ? +m[4] : m[3] ? (+m[3] < 100 ? 2000 + +m[3] : +m[3]) : hoy.getFullYear(); const me = m[4] ? +m[5] : +m[2], di = m[4] ? +m[6] : +m[1], h = m[7] != null ? +m[7] : null; if (me < 1 || me > 12 || di < 1 || di > 31) return null;
+      let s = new Date(a, me - 1, di, h || 0, h != null ? +m[8] : 0); if (s.getDate() !== di || s.getMonth() !== me - 1) return null; if (!m[3] && !m[4] && s < hoy - 30 * 864e5) s = new Date(a + 1, me - 1, di, h || 0, h != null ? +m[8] : 0);
+      const e = m[9] != null ? new Date(s.getFullYear(), s.getMonth(), s.getDate(), +m[9], +m[10]) : null; return { s: +s, e: e ? +e : NaN, d: h == null, n: (r[1] || '').trim().slice(0, 80), l: (r[2] || '').trim().slice(0, 60) }; }).filter(Boolean); }
 
   /* ---------- el fondo de la escena ---------- */
   function fondo(cont, f, ctx) { f = f || {}; const c = col(f.c, '#101014'), c2 = col(f.c2, '#3a1c71'), c3 = col(f.c3, c2); let bg = c;
@@ -110,6 +135,22 @@
         entra.textContent = ''; if (esVideo(f)) { const v = el('video'); v.muted = true; v.playsInline = true; v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.src = u; entra.appendChild(v); if (ctx.vivo) { const pl = v.play(); pl && pl.catch && pl.catch(() => {}); } v.onloadeddata = () => listo(Math.min(600000, Math.max(2000, (v.duration || p.seg || 8) * 1000))); v.onerror = () => { if (vivo && ctx.vivo) t = setTimeout(pon, 600); }; }
         else { const i = el('img'); i.alt = ''; i.draggable = false; i.onload = () => listo(num(p.seg, 8, 2, 600) * 1000); i.onerror = () => { if (vivo && ctx.vivo) t = setTimeout(pon, 600); }; i.src = u; entra.appendChild(i); } };
       pon(); return { fin() { vivo = false; clearTimeout(t); caja.querySelectorAll('video').forEach(v => { try { v.pause(); } catch (e) {} }); } }; },
+    agenda(p, caja, ctx) { letra(caja, p, 700); const lis = el('div', 'ag'); caja.appendChild(lis); let L = [], vivo = true, t = 0, k = 0; const tt = T(ctx), lg = ctx.lang === 'ca' ? 'ca-ES' : ctx.lang === 'en' ? 'en-GB' : 'es-ES';
+      const ejemplo = () => { const b = new Date(); b.setHours(0, 0, 0, 0); return tt.agEj.map((x, i) => { const [n, l] = x.split(';'); return { s: +b + [1, 3, 6][i] * 864e5 + [19, 20, 21][i] * 36e5, e: NaN, d: false, n, l }; }); };
+      const deTexto = () => { const E = agLineas(p.filas); ej(caja, ctx, !E.length); return E.length ? eventos(E, Date.now() - 864e5, Date.now() + 400 * 864e5) : (ctx.edita ? ejemplo() : []); };
+      const hora = d => d.toLocaleTimeString(lg, { hour: '2-digit', minute: '2-digit' });
+      const pinta = () => { if (!vivo) return; const ah = Date.now(), V = L.filter(e => (isFinite(e.e) && e.e > e.s ? e.e : e.s + (e.d ? 864e5 : 36e5)) > ah).slice(0, num(p.n, 4, 1, 8)); lis.textContent = '';
+        if (!V.length) { if (ctx.edita) vacio(caja, tt.agNo, p.src === 'ics' && !p.url ? tt.agIcs : '', ctx); else { const v = el('div', 'ag-no'); v.textContent = tt.agNo; lis.appendChild(v); } ajusta(); return; } caja.querySelectorAll('.vacio').forEach(v => v.remove());
+        const h0 = new Date(); h0.setHours(0, 0, 0, 0);
+        V.forEach(e => { const d = new Date(e.s), dd = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - h0) / 864e5), f = el('div', 'ag-f'), c = el('div', 'ag-d'), n1 = el('b'), m1 = el('small'), x = el('div', 'ag-t'), ti = el('div', 'ag-n'), su = el('div', 'ag-s');
+          n1.textContent = d.getDate(); m1.textContent = d.toLocaleDateString(lg, { month: 'short' }).replace('.', '').toUpperCase(); c.style.color = col(p.acento, '#ffb000'); c.append(n1, m1);
+          ti.textContent = e.n || '—'; const dia = dd === 0 ? tt.hoy : dd === 1 ? tt.man : d.toLocaleDateString(lg, { weekday: 'long' }); su.textContent = [dia.charAt(0).toUpperCase() + dia.slice(1), e.d ? tt.todo : hora(d) + (isFinite(e.e) && e.e > e.s && !e.d ? '–' + hora(new Date(e.e)) : ''), e.l].filter(Boolean).join(' · ');
+          x.append(ti, su); f.append(c, x); lis.appendChild(f); }); ajusta(); };
+      const ajusta = () => { const nr = Math.max(1, lis.children.length); let fs = Math.max(6, Math.min(lis.clientHeight / nr * .36, lis.clientWidth / 14)); lis.style.fontSize = fs + 'px';
+        for (let i = 0; i < 12 && ([...lis.querySelectorAll('.ag-n, .ag-s')].some(r => r.scrollWidth > r.clientWidth + 1) || lis.scrollHeight > lis.clientHeight + 1); i++) { fs *= .92; lis.style.fontSize = fs + 'px'; } };
+      const pide = () => { const u = String(p.url || '').trim(); if (p.src !== 'ics' || !u || !ctx.red) return; ics(u, ctx.base, num(p.ref, 30, 5, 1440)).then(E => { if (E && vivo) { L = E; pinta(); } }); };
+      L = p.src === 'ics' ? (ctx.edita && !p.url ? (ej(caja, ctx, true), ejemplo()) : []) : deTexto(); pinta(); pide(); if (p.src === 'ics' && ctx.vivo) t = setInterval(pide, num(p.ref, 30, 5, 1440) * 60000);
+      return { ajusta, tic() { if (++k % 60 === 0) pinta(); }, fin() { vivo = false; clearInterval(t); } }; },
     boton(p, caja) { const bt = el('div', 'bt'), tx = el('div', 'tx'); tx.textContent = String(p.tx == null ? '' : p.tx).slice(0, 60); letra(tx, p, [400, 700, 800].includes(+p.peso) ? +p.peso : 800); if (p.may) tx.style.textTransform = 'uppercase'; bt.appendChild(tx); caja.appendChild(bt);   /* v1.40 */
       return { ajusta() { encaja(bt, tx, true, Math.max(4, bt.clientHeight * .62)); } }; },
     forma(p, caja) { const c = col(p.col, '#ffb000'); caja.style.background = p.col2 ? 'linear-gradient(' + num(p.ang, 135, 0, 360) + 'deg,' + c + ',' + col(p.col2, c) + ')' : c; if (p.f === 'elipse') caja.style.borderRadius = '50%'; return {}; },
@@ -200,5 +241,5 @@
     if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', ajusta);
     return { pon, ajusta, el: id => (vivas.get(id) || {}).el || null, destruye() { muerto = true; clearInterval(tTic); ro && ro.disconnect(); if (document.fonts && document.fonts.removeEventListener) document.fonts.removeEventListener('loadingdone', ajusta); vivas.forEach(v => v.ctl.fin && v.ctl.fin()); vivas.clear(); cont.textContent = ''; cont.classList.remove('esc', 'entra'); cont.style.background = ''; } };
   }
-  window.ADESCENA = { FUENTES, TIPOS, nueva, monta, id, col, csv, hoja };
+  window.ADESCENA = { FUENTES, TIPOS, nueva, monta, id, col, csv, hoja, icsLee, eventos, agLineas };
 })();

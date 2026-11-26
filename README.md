@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.43**
+**Versión actual: v1.44**
 
 
 ## Icono
@@ -161,7 +161,14 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.43)
+## Cambios de la versión actual (v1.44)
+- **Pieza Agenda:** enseña los próximos eventos con la fecha en un bloque del color de acento, el día («Hoy», «Mañana» o el día de la semana), la hora y el lugar. Los eventos pasados se quitan solos. Dos fuentes:
+  - **Escritos aquí:** una línea por evento, por ejemplo `28/11 19:00-21:00;Concierto;Sala 2` o `24/12;Nochebuena` (sin hora, todo el día).
+  - **Calendario (ICS):** la dirección pública de un calendario (en Google Calendar, «Dirección pública en formato iCal»). Entiende eventos que se repiten (cada día, cada semana con sus días, cada mes o cada año) y salta los cancelados. Solo funcionan los calendarios que se dejan leer desde otra web; sin red, la pantalla usa la última copia.
+- Se elige cuántos eventos salen (1 a 8), los colores y la letra. La guía (AYUDA) la menciona.
+- Caché nueva de la app (`adposter-v39`).
+
+## Cambios de la v1.43
 - **Modo operador para tu equipo:** en «📱 Mando en el móvil» hay dos códigos, **Completo** y **Solo operador**. El de operador abre el gestor unido a tus pantallas pero solo con lo del día a día: las pantallas, los turnos, los pedidos, los avisos y la emergencia; sin listas, editor, publicar ni SIMPLE/PRO. Para volver al gestor completo, «Salir del modo operador» (dos toques). Es para simplificar, no un candado: quien tiene el código del canal puede mandar a las pantallas.
 - En el móvil apaisado, el QR del mando va a la izquierda y los textos a la derecha, para que quepa todo.
 - La guía (AYUDA) explica el modo operador.
@@ -580,7 +587,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.43 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.44 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 
