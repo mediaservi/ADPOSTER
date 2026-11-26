@@ -8,7 +8,7 @@
      (el original no se toca nunca). Todo ocurre en el navegador: la imagen no sale del equipo. */
 (function () {
   'use strict';
-  const $ = s => document.querySelector(s), PX = window.ADPX, VERSION = '1.41';
+  const $ = s => document.querySelector(s), PX = window.ADPX, VERSION = '1.42';
   const lee = k => { try { return JSON.parse(localStorage.getItem('adposter:' + k)); } catch (e) { return null; } }, guarda = (k, v) => { try { localStorage.setItem('adposter:' + k, JSON.stringify(v)); } catch (e) {} };
   const IDI = ['es', 'en', 'ca']; let lang = lee('lang') || (IDI.includes((navigator.language || '').slice(0, 2)) ? navigator.language.slice(0, 2) : 'es');
   /* textos: español de base y [inglés, catalán] */

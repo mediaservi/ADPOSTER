@@ -750,3 +750,25 @@ html:not(.md-simple) .bt-simple-f { display: none !important; }
 @media (max-width: 900px) { .tecla.emer-bt .sos { display: inline; } .tecla.emer-bt .sir { display: none; } }
 .estado > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (min-width: 901px) and (min-height: 820px) { html.md-simple .mini .mm { width: clamp(38px, 5.2vh, 54px); } html.md-simple .mini.hor .mm { width: clamp(80px, 11vh, 112px); } }
+
+/* v1.42 · AYUDA: botón «?» en la cabecera (en el móvil vertical ocupa el sitio de la «i»; la guía abre la información con «Acerca de») y guía en un modal */
+.cab .der .ay-bt span { font: 900 clamp(17px, 2.3vh, 22px)/1 Inter, system-ui, sans-serif; color: #e9ebee; }
+.cab .der .ay-bt:hover span, .cab .der .ay-bt:focus-visible span { color: #fff; }
+@media (max-width: 559px) and (orientation: portrait) { .cab .der .info-m { display: none !important; } .cab .der .ay-bt span { font-size: 16px; } }
+.modal.m-ay .m-caja { width: min(1000px, 100%); height: auto; max-height: 100%; overflow: auto; }
+.ay { display: grid; gap: 12px; min-width: 0; }
+.ay-i { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.ay-i .tecla { min-height: 0; padding: 7px 9px; justify-content: flex-start; gap: 7px; font-size: .86em; text-align: left; }
+.ay-i .tecla b { flex: none; width: 1.6em; height: 1.6em; border-radius: 50%; display: inline-grid; place-items: center; background: #0d0d10; color: var(--ambar, #ffb000); font: 800 .82em/1 'Share Tech Mono', monospace; }
+.ay-i .tecla.on b { background: var(--ambar, #ffb000); color: #111; }
+.ay-i .tecla span { min-width: 0; white-space: normal; line-height: 1.15; }
+.ay-c { background: #0d0d10; border: 1px solid #000; border-radius: 10px; padding: 14px 18px; max-height: min(52vh, 460px); overflow: auto; line-height: 1.5; font-size: 15px; color: #dfe2e6; }
+.ay-c h2 { margin: 0 0 8px; }
+.ay-c p { margin: 0 0 10px; } .ay-c ol, .ay-c ul { margin: 0 0 10px; padding-left: 1.3em; } .ay-c li { margin: 0 0 6px; } .ay-c b { color: #fff; }
+.ay-c .fila { margin-top: 6px; }
+.ay-n { display: grid !important; grid-template-columns: 1fr auto 1fr; gap: 8px; }
+@media (max-width: 900px) { .ay-i { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 600px), (max-height: 520px) { .ay-i { display: flex; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; } .ay-i::-webkit-scrollbar { display: none; } .ay-i .tecla { flex: none; max-width: 70vw; } .ay-i .tecla span { white-space: nowrap; } .ay-c { font-size: 14px; max-height: none; } }
+@media (max-height: 520px) { .ay-c { max-height: 48vh; } }
+@media (max-width: 600px), (max-height: 520px) { .modal.m-ay .m-caja { height: 100%; overflow: hidden; } .ay { flex: 1 1 auto; min-height: 0; grid-template-rows: auto minmax(0, 1fr) auto; } .ay-c { max-height: none !important; min-height: 0; } }
+@media (max-width: 559px) and (orientation: portrait) { .cab .der .ic-bt { flex: none; } .cab .der .aviso-bt { flex: none; margin-right: 2px; padding: 0 7px; letter-spacing: .02em; font-size: clamp(11px, 3.4vw, 15px); } }
