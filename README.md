@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.36**
+**Versión actual: v1.37**
 
 
 ## Icono
@@ -161,7 +161,14 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.36)
+## Cambios de la versión actual (v1.37)
+- **Fondo desenfocado:** si una foto no encaja con la forma de la pantalla (una vertical en una tele horizontal), sale entera y con ella misma ampliada y desenfocada detrás, en lugar de recortarla o dejar los lados en negro. Se activa en CONTENIDO («Fondo desenfocado»); las listas nuevas de SIMPLE lo traen puesto. Las fotos que casi encajan (un póster 2:3 en una tele vertical) siguen llenando la pantalla.
+- **Deshacer en el mando de pedidos:** «↶ Deshacer» vuelve atrás el último toque (añadir, pasar a listo, retirar o limpiar), hasta 20 pasos.
+- **«Hoy cerrado» dura todo el día:** en la tecla AVISO, ese texto preparado se queda hasta las 23:59.
+- **Copiar una escena a otra lista:** en ESCENA, «Copiar a otra lista» la añade al final de la lista de composición que elijas, sin tocar esta.
+- Caché nueva de la app (`adposter-v32`).
+
+## Cambios de la v1.36
 - **Subir fotos desde «Añadir carteles» las mete ya en la lista** (una o varias), sin pulsar «Añadir» otra vez; la ventana se cierra y el estado dice cuántas han entrado.
 - **El asistente solo pide el nombre del negocio cuando lo va a usar** (en el rótulo de marca o bajo el QR); en la cafetería, por ejemplo, ya no lo pide.
 - **El estado no se mete debajo de los botones:** un mensaje largo se corta con puntos suspensivos y se lee entero al pasar por encima.
@@ -317,12 +324,11 @@ Pensada para usos muy distintos, desde quien pone su primera pantalla hasta quie
 
 ### Siguiente fase (anotado, aún no hecho)
 - **Vídeos subidos sin acceso privado**: no hay vía fiable sin un servidor de pago (los repetidores públicos no aguantan archivos de varios MB); se valorará guardarlos en el panel ADMIN o enviarlos de aparato a aparato.
-- **Copiar o reutilizar una escena en varias listas** y anuncios entre escenas hechos con escenas propias.
-- **Asistente «Restaurante»** con varias listas y pantallas de una vez; botón «Hoy cerrado» de un toque en el MANDO.
+- Anuncios entre escenas hechos con escenas propias.
+- **Asistente «Restaurante»** con varias listas y pantallas de una vez; «Hoy cerrado» ya está en la tecla AVISO (v1.37).
 - **Pieza «Botón»** con estilo listo y opción «quedarse en la portada hasta que toquen» para kioscos táctiles; «Al tocar» visible aunque el modo táctil esté apagado.
 - **Posición de piezas en píxeles** en los lienzos a medida, para cuadrar con los módulos LED.
-- **Fondo desenfocado o «llenar»** para carteles verticales en pantallas horizontales en SIMPLE; tira de carteles con miniaturas más grandes.
-- Deshacer en el mando de pedidos.
+- Tira de carteles con miniaturas más grandes.
 - Pieza **Agenda** que lea un calendario ICS publicado; necesita que el calendario deje leerse desde otra web o un pequeño intermediario.
 - **Etiquetas** por pantalla (varias por display) además de grupo y sede.
 - **Sincronía de vídeo** entre pantallas y muro de varios monitores con reloj común.
@@ -544,7 +550,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.36 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.37 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

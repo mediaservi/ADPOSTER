@@ -16,7 +16,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.36';
+  const VERSION = '1.37';
   const SC = document.currentScript, Q = new URLSearchParams(location.search);
   const BASE = new URL(SC.dataset.base || '../', location.href).href;
   const ID = (SC.dataset.playlist || Q.get('l') || 'demo').toLowerCase().replace(/[^a-z0-9_-]/g, '');
@@ -36,7 +36,7 @@
   const DISP = (() => { let d = leeG('disp'); if (!/^[a-z0-9]{6}$/.test(d)) { d = (Math.random().toString(36) + '000000').slice(2, 8); guardaG('disp', d); } return d; })();
   if (!PREV) ['nombre', 'grupo', 'sede', 'canal', 'lang'].forEach(k => { const v = Q.get(k); if (v !== null) guardaG(k, k === 'canal' ? (/^[a-z0-9]{6,40}$/i.test(v) ? v : '') : v.trim().slice(0, 32)); });
   const DEF = { nombre: ID.toUpperCase(), fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7],
-    fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true, horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '',
+    fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, desenf: false, brillo: true, horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '',
     formato: 'vertical', qr: { activo: false, modo: 'url', url: '', texto: '', pos: 'bd' }, cinta: { activo: false, texto: '', rss: '' }, publico: false, modo: 'carteles', escenas: [], orden: 'azar', secuencia: [], archivos: {}, sueltos: [], adsS: [], tactil: { activo: false, vuelta: 30 } };
   const TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'];
 
@@ -124,7 +124,7 @@
     cfg = calcula(); diaA = hoyISO(); pool = calPool(); const car = (MAN && MAN.carpetas) || {};
     const st = escena.style, hor = HOR();
     st.setProperty('--t', (cfg.fundido.tipo === 'corte' ? 0 : cfg.fundido.segundos) + 's'); st.setProperty('--dur', (cfg.segundos + cfg.fundido.segundos) + 's');
-    escena.className = 't-' + cfg.fundido.tipo + (cfg.movimiento ? ' mov' : '') + (cfg.llenar && !hor ? ' llena' : '') + (cfg.brillo ? ' brillo' : '') + (hor ? ' horizontal' : '') + (hor && pool.feed.length && pool.ads.length && !ESC() ? ' dos' : '') + (ESC() ? ' modo-esc' : '') + (ESC() && cfg.tactil.activo ? ' tactil' : ''); if (!ESC()) limpiaEsc(); tamEscena(); CAPAS.feed.forEach(c => c.classList.toggle('centro', cfg.alinea === 'centro'));
+    escena.className = 't-' + cfg.fundido.tipo + (cfg.movimiento ? ' mov' : '') + (cfg.llenar && !hor ? ' llena' : '') + (cfg.desenf ? ' desenf' : '') + (cfg.brillo ? ' brillo' : '') + (hor ? ' horizontal' : '') + (hor && pool.feed.length && pool.ads.length && !ESC() ? ' dos' : '') + (ESC() ? ' modo-esc' : '') + (ESC() && cfg.tactil.activo ? ' tactil' : ''); if (!ESC()) limpiaEsc(); tamEscena(); CAPAS.feed.forEach(c => c.classList.toggle('centro', cfg.alinea === 'centro'));
     const f = $('.fondo'), fs = car.fondos || [], fa = cfg.fondo && fs.find(x => x.replace(/\.[a-z0-9]+$/i, '') === cfg.fondo);
     if (fa) { const u = url('fondos/' + fa); if (f.dataset.u !== u) { const i = new Image(); i.onload = () => { f.style.backgroundImage = 'url("' + u + '")'; f.dataset.u = u; f.classList.add('on'); }; i.src = u; } } else { f.classList.remove('on'); f.dataset.u = ''; }
     cinta(); margenes(); qr(); if ((cfg.cinta.activo ? cfg.cinta.rss || '' : '') !== rssU) rss(); enlaza(); menu();
@@ -177,7 +177,8 @@
     return new Promise(res => { const i = new Image(); let fin = false; const ok = v => { if (!fin) { fin = true; res(v); } }; const t = setTimeout(() => ok(false), 12000);
     i.onload = () => { clearTimeout(t); (i.decode ? i.decode().catch(() => {}) : Promise.resolve()).then(() => ok(i)); }; i.onerror = () => { clearTimeout(t); ok(false); }; i.src = u; }); }
   /* cada póster ocupa todo lo que cabe en su marco, sea cual sea su tamaño original */
-  function encaja(capa) { const h = capa.querySelector('.hoja'); if (!h || !h.dataset.r) return; const m = $('.marco'), r = +h.dataset.r, w = Math.min(m.clientWidth, m.clientHeight * r); h.style.width = w + 'px'; h.style.height = w / r + 'px'; h.style.setProperty('--k', (Math.max(m.clientWidth / w, m.clientHeight / (w / r)) * 1.015).toFixed(4)); }
+  function encaja(capa) { const h = capa.querySelector('.hoja'); if (!h || !h.dataset.r) return; const m = $('.marco'), r = +h.dataset.r; capa.classList.toggle('entera', !!cfg.desenf && m.clientHeight > 0 && Math.abs(Math.log(r / (m.clientWidth / m.clientHeight))) > .25);   /* v1.37 · si no encaja, entera y con fondo desenfocado */
+    const w = Math.min(m.clientWidth, m.clientHeight * r); h.style.width = w + 'px'; h.style.height = w / r + 'px'; h.style.setProperty('--k', (Math.max(m.clientWidth / w, m.clientHeight / (w / r)) * 1.015).toFixed(4)); }
   addEventListener('resize', () => CAPAS.feed.forEach(encaja));
   const actual = { feed: '', ads: '' };
   async function paso(tipo) {
@@ -185,7 +186,7 @@
     const g = gen, vid = pre.tagName === 'VIDEO', capas = CAPAS[tipo], n = turno[tipo] % 2, entra = capas[n], sale = capas[1 - n], caja = c => (tipo === 'feed' ? c.querySelector('.hoja') : c), cj = caja(entra), img = cj.querySelector('img'), viejo = cj.querySelector('video'); turno[tipo]++;
     if (viejo) { viejo.pause(); viejo.remove(); } if (vid) { img.style.display = 'none'; img.removeAttribute('src'); cj.appendChild(pre); const pl = pre.play(); pl && pl.catch && pl.catch(() => {}); } else { img.style.display = ''; img.src = u; }
     const w = vid ? pre.videoWidth : pre.naturalWidth, h = vid ? pre.videoHeight : pre.naturalHeight;
-    if (tipo === 'feed' && w && h) { cj.dataset.r = w / h; encaja(entra); cj.classList.remove('anim'); void cj.offsetWidth; cj.classList.add('anim'); }   // el movimiento arranca con cada póster y se mantiene mientras se va
+    if (tipo === 'feed') entra.style.setProperty('--bg', vid ? 'none' : 'url("' + u.replace(/"/g, '%22') + '")'); if (tipo === 'feed' && w && h) { cj.dataset.r = w / h; encaja(entra); cj.classList.remove('anim'); void cj.offsetWidth; cj.classList.add('anim'); }   // el movimiento arranca con cada póster y se mantiene mientras se va
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
     sale.classList.add('sale'); sale.classList.remove('on'); entra.classList.remove('sale'); entra.classList.add('on'); const tf = cfg.fundido.tipo === 'corte' ? 0 : cfg.fundido.segundos * 1000, vs = caja(sale).querySelector('video');
     if (tipo === 'feed' && !escena.classList.contains('dos')) { setTimeout(() => CAPAS.ads.forEach(c => c.classList.remove('on', 'sale')), tf ? 60 : 0); }

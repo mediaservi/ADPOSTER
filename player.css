@@ -172,3 +172,8 @@ body.ap.px1 #escena { contain: strict; }
 /* v1.23 · la página de alta cabe entera en cualquier pantalla (antes, en 1920×1080, se cortaban el logo y «Esperando…») */
 #alta { --a: min(.8vw, 1.15vh); gap: calc(var(--a) * 1.8); overflow: hidden; }
 #alta .qr-a { width: calc(var(--a) * 14); }
+/* v1.37 · fondo desenfocado: la foto que no encaja sale entera, con ella misma ampliada y desenfocada detrás */
+.desenf .capa.entera::before { content: ''; position: absolute; inset: -8%; z-index: 0; background: var(--bg, none) center / cover no-repeat; filter: blur(calc(var(--u) * 3)) brightness(.5) saturate(1.2); }
+.desenf .marco { overflow: hidden; }
+.desenf .capa.entera .hoja { z-index: 1; }
+.llena.desenf .capa.entera .hoja.anim { animation: none; transform: none; }

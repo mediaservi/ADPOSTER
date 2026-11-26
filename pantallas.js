@@ -278,12 +278,14 @@
       <div class="fila">${campo('tu-serie', TU.serie, T('serie'), ' maxlength="2" data-tu="serie" style="flex:0 0 4em;text-align:center"')}${campo('tu-puestos', TU.puestos, T('puestos, separados por comas'), ' maxlength="120" data-tu="puestos"')}</div>${EM && EM.on ? `<div class="nota mal">${T('Turnos en silencio durante la emergencia')}</div>` : ''}`;
     if (hay('pedidos')) { vivos(); h += `<h2>${T('Pedidos listos')}</h2><div class="pe"><div class="pe-tec"><div class="lcd grande" id="pe-lcd">${esc(PE.lcd || '—')}</div><div class="pe-num">${[1, 2, 3, 4, 5, 6, 7, 8, 9, '⌫', 0, '✓'].map(k => `<button type="button" class="tecla" data-a="peTecla" data-v="${k}">${k}</button>`).join('')}</div></div>
       <div class="pe-col"><b>${T('Preparando')}</b><div class="pe-ch">${PE.prep.map(n => `<button type="button" class="tecla ch" data-a="peListo" data-v="${esc(n)}">${esc(n)}</button>`).join('')}</div><b class="v">${T('Listo')}</b><div class="pe-ch">${PE.listos.map(x => `<button type="button" class="tecla ch v" data-a="peQuita" data-v="${esc(x[0])}">${esc(x[0])}</button>`).join('')}</div></div></div>
-      <div class="fila"><button type="button" class="tecla" data-a="peLimpia">${T('Limpiar')}</button>${G.medio('peCad', PE.cad + ' <small>min</small>')}</div><div class="nota">${esc(T('Toca un número de «Preparando» para pasarlo a «Listo», y uno de «Listo» para retirarlo. Los listos se van solos a los {n} min.').replace('{n}', PE.cad))}</div>`; }
+      <div class="fila"><button type="button" class="tecla" data-a="peDeshaz"${PEH.length ? '' : ' disabled'}>↶ ${T('Deshacer')}</button><button type="button" class="tecla" data-a="peLimpia">${T('Limpiar')}</button></div><div class="fila">${G.medio('peCad', PE.cad + ' <small>min</small>')}</div><div class="nota">${esc(T('Toca un número de «Preparando» para pasarlo a «Listo», y uno de «Listo» para retirarlo. Los listos se van solos a los {n} min.').replace('{n}', PE.cad))}</div>`; }
     return h; }
   function mandaTurno(repite) { const pu = puestos(), n = numT(TU.num), p = pu[TU.p] || '';
     if (!repite || !TU.hist[0] || TU.hist[0].n !== n) { TU.hist.unshift({ n, p }); TU.hist = TU.hist.slice(0, 8); }   // REPETIR no duplica el historial
     const m = { n, p, h: TU.hist.slice(1, 7), t: Date.now(), voz: !!TU.voz, rep: repite ? 1 : 0, k: TU.num, s: TU.serie }; TU.t = m.t; guarda('g-turno', TU);
     window.ADVIVO && window.ADVIVO.pon('turno', m); const r = publica('turno', m, true); G.estado(EM && EM.on ? T('Turnos en silencio durante la emergencia') : r === 'ok' ? T('Enviado') + ' · ' + m.n + ' → ' + m.p : r === 'red' ? T('Sin conexión: se enviará al volver.') : T('Sin directo: el turno solo se ve en el lienzo.')); G.pintaT(); }
+  /* v1.37 · deshacer en el mando de pedidos: guarda cómo estaba antes de cada toque (hasta 20) */
+  const PEH = []; const peGuarda = () => { PEH.push(JSON.stringify({ prep: PE.prep, listos: PE.listos })); if (PEH.length > 20) PEH.shift(); };
   function mandaPedidos() { vivos(); const m = { prep: PE.prep.slice(0, 24), listos: PE.listos.slice(0, 24), cad: PE.cad, t: Date.now() }; guarda('g-pedidos', PE); window.ADVIVO && window.ADVIVO.pon('pedidos', m); publica('pedidos', m, true); G.pintaT(); }
 
   /* ================= formato a medida (LED) ================= */
@@ -344,7 +346,7 @@
   Object.assign(ACC, {
     vista(v) { const s = v === 'simple'; html.classList.toggle('md-simple', s); guarda('g-vista', s ? 'simple' : 'pro'); pintaSw(); G.repinta(); X.alLista && X.alLista(); },
     avisoRapido() { av = {}; X.abreModal('', 'm-av', () => { av = null; }); avPinta(); const i = $('#av-x'); i && i.focus(); },
-    avTxt(v) { const p = AVP[+v]; if (p) { G.D.aviso = T(p[1]); avPinta(); } }, avSeg(v) { G.D.seg = +v; G.D.hasta = ''; avPinta(); }, avCol(v) { G.D.color = v; avPinta(); },
+    avTxt(v) { const p = AVP[+v]; if (p) { G.D.aviso = T(p[1]); if (+v === 3) G.D.hasta = '23:59'; avPinta(); } },   /* v1.37 · «Hoy cerrado» dura hasta el final del día */ avSeg(v) { G.D.seg = +v; G.D.hasta = ''; avPinta(); }, avCol(v) { G.D.color = v; avPinta(); },
     avEnvia() { if (!G.D.aviso.trim()) return; ACC.aviso(); X.cierraModal ? X.cierraModal() : ACC.modalCierra(); G.estado('✓ ' + T('Aviso enviado')); },   /* v1.33 */
     alMas() { if (al) { al.mas = !al.mas; alPinta(); } },   /* v1.32 */
     bvVe(v) { guarda('g-bv', 1); X.cierraModal ? X.cierraModal() : ACC.modalCierra(); if (v === 'as') ACC.asistente(); else if (v === 'tv') ACC.altaPantalla(); },   /* v1.25 · bienvenida */
@@ -379,9 +381,10 @@
     tuLlama() { TU.num++; mandaTurno(false); }, tuRepite() { mandaTurno(true); },
     tuCero() { const b = $('[data-a="tuCero"]'); if (b && !b.dataset.seguro) { b.dataset.seguro = '1'; b.textContent = T('¿Seguro? A cero'); setTimeout(() => { if (b.isConnected) { delete b.dataset.seguro; b.textContent = T('Empezar de 0'); } }, 3000); return; }
       TU.num = 0; TU.hist = []; TU.t = Date.now(); guarda('g-turno', TU); const m = { reset: 1, n: '', p: '', h: [], k: 0, t: TU.t }; window.ADVIVO && window.ADVIVO.pon('turno', { n: '', p: '', h: [], t: TU.t }); publica('turno', m, true); G.estado(T('Turnos a cero')); G.pintaT(); },
-    peTecla(v) { if (v === '⌫') PE.lcd = PE.lcd.slice(0, -1); else if (v === '✓') { const n = PE.lcd.trim(); if (n && !PE.prep.includes(n)) PE.prep.push(n); PE.lcd = ''; mandaPedidos(); return; } else if (PE.lcd.length < 4) PE.lcd += v; const l = $('#pe-lcd'); if (l) l.textContent = PE.lcd || '—'; },
-    peListo(v) { PE.prep = PE.prep.filter(n => n !== v); PE.listos = PE.listos.filter(x => x[0] !== v); PE.listos.unshift([v, Date.now()]); mandaPedidos(); },
-    peQuita(v) { PE.listos = PE.listos.filter(x => x[0] !== v); mandaPedidos(); }, peLimpia() { PE.prep = []; PE.listos = []; PE.lcd = ''; mandaPedidos(); }, peCad(v) { PE.cad = lim(PE.cad + +v, 1, 60); mandaPedidos(); },
+    peTecla(v) { if (v === '⌫') PE.lcd = PE.lcd.slice(0, -1); else if (v === '✓') { const n = PE.lcd.trim(); if (n && !PE.prep.includes(n)) { peGuarda(); PE.prep.push(n); } PE.lcd = ''; mandaPedidos(); return; } else if (PE.lcd.length < 4) PE.lcd += v; const l = $('#pe-lcd'); if (l) l.textContent = PE.lcd || '—'; },
+    peListo(v) { peGuarda(); PE.prep = PE.prep.filter(n => n !== v); PE.listos = PE.listos.filter(x => x[0] !== v); PE.listos.unshift([v, Date.now()]); mandaPedidos(); },
+    peDeshaz() { const u = PEH.pop(); if (!u) return; const o = JSON.parse(u); PE.prep = o.prep; PE.listos = o.listos; mandaPedidos(); },
+    peQuita(v) { peGuarda(); PE.listos = PE.listos.filter(x => x[0] !== v); mandaPedidos(); }, peLimpia() { peGuarda(); PE.prep = []; PE.listos = []; PE.lcd = ''; mandaPedidos(); }, peCad(v) { PE.cad = lim(PE.cad + +v, 1, 60); mandaPedidos(); },
     fmPre(v) { const [w, h] = v.split('x').map(Number); fm.w = w; fm.h = h; fmPinta(); },
     fmPon() { const w = lim(Math.round(fm.w), 64, 8192), h = lim(Math.round(fm.h), 64, 8192); X.antes && X.antes(); G.cambia(p => { p.medida = { w, h }; p.formato = w >= h ? 'horizontal' : 'vertical'; }); ACC.modalCierra(); X.alLista && X.alLista(); },
     fmQuita() { G.cambia(p => { delete p.medida; }); ACC.modalCierra(); X.alLista && X.alLista(); },
