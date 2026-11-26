@@ -17,6 +17,7 @@
   'use strict';
   const G = window.ADG; if (!G || !G.ext.abreModal) return;
   const { T, TX, $, esc, tecla, campo, lim, copia } = G, X = G.ext, ACC = G.ACC, html = document.documentElement;
+  Object.assign(TX, { 'Editar': ['Edit', 'Edita'], 'Avisos': ['Alerts', 'Avisos'] });
   Object.assign(TX, { 'Ámbar': ['Amber', 'Ambre'], 'Rojo': ['Red', 'Vermell'], 'Verde': ['Green', 'Verd'], 'Azul': ['Blue', 'Blau'], 'Aviso': ['Notice', 'Avís'], 'Mandar un aviso a las pantallas': ['Send a notice to the screens', 'Envia un avís a les pantalles'], 'Cuánto dura': ['How long', 'Quant dura'], 'Color': ['Colour', 'Color'], 'Enviar aviso': ['Send notice', 'Envia l’avís'], 'Aviso enviado': ['Notice sent', 'Avís enviat'],
     'Sale encima de lo que esté saliendo en todas las pantallas y luego desaparece solo.': ['It shows on top of whatever is playing on every screen and then goes away by itself.', 'Surt a sobre del que estigui sortint a totes les pantalles i després desapareix sol.'],
     'Cerramos antes hoy': ['Closing early today', 'Avui tanquem abans'], 'Hoy cerramos antes. ¡Gracias por su visita!': ['We close early today. Thanks for your visit!', 'Avui tanquem abans. Gràcies per la visita!'],
@@ -406,7 +407,7 @@
   const nav = el('nav'); nav.id = 'nav-m'; nav.setAttribute('aria-label', 'ADPOSTER'); document.body.appendChild(nav);
   let vm = lee('g-vm') || 'listas';
   function ponVm(v) { vm = ['listas', 'lienzo', 'ajustes', 'mando'].includes(v) ? v : 'listas'; guarda('g-vm', vm); html.dataset.vm = vm; if (vm === 'mando' && G.tab !== 'directo') ACC.tab('directo'); pintaNav(); scrollTo(0, 0); G.ajusta(); }
-  function pintaNav() { nav.innerHTML = [['listas', 'Listas', '☰'], ['lienzo', 'Lienzo', '▣'], ['ajustes', 'Ajustes', '⚙'], ['mando', 'Mando', '◉']].map(([k, t, i]) => `<button type="button" class="nv${vm === k ? ' on' : ''}" data-a="vm" data-v="${k}" aria-pressed="${vm === k}"><b>${i}</b><span>${T(t)}</span></button>`).join(''); }
+  function pintaNav() { nav.innerHTML = [['listas', 'Listas', '☰'], ['lienzo', 'Editar', '▣'], ['ajustes', 'Ajustes', '⚙'], ['mando', 'Avisos', '◉']].map(([k, t, i]) => `<button type="button" class="nv${vm === k ? ' on' : ''}" data-a="vm" data-v="${k}" aria-pressed="${vm === k}"><b>${i}</b><span>${T(t)}</span></button>`).join(''); }
   html.dataset.vm = vm;
   /* al tocar una lista en el móvil se pasa al lienzo para verla (no al crear una nueva) */
   let tocaLista = false; document.addEventListener('click', e => { tocaLista = !!(e.target.closest && e.target.closest('#zona-listas [data-a="sel"]')); }, true);

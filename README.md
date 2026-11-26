@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.34**
+**Versión actual: v1.35**
 
 
 ## Icono
@@ -161,7 +161,13 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.34)
+## Cambios de la versión actual (v1.35)
+- **Rótulos que dicen sobre qué actúan:** «Duplicar lista / Borrar lista» en LISTAS, «Duplicar escena / Borrar escena» en ESCENA y «Duplicar pieza / Borrar pieza» en PIEZAS (antes, «Duplicar» y «Borrar» a secas en los tres sitios). Las flechas de la escena dicen **«◀ Mover antes»** y **«Mover después ▶»** (parecían «anterior / siguiente»).
+- **Barra de abajo del móvil:** LISTAS · **EDITAR** · AJUSTES · **AVISOS** (antes LIENZO y MANDO).
+- En LISTAS, los botones pasan a dos líneas si no caben (en tablet o en catalán), siempre entre palabras.
+- Caché nueva de la app (`adposter-v30`).
+
+## Cambios de la v1.34
 - **Editor de textos más corto en SIMPLE:** seis tipos de letra recomendados (Inter, Montserrat, Bebas Neue, Playfair, Caveat y Archivo Black, más la que ya lleve la pieza) y **«Más letras…»** para ver las 19; la alineación, las mayúsculas, la cursiva, la sombra y los espaciados, plegados en **«Más: alineación, mayúsculas, sombra…»**. Así el panel cabe sin desplazarse. En PRO, todo a la vista como antes.
 - **Las piezas nuevas buscan un hueco libre** (SIMPLE): en lugar de caer en el centro encima de lo que haya, se colocan donde menos tapen (las formas de fondo no cuentan), lo más cerca del centro; si a su tamaño no caben, prueban a tres cuartos y a la mitad. En PRO, la cascada de siempre.
 - Caché nueva de la app (`adposter-v29`).
@@ -530,7 +536,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.34 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.35 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 
