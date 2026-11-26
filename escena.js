@@ -17,7 +17,7 @@
   'use strict';
   const FUENTES = [['Inter', 'Inter'], ['Montserrat', 'Montserrat'], ['Poppins', 'Poppins'], ['Bebas Neue', 'Bebas Neue'], ['Anton', 'Anton'], ['Oswald', 'Oswald'], ['League Gothic', 'League Gothic'], ['Archivo Black', 'Archivo Black'],
     ['Playfair', 'Playfair Display'], ['Abril', 'Abril Fatface'], ['Cinzel', 'Cinzel'], ['Marcellus', 'Marcellus'], ['Alfa Slab', 'Alfa Slab One'], ['Fredoka', 'Fredoka'], ['Righteous', 'Righteous'], ['Pacifico', 'Pacifico'], ['Caveat', 'Caveat'], ['Courier', 'Courier Prime'], ['Mono', 'Share Tech Mono']];
-  const TIPOS = ['texto', 'imagen', 'video', 'zona', 'forma', 'reloj', 'fecha', 'tiempo', 'rss', 'qr', 'web', 'turno', 'pedidos', 'precios'];
+  const TIPOS = ['texto', 'imagen', 'video', 'zona', 'forma', 'reloj', 'fecha', 'tiempo', 'rss', 'qr', 'web', 'turno', 'pedidos', 'precios', 'boton'];
   const VIVO = window.ADVIVO || (window.ADVIVO = { d: {}, fs: new Set(), pon(k, v) { this.d[k] = v; this.fs.forEach(f => { try { f(k, v); } catch (e) {} }); }, oye(f) { this.fs.add(f); return () => this.fs.delete(f); } });
   const FAM = f => (FUENTES.find(x => x[1] === f) || FUENTES[0])[1];
   const col = (c, d) => typeof c === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(c) ? c : d;
@@ -46,6 +46,7 @@
     if (t === 'turno') return Object.assign(b, { tit: '', nh: 3, col: '#ffffff', acento: '#ffb000', fam: 'Inter', fondo: '#000000a6', radio: 2, x: 8, w: 84, y: 18, h: hor ? 64 : 46 });
     if (t === 'pedidos') return Object.assign(b, { col: '#ffffff', fam: 'Inter', fondo: '#000000a6', radio: 2, x: 4, w: 92, y: 12, h: hor ? 80 : 76 });
     if (t === 'precios') return Object.assign(b, { src: 'texto', filas: '', url: '', cn: 1, cp: 2, cab: true, ref: 10, cols: 1, col: '#ffffff', acento: '#ffb000', fam: 'Inter', x: 8, w: 84, y: 20, h: hor ? 66 : 56 });
+    if (t === 'boton') return Object.assign(b, { tx: 'Ver más', fam: 'Inter', peso: 800, col: '#111111', fondo: '#ffb000', radio: 3, sombra: true, ir: '', x: 25, w: 50, y: hor ? 74 : 80, h: hor ? 14 : 8 });   /* v1.40 · botón táctil: lleva a otra escena */
     return b; }
 
   /* ---------- iconos del tiempo (dibujos propios) ---------- */
@@ -109,6 +110,8 @@
         entra.textContent = ''; if (esVideo(f)) { const v = el('video'); v.muted = true; v.playsInline = true; v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.src = u; entra.appendChild(v); if (ctx.vivo) { const pl = v.play(); pl && pl.catch && pl.catch(() => {}); } v.onloadeddata = () => listo(Math.min(600000, Math.max(2000, (v.duration || p.seg || 8) * 1000))); v.onerror = () => { if (vivo && ctx.vivo) t = setTimeout(pon, 600); }; }
         else { const i = el('img'); i.alt = ''; i.draggable = false; i.onload = () => listo(num(p.seg, 8, 2, 600) * 1000); i.onerror = () => { if (vivo && ctx.vivo) t = setTimeout(pon, 600); }; i.src = u; entra.appendChild(i); } };
       pon(); return { fin() { vivo = false; clearTimeout(t); caja.querySelectorAll('video').forEach(v => { try { v.pause(); } catch (e) {} }); } }; },
+    boton(p, caja) { const bt = el('div', 'bt'), tx = el('div', 'tx'); tx.textContent = String(p.tx == null ? '' : p.tx).slice(0, 60); letra(tx, p, [400, 700, 800].includes(+p.peso) ? +p.peso : 800); if (p.may) tx.style.textTransform = 'uppercase'; bt.appendChild(tx); caja.appendChild(bt);   /* v1.40 */
+      return { ajusta() { encaja(bt, tx, true, Math.max(4, bt.clientHeight * .62)); } }; },
     forma(p, caja) { const c = col(p.col, '#ffb000'); caja.style.background = p.col2 ? 'linear-gradient(' + num(p.ang, 135, 0, 360) + 'deg,' + c + ',' + col(p.col2, c) + ')' : c; if (p.f === 'elipse') caja.style.borderRadius = '50%'; return {}; },
     reloj(p, caja, ctx) { if (p.est === 'analogico') { const c = col(p.col, '#ffffff'); caja.innerHTML = '<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><circle cx="50" cy="50" r="46" fill="none" stroke="' + c + '" stroke-width="3"/>' + Array.from({ length: 12 }, (x, i) => '<line x1="50" y1="8" x2="50" y2="' + (i % 3 ? 12 : 16) + '" stroke="' + c + '" stroke-width="' + (i % 3 ? 1.6 : 3) + '" transform="rotate(' + i * 30 + ' 50 50)"/>').join('') +
         '<line class="h" x1="50" y1="52" x2="50" y2="26" stroke="' + c + '" stroke-width="4.5" stroke-linecap="round"/><line class="m" x1="50" y1="52" x2="50" y2="14" stroke="' + c + '" stroke-width="3" stroke-linecap="round"/>' + (p.sg ? '<line class="s" x1="50" y1="58" x2="50" y2="12" stroke="#ff4d4d" stroke-width="1.4" stroke-linecap="round"/>' : '') + '<circle cx="50" cy="50" r="3" fill="' + c + '"/></svg>';

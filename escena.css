@@ -133,3 +133,9 @@
 .tactil .pz[data-ir]{cursor:pointer;pointer-events:auto}
 /* v1.23 · datos de ejemplo del editor: marca visible (no salen en las pantallas) */
 .ejemplo::after { content: attr(data-ej); position: absolute; top: 3px; right: 3px; z-index: 3; padding: 1px 5px; border-radius: 3px; background: #2f7de8; color: #fff; font: 800 10px/1.3 Inter, Arial, sans-serif; letter-spacing: .08em; pointer-events: none; }
+
+/* v1.40 · pieza BOTÓN (lista táctil): rótulo centrado que se ajusta a la caja y responde al dedo */
+.pz-boton > .in{cursor:pointer;transition:transform .12s ease,filter .12s ease}
+.pz-boton .bt{position:absolute;inset:14% 7%;display:flex;align-items:center;justify-content:center}
+.pz-boton .tx{text-align:center;line-height:1.05;white-space:pre-wrap;overflow-wrap:normal}
+.pz-boton:active > .in{transform:scale(.96);filter:brightness(1.18)}

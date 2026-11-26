@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.39**
+**Versión actual: v1.40**
 
 
 ## Icono
@@ -161,7 +161,12 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.39)
+## Cambios de la versión actual (v1.40)
+- **Pieza Botón (pantallas táctiles):** en PIEZAS, «Botón» añade un rótulo grande (por defecto «Ver más») que, al tocarlo en la pantalla, lleva a la escena que elijas en «Lleva a». Se eligen el texto, el color del botón, el color de la letra y el tipo de letra; el rótulo se ajusta solo a la caja y el botón se hunde un poco al tocarlo. Al añadir el primer botón, la lista pasa a pantalla táctil.
+- **Quedarse en la portada:** en el botón (y en TIEMPOS › Modo táctil), con esta opción la pantalla no va pasando escenas sola: se queda en la primera hasta que alguien toca un botón, y a los segundos de «vuelta» sin tocar regresa a la primera.
+- Caché nueva de la app (`adposter-v35`).
+
+## Cambios de la v1.39
 - **Etiquetas por pantalla:** al añadir una pantalla (en «Más opciones») puedes darle una o varias etiquetas separadas por comas, como «barra, terraza». Después, en A PANTALLAS y en las reglas del calendario, puedes mandar un aviso, una lista o un turno solo a las pantallas con esa etiqueta (por ejemplo, todas las de la barra aunque estén en grupos distintos). Hasta 8 etiquetas por pantalla.
 - Si cambias las etiquetas de una pantalla, se vuelve a conectar sola para recibir las órdenes nuevas.
 - Caché nueva de la app (`adposter-v34`).
@@ -558,7 +563,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.39 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.40 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

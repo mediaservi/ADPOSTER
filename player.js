@@ -16,7 +16,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.39';
+  const VERSION = '1.40';
   const SC = document.currentScript, Q = new URLSearchParams(location.search);
   const BASE = new URL(SC.dataset.base || '../', location.href).href;
   const ID = (SC.dataset.playlist || Q.get('l') || 'demo').toLowerCase().replace(/[^a-z0-9_-]/g, '');
@@ -222,12 +222,14 @@
   function limpiaEsc() { escM.forEach((m, i) => { if (m) { m.destruye(); escM[i] = null; } }); $$('.esc-capa').forEach(c => c.classList.remove('on', 'sale')); }
   /* v1.23 · ANUNCIOS entre escenas (uno cada mín–máx, a pantalla completa) y lista TÁCTIL (tocar una pieza con destino salta a esa escena; sin tocar, vuelve a la primera) */
   let salto = '', tToque = 0, enMano = false, escAct = null;
+  const quieta = () => !!(cfg.tactil && cfg.tactil.activo && cfg.tactil.portada);
   const anuncioEsc = f => ({ id: 'ad', n: 'AD · ' + f, seg: cfg.segundosAnuncio, fondo: { t: 'color', c: '#000000' }, piezas: [{ id: 'ad' + Date.now().toString(36), t: esVideo(f) ? 'video' : 'imagen', x: 0, y: 0, w: 100, h: 100, src: f, aj: 'contener' }] });
   async function escenas() { const g = gen, capas = $$('.esc-capa'); let hechas = 0, toca = entre(cfg.anunciosCada[0], cfg.anunciosCada[1]);
     while (g === gen && activo() && ESC()) { const lista = cfg.escenas.filter(vale); if (!lista.length) { limpiaEsc(); await espera(2000); ultimo = Date.now(); continue; }
       let e, esAd = false, vuelta = num(cfg.tactil.vuelta, 30, 5, 300) * 1000;
       if (salto) { e = cfg.escenas.find(x => x.id === salto) || lista[0]; salto = ''; enMano = true; escI = lista.indexOf(e) + 1; }
       else if (enMano) { enMano = false; e = lista[0]; escI = 1; }
+      else if (quieta()) { e = lista[0]; escI = 1; }   /* v1.40 · «Quedarse en la portada»: sin tocar, la primera escena no se mueve */
       else if (pool.ads.length && hechas >= toca && !cfg.tactil.activo) { const f = saca('ads'); if (f) { e = anuncioEsc(f); esAd = true; } hechas = 0; toca = entre(cfg.anunciosCada[0], cfg.anunciosCada[1]); }
       if (!e) { e = lista[escI % lista.length]; escI++; hechas++; }
       const n = escN % 2, entra = capas[n], sale = capas[1 - n]; escN++;
@@ -236,7 +238,7 @@
       sale.classList.add('sale'); sale.classList.remove('on'); entra.classList.add('on'); const tf = cfg.fundido.tipo === 'corte' ? 0 : cfg.fundido.segundos * 1000, viejo = 1 - n;
       setTimeout(() => { sale.classList.remove('sale'); if (!sale.classList.contains('on') && escM[viejo]) { escM[viejo].destruye(); escM[viejo] = null; } }, tf + 120);
       actual.feed = esAd ? e.piezas[0].src : String(e.n || ''); actual.ads = ''; ultimo = Date.now(); const dur = num(e.seg, 12, 3, 3600) * 1000 + tf, t0 = Date.now(), sola = lista.length < 2 && !esAd && !(pool.ads.length && !cfg.tactil.activo);
-      while (g === gen && activo() && !salto && (enMano ? Date.now() - tToque < vuelta : (sola || Date.now() - t0 < dur))) { await espera(250); ultimo = Date.now(); if (!enMano && sola && cfg.escenas.filter(vale).length !== 1) break; }
+      while (g === gen && activo() && !salto && (enMano ? Date.now() - tToque < vuelta : (sola || (quieta() && e === lista[0]) || Date.now() - t0 < dur))) { await espera(250); ultimo = Date.now(); if (!enMano && sola && cfg.escenas.filter(vale).length !== 1) break; }
       cuenta(esAd ? e.piezas[0].src : 'escena · ' + (e.n || e.id), (Date.now() - t0) / 1000); }
     if (!ESC() || !activo()) limpiaEsc(); }
   /* v1.23 · informe de emisión: cada display cuenta qué ha sacado y cuánto tiempo, por día (31 días); el gestor lo pide y lo baja en CSV */
