@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.40**
+**Versión actual: v1.41**
 
 
 ## Icono
@@ -161,7 +161,12 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.40)
+## Cambios de la versión actual (v1.41)
+- **Restaurante en el ASISTENTE:** crea tres listas de una vez, una por pantalla: **ENTRADA** (vertical: bienvenida, menú del día de 12:00 a 16:00, especialidad, horario y reseñas), **SALA** (horizontal: pizarra, carta, especialidad, redes y wifi) y **CARTA TÁCTIL** (una portada con el botón «Ver la carta» que se queda quieta hasta que alguien la toca). El último paso recuerda añadir una pantalla para cada lista.
+- En pantallas bajas (móvil apaisado), los tipos de negocio del asistente van en tres columnas para que todo quepa sin desplazar.
+- Caché nueva de la app (`adposter-v36`).
+
+## Cambios de la v1.40
 - **Pieza Botón (pantallas táctiles):** en PIEZAS, «Botón» añade un rótulo grande (por defecto «Ver más») que, al tocarlo en la pantalla, lleva a la escena que elijas en «Lleva a». Se eligen el texto, el color del botón, el color de la letra y el tipo de letra; el rótulo se ajusta solo a la caja y el botón se hunde un poco al tocarlo. Al añadir el primer botón, la lista pasa a pantalla táctil.
 - **Quedarse en la portada:** en el botón (y en TIEMPOS › Modo táctil), con esta opción la pantalla no va pasando escenas sola: se queda en la primera hasta que alguien toca un botón, y a los segundos de «vuelta» sin tocar regresa a la primera.
 - Caché nueva de la app (`adposter-v35`).
@@ -563,7 +568,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.40 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.41 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

@@ -506,6 +506,7 @@ textarea.campo.area { flex: none; width: 100%; box-sizing: border-box; min-heigh
 .as-pasos { display: flex; justify-content: center; gap: 10px; } .as-pasos i { width: 2em; height: 2em; display: grid; place-items: center; border-radius: 50%; font: 400 1em 'Share Tech Mono', monospace; font-style: normal; color: var(--gris); background: #131315; box-shadow: inset 0 2px 5px #000; }
 .as-pasos i.on { color: #1a1205; background: var(--ambar); box-shadow: 0 0 10px rgba(255, 176, 0, .6); }
 .rej.neg .tecla { min-height: calc(var(--alto) * 1.3); }
+@media (max-height: 520px) { .rej.neg { grid-template-columns: repeat(3, minmax(0, 1fr)); } .rej.neg .tecla { min-height: var(--alto); } .m-as .m-caja { width: min(760px, 100%); } }   /* v1.41 · 9 negocios en pantallas bajas: tres columnas */
 .as-res { display: flex; flex-direction: column; gap: 6px; }
 .fm-l { flex: 1; display: flex; align-items: center; gap: 6px; font: 400 .85em 'Share Tech Mono', monospace; color: var(--gris); text-transform: uppercase; } .fm-l input { width: 100%; }
 /* DISPLAYS: contadores, miniatura y «visto hace» */
