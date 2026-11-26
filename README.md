@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.46**
+**Versión actual: v1.47**
 
 
 ## Icono
@@ -161,7 +161,12 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.46)
+## Cambios de la versión actual (v1.47)
+- **Vídeos sin conexión:** cada pantalla guarda también los vídeos de sus listas (carteles, piezas Vídeo y zonas de carpeta), igual que ya hacía con las fotos. Si se cae la red, los sigue reproduciendo desde su copia. Los vídeos de otras webs se guardan si esa web lo permite; si no, o si pesan más de 500 MB, se siguen viendo por la red como antes. Al quitar un vídeo de las listas, su copia se borra.
+- La guía (AYUDA) lo menciona en Trucos.
+- Caché nueva de la app (`adposter-v42`).
+
+## Cambios de la v1.46
 - **Arreglo:** de vez en cuando (más o menos 1 de cada 40 aperturas), el gestor en SIMPLE salía con algunos rótulos de PRO («Activar el directo», «Directo»…) hasta tocar algo. Ahora el modo SIMPLE se marca antes de pintar nada.
 - Caché nueva de la app (`adposter-v41`).
 
@@ -597,7 +602,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.46 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.47 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

@@ -30,7 +30,7 @@
       ['tactil', 'Pantallas táctiles', `<p>Para un kiosco o una carta que el cliente toca:</p><ul><li>Añade la pieza <b>Botón</b> y elige en «Lleva a» la escena que abre (por ejemplo, la carta).</li><li>Activa <b>Quedarse en la portada</b> para que, sin tocar, la pantalla no cambie de escena.</li><li>A los segundos de «vuelta» sin tocar, vuelve sola a la primera escena.</li></ul>
         <p>El ASISTENTE de <b>Restaurante</b> ya trae una carta táctil hecha.</p>`],
       ['modos', 'SIMPLE y PRO', `<p>El interruptor de arriba cambia la vista:</p><ul><li><b>SIMPLE</b>: lo justo para el día a día, con palabras sencillas.</li><li><b>PRO</b>: todos los ajustes (capas, transiciones, medidas LED, público, carpetas…).</li></ul><p>Lo que haces en una vista se mantiene en la otra.</p>`],
-      ['trucos', 'Trucos', `<ul><li><b>Restablecer</b> (al pie de cada pestaña) vuelve a los valores de fábrica; pide un segundo toque para confirmar.</li><li>El botón de idioma cambia la app a español, inglés o catalán.</li><li>Una pantalla sin red sigue enseñando lo último que recibió.</li><li>Si algo falla, el botón rojo del pie manda el aviso del fallo.</li></ul>`]
+      ['trucos', 'Trucos', `<ul><li><b>Restablecer</b> (al pie de cada pestaña) vuelve a los valores de fábrica; pide un segundo toque para confirmar.</li><li>El botón de idioma cambia la app a español, inglés o catalán.</li><li>Una pantalla sin red sigue enseñando lo último que recibió, fotos y vídeos incluidos.</li><li>Si algo falla, el botón rojo del pie manda el aviso del fallo.</li></ul>`]
     ],
     en: [
       ['que', 'What it is', `<p><b>ADPOSTER</b> is digital signage: from this device (computer, tablet or phone) you prepare what appears on your TVs or screens, and they pick it up on their own.</p>
@@ -54,7 +54,7 @@
       ['tactil', 'Touch screens', `<p>For a kiosk or a menu that customers touch:</p><ul><li>Add the <b>Button</b> piece and choose in “Goes to” the scene it opens (the menu, for example).</li><li>Turn on <b>Stay on the home scene</b> so the screen does not change scene when nobody touches it.</li><li>After the “return” seconds without a touch, it goes back to the first scene on its own.</li></ul>
         <p>The <b>Restaurant</b> WIZARD already includes a touch menu.</p>`],
       ['modos', 'SIMPLE and PRO', `<p>The switch at the top changes the view:</p><ul><li><b>SIMPLE</b>: just what you need day to day, in plain words.</li><li><b>PRO</b>: every setting (layers, transitions, LED sizes, audience, folders…).</li></ul><p>What you do in one view stays in the other.</p>`],
-      ['trucos', 'Tips', `<ul><li><b>Reset</b> (at the bottom of each tab) goes back to the factory values; it asks for a second tap to confirm.</li><li>The language button switches the app to Spanish, English or Catalan.</li><li>A screen without network keeps showing the last thing it received.</li><li>If something fails, the red button in the footer reports it.</li></ul>`]
+      ['trucos', 'Tips', `<ul><li><b>Reset</b> (at the bottom of each tab) goes back to the factory values; it asks for a second tap to confirm.</li><li>The language button switches the app to Spanish, English or Catalan.</li><li>A screen without network keeps showing the last thing it received, photos and videos included.</li><li>If something fails, the red button in the footer reports it.</li></ul>`]
     ],
     ca: [
       ['que', 'Què és', `<p><b>ADPOSTER</b> és cartelleria digital: des d’aquest aparell (ordinador, tauleta o mòbil) prepares el que surt a les teves teles o pantalles, i elles ho recullen soles.</p>
@@ -78,7 +78,7 @@
       ['tactil', 'Pantalles tàctils', `<p>Per a un quiosc o una carta que el client toca:</p><ul><li>Afegeix la peça <b>Botó</b> i tria a «Porta a» l’escena que obre (per exemple, la carta).</li><li>Activa <b>Quedar-se a la portada</b> perquè, sense tocar, la pantalla no canviï d’escena.</li><li>Als segons de «tornada» sense tocar, torna sola a la primera escena.</li></ul>
         <p>L’ASSISTENT de <b>Restaurant</b> ja porta una carta tàctil feta.</p>`],
       ['modos', 'SIMPLE i PRO', `<p>L’interruptor de dalt canvia la vista:</p><ul><li><b>SIMPLE</b>: el just per al dia a dia, amb paraules senzilles.</li><li><b>PRO</b>: tots els ajustos (capes, transicions, mides LED, públic, carpetes…).</li></ul><p>El que fas en una vista es manté a l’altra.</p>`],
-      ['trucos', 'Trucs', `<ul><li><b>Restableix</b> (al peu de cada pestanya) torna als valors de fàbrica; demana un segon toc per confirmar.</li><li>El botó d’idioma canvia l’app a castellà, anglès o català.</li><li>Una pantalla sense xarxa continua ensenyant l’últim que va rebre.</li><li>Si alguna cosa falla, el botó vermell del peu n’envia l’avís.</li></ul>`]
+      ['trucos', 'Trucs', `<ul><li><b>Restableix</b> (al peu de cada pestanya) torna als valors de fàbrica; demana un segon toc per confirmar.</li><li>El botó d’idioma canvia l’app a castellà, anglès o català.</li><li>Una pantalla sense xarxa continua ensenyant l’últim que va rebre, fotos i vídeos inclosos.</li><li>Si alguna cosa falla, el botó vermell del peu n’envia l’avís.</li></ul>`]
     ]
   };
   Object.assign(TX, { 'Ayuda': ['Help', 'Ajuda'], 'Guía de uso': ['User guide', 'Guia d’ús'], 'Anterior': ['Previous', 'Anterior'], 'Siguiente': ['Next', 'Següent'], 'Acerca de': ['About', 'Quant a'] });

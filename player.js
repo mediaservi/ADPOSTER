@@ -16,7 +16,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.46';
+  const VERSION = '1.47';
   const SC = document.currentScript, Q = new URLSearchParams(location.search);
   const BASE = new URL(SC.dataset.base || '../', location.href).href;
   const ID = (SC.dataset.playlist || Q.get('l') || 'demo').toLowerCase().replace(/[^a-z0-9_-]/g, '');
@@ -117,8 +117,8 @@
     Object.keys(L).map(k => L[k]).concat(cfg ? [cfg] : []).forEach(p => { if (!p || typeof p !== 'object') return;
       [].concat(p.contenido || [], p.anuncios || []).forEach(c => de(c).forEach(f => fs.add(f))); (Array.isArray(p.sueltos) ? p.sueltos : []).forEach(f => { if (ok(f) && f.indexOf('/') > 0) fs.add(f); });
       if (p.fondo) (car.fondos || []).forEach(x => { if (x.replace(/\.[a-z0-9]+$/i, '') === p.fondo) fs.add('fondos/' + x); });
-      (Array.isArray(p.escenas) ? p.escenas : []).forEach(e => { if (!e || typeof e !== 'object') return; if (e.fondo && e.fondo.t === 'img' && ok(e.fondo.src)) fs.add(e.fondo.src); (Array.isArray(e.piezas) ? e.piezas : []).forEach(z => { if (!z) return; if (z.t === 'zona') (z.carp || []).forEach(c => de(c).forEach(f => fs.add(f))); else if (z.t === 'imagen' && ok(z.src)) fs.add(z.src); }); }); });
-    const urls = [...fs].filter(f => !esVideo(f)).slice(0, 3000).map(url).concat([location.href.split('#')[0]]), firma = urls.join('|'); if (firma === copiado) return; copiado = firma;
+      (Array.isArray(p.escenas) ? p.escenas : []).forEach(e => { if (!e || typeof e !== 'object') return; if (e.fondo && e.fondo.t === 'img' && ok(e.fondo.src)) fs.add(e.fondo.src); (Array.isArray(e.piezas) ? e.piezas : []).forEach(z => { if (!z) return; if (z.t === 'zona') (z.carp || []).forEach(c => de(c).forEach(f => fs.add(f))); else if ((z.t === 'imagen' || z.t === 'video') && ok(z.src)) fs.add(z.src); else if (z.t === 'video' && /^https:\/\/\S+$/i.test(z.src || '')) fs.add(z.src); }); }); });   // v1.47 · también los vídeos
+    const urls = [...fs].slice(0, 3000).map(f => /^https:/i.test(f) ? f : url(f)).concat([location.href.split('#')[0]]), firma = urls.join('|'); if (firma === copiado) return; copiado = firma;
     navigator.serviceWorker.ready.then(r => { r.active && r.active.postMessage({ t: 'pre', id: 'display', urls, limpia: true }); }).catch(() => {}); }
   function aplica() {
     cfg = calcula(); diaA = hoyISO(); pool = calPool(); const car = (MAN && MAN.carpetas) || {};
@@ -173,7 +173,7 @@
   const esVideo = f => /\.(mp4|webm|m4v|mov)(\?|$)/i.test(f);
   function precarga(u) {
     if (esVideo(u)) return new Promise(res => { const v = document.createElement('video'); let fin = false; const ok = x => { if (!fin) { fin = true; clearTimeout(t); res(x); } }, t = setTimeout(() => ok(false), 20000);
-      v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.setAttribute('muted', ''); v.preload = 'auto'; v.onloadeddata = () => ok(v); v.onerror = () => ok(false); v.src = u; v.load(); });
+      v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.setAttribute('muted', ''); v.preload = 'auto'; v.onloadeddata = () => ok(v); v.onerror = () => ok(false); (window.ADESCENA && window.ADESCENA.ponVideo ? window.ADESCENA.ponVideo(v, u, !PREV) : Promise.resolve(v.src = u)).then(() => v.load()); });   // v1.47 · desde la copia guardada si la hay
     return new Promise(res => { const i = new Image(); let fin = false; const ok = v => { if (!fin) { fin = true; res(v); } }; const t = setTimeout(() => ok(false), 12000);
     i.onload = () => { clearTimeout(t); (i.decode ? i.decode().catch(() => {}) : Promise.resolve()).then(() => ok(i)); }; i.onerror = () => { clearTimeout(t); ok(false); }; i.src = u; }); }
   /* cada póster ocupa todo lo que cabe en su marco, sea cual sea su tamaño original */
