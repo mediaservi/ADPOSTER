@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.37**
+**Versión actual: v1.38**
 
 
 ## Icono
@@ -161,7 +161,12 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.37)
+## Cambios de la versión actual (v1.38)
+- **Posición y tamaño en píxeles en los lienzos A MEDIDA (LED):** al elegir una pieza, X, Y, ancho y alto van en píxeles reales del controlador (por ejemplo, de 0 a 1500 × 0 a 1000), para cuadrar las piezas con los módulos. En los lienzos normales siguen en %.
+- **Miniaturas más grandes** en la tira de carteles y de escenas, en SIMPLE y en pantallas de escritorio altas (sin desplazar la página).
+- Caché nueva de la app (`adposter-v33`).
+
+## Cambios de la v1.37
 - **Fondo desenfocado:** si una foto no encaja con la forma de la pantalla (una vertical en una tele horizontal), sale entera y con ella misma ampliada y desenfocada detrás, en lugar de recortarla o dejar los lados en negro. Se activa en CONTENIDO («Fondo desenfocado»); las listas nuevas de SIMPLE lo traen puesto. Las fotos que casi encajan (un póster 2:3 en una tele vertical) siguen llenando la pantalla.
 - **Deshacer en el mando de pedidos:** «↶ Deshacer» vuelve atrás el último toque (añadir, pasar a listo, retirar o limpiar), hasta 20 pasos.
 - **«Hoy cerrado» dura todo el día:** en la tecla AVISO, ese texto preparado se queda hasta las 23:59.
@@ -327,8 +332,6 @@ Pensada para usos muy distintos, desde quien pone su primera pantalla hasta quie
 - Anuncios entre escenas hechos con escenas propias.
 - **Asistente «Restaurante»** con varias listas y pantallas de una vez; «Hoy cerrado» ya está en la tecla AVISO (v1.37).
 - **Pieza «Botón»** con estilo listo y opción «quedarse en la portada hasta que toquen» para kioscos táctiles; «Al tocar» visible aunque el modo táctil esté apagado.
-- **Posición de piezas en píxeles** en los lienzos a medida, para cuadrar con los módulos LED.
-- Tira de carteles con miniaturas más grandes.
 - Pieza **Agenda** que lea un calendario ICS publicado; necesita que el calendario deje leerse desde otra web o un pequeño intermediario.
 - **Etiquetas** por pantalla (varias por display) además de grupo y sede.
 - **Sincronía de vídeo** entre pantallas y muro de varios monitores con reloj común.
@@ -550,7 +553,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.37 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.38 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

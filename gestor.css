@@ -748,3 +748,4 @@ html:not(.md-simple) .bt-simple-f { display: none !important; }
 .tecla.emer-bt .sos { display: none; letter-spacing: .06em; }
 @media (max-width: 900px) { .tecla.emer-bt .sos { display: inline; } .tecla.emer-bt .sir { display: none; } }
 .estado > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (min-width: 901px) and (min-height: 820px) { html.md-simple .mini .mm { width: clamp(38px, 5.2vh, 54px); } html.md-simple .mini.hor .mm { width: clamp(80px, 11vh, 112px); } }
