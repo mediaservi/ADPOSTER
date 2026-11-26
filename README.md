@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.33**
+**Versión actual: v1.34**
 
 
 ## Icono
@@ -161,7 +161,12 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.33)
+## Cambios de la versión actual (v1.34)
+- **Editor de textos más corto en SIMPLE:** seis tipos de letra recomendados (Inter, Montserrat, Bebas Neue, Playfair, Caveat y Archivo Black, más la que ya lleve la pieza) y **«Más letras…»** para ver las 19; la alineación, las mayúsculas, la cursiva, la sombra y los espaciados, plegados en **«Más: alineación, mayúsculas, sombra…»**. Así el panel cabe sin desplazarse. En PRO, todo a la vista como antes.
+- **Las piezas nuevas buscan un hueco libre** (SIMPLE): en lugar de caer en el centro encima de lo que haya, se colocan donde menos tapen (las formas de fondo no cuentan), lo más cerca del centro; si a su tamaño no caben, prueban a tres cuartos y a la mitad. En PRO, la cascada de siempre.
+- Caché nueva de la app (`adposter-v29`).
+
+## Cambios de la v1.33
 - **Tecla AVISO** en la cabecera, ámbar, junto a la roja de EMERGENCIA: abre una ventanita con textos preparados (**Cerramos antes hoy**, **Volvemos enseguida**, **Oferta del día**, **Hoy cerrado**) o libre, **cuánto dura** (30 s, 2 min, 10 min o hasta una hora), el **color** y **ENVIAR AVISO**. Es el mismo aviso de la pestaña AVISOS/DIRECTO, a un toque.
 - La **EMERGENCIA** se queda para lo que es: evacuación, incendio, confinamiento o texto libre. «Cierre del local» sale de su lista (para eso está el AVISO).
 - Caché nueva de la app (`adposter-v28`).
@@ -525,7 +530,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.33 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.34 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 
