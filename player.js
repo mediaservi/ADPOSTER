@@ -16,7 +16,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.26';
+  const VERSION = '1.27';
   const SC = document.currentScript, Q = new URLSearchParams(location.search);
   const BASE = new URL(SC.dataset.base || '../', location.href).href;
   const ID = (SC.dataset.playlist || Q.get('l') || 'demo').toLowerCase().replace(/[^a-z0-9_-]/g, '');
@@ -50,7 +50,7 @@
     'EMERGENCIA': ['EMERGENCY', 'EMERGÈNCIA'], 'TURNO': ['NOW SERVING', 'TORN'], 'PANTALLA NUEVA': ['NEW SCREEN', 'PANTALLA NOVA'], 'Código de esta pantalla': ['This screen’s code', 'Codi d’aquesta pantalla'],
     'En el gestor: PUBLICAR → Añadir pantalla → escribe este código. O escanea el QR con el móvil.': ['In the manager: PUBLISH → Add screen → type this code. Or scan the QR with your phone.', 'Al gestor: PUBLICA → Afegeix una pantalla → escriu aquest codi. O escaneja el QR amb el mòbil.'],
     'Esperando…': ['Waiting…', 'Esperant…'], 'Sin conexión con el repetidor: reintentando…': ['No relay connection: retrying…', 'Sense connexió amb el repetidor: reintentant…'], '¡Emparejada!': ['Paired!', 'Aparellada!'], 'Turno': ['Number', 'Torn'], 'puesto': ['desk', 'lloc'],
-    'Esperando el contenido del gestor…': ['Waiting for content from the manager…', 'Esperant el contingut del gestor…'], 'En el gestor, pulsa «✓ Enviar cambios».': ['In the manager, press “✓ Send changes”.', 'Al gestor, prem «✓ Envia els canvis».'],
+    'Esperando el contenido del gestor…': ['Waiting for content from the manager…', 'Esperant el contingut del gestor…'], 'En el gestor, pulsa «✓ Publicar».': ['In the manager, press “✓ Publish”.', 'Al gestor, prem «✓ Publica».'],
     'En el gestor: Añadir pantalla → escribe este código. O escanea el QR con el móvil.': ['In the manager: Add screen → type this code. Or scan the QR with your phone.', 'Al gestor: Afegeix una pantalla → escriu aquest codi. O escaneja el QR amb el mòbil.'],
     'Sin confirmar: el gestor puede retirarla.': ['Unconfirmed: the manager can withdraw it.', 'Sense confirmar: el gestor la pot retirar.'] };
   const T = s => { const t = TX[s]; return !t || LANG === 'es' ? s : (LANG === 'ca' ? t[1] : LANG === 'en' ? t[0] : s); };
@@ -199,7 +199,7 @@
   async function bucle() {
     for (;;) {
       ultimo = Date.now();
-      if (!cfg.existe) { if (!PREV) aviso(T('Esperando el contenido del gestor…') + '\n' + T('En el gestor, pulsa «✓ Enviar cambios».')); await espera(PREV ? 300 : 1000); continue; }   // v1.23 · nunca «No existe la playlist»: la lista llega por el directo en cuanto el gestor la manda
+      if (!cfg.existe) { if (!PREV) aviso(T('Esperando el contenido del gestor…') + '\n' + T('En el gestor, pulsa «✓ Publicar».')); await espera(PREV ? 300 : 1000); continue; }   // v1.23 · nunca «No existe la playlist»: la lista llega por el directo en cuanto el gestor la manda
       if (!activo()) { $('.apagado').classList.add('on'); aviso(''); await espera(PREV ? 600 : offR ? 1500 : 20000); continue; } $('.apagado').classList.remove('on');
       if (ESC()) { aviso(''); await escenas(); continue; }
       if (!pool.feed.length && !pool.ads.length) { aviso(T('Esta lista aún no tiene carteles: añádelos desde el gestor.')); await espera(PREV ? 500 : 3000); continue; } aviso('');

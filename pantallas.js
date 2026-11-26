@@ -17,7 +17,7 @@
   'use strict';
   const G = window.ADG; if (!G || !G.ext.abreModal) return;
   const { T, TX, $, esc, tecla, campo, lim, copia } = G, X = G.ext, ACC = G.ACC, html = document.documentElement;
-  Object.assign(TX, { 'Siguiente': ['Next', 'Següent'], 'código': ['code', 'codi'], 'Lista creada: toca un texto del lienzo para cambiarlo y, cuando esté, «✓ Enviar cambios».': ['List created: tap a text on the canvas to change it and, when ready, “✓ Send changes”.', 'Llista creada: toca un text del llenç per canviar-lo i, quan estigui, «✓ Envia els canvis».'],
+  Object.assign(TX, { 'Poner otra lista un rato o desde una fecha': ['Show another list for a while or from a date', 'Posa una altra llista una estona o des d’una data'], 'Siguiente': ['Next', 'Següent'], 'código': ['code', 'codi'], 'Lista creada: toca un texto del lienzo para cambiarlo y, cuando esté, «✓ Publicar».': ['List created: tap a text on the canvas to change it and, when ready, “✓ Publish”.', 'Llista creada: toca un text del llenç per canviar-lo i, quan estigui, «✓ Publica».'],
     'Pon otra lista en algunas pantallas: ahora, un rato o desde una fecha.': ['Put another list on some screens: now, for a while or from a date.', 'Posa una altra llista en algunes pantalles: ara, una estona o des d’una data.'],
     'Si no lo marcas, es solo por un rato: luego cada pantalla vuelve a su lista.': ['If unticked, it’s only for a while: each screen then goes back to its list.', 'Si no ho marques, és només una estona: després cada pantalla torna a la seva llista.'],
     'En la tele, abre el navegador (o la app Kiosk del stick) y entra en {u}. Saldrá un código de 6 caracteres: escríbelo aquí y la pantalla se configura sola.': ['On the TV, open the browser (or the stick’s Kiosk app) and go to {u}. A 6-character code appears: type it here and the screen sets itself up.', 'A la tele, obre el navegador (o l’app Kiosk de l’stick) i entra a {u}. Sortirà un codi de 6 caràcters: escriu-lo aquí i la pantalla es configura sola.'] });
@@ -88,7 +88,7 @@
     'Pega aquí el enlace del mando o el código del canal': ['Paste the remote link or the channel code here', 'Enganxa aquí l’enllaç del comandament o el codi del canal'], 'Ese enlace o código no vale.': ['That link or code is not valid.', 'Aquest enllaç o codi no val.'], 'Listas traídas de tus pantallas': ['Lists brought from your screens', 'Llistes portades de les pantalles'],
     'Todas las pantallas': ['All screens', 'Totes les pantalles'], 'sin datos': ['no data', 'sense dades'], 'px ancho': ['px wide', 'px ample'], 'px alto': ['px high', 'px alt'],
     'Panadería o pastelería': ['Bakery or pastry shop', 'Forn o pastisseria'], 'PAN DEL DÍA': ['BREAD OF THE DAY', 'PA DEL DIA'],
-    'Toca un texto del lienzo para escribir el tuyo.': ['Tap a text on the canvas to type yours.', 'Toca un text del llenç per escriure el teu.'], 'Creadas {n} listas: toca un texto del lienzo para cambiarlo y, cuando esté, «✓ Enviar cambios».': ['{n} lists created: tap a text on the canvas to change it and, when ready, “✓ Send changes”.', 'Creades {n} llistes: toca un text del llenç per canviar-lo i, quan estigui, «✓ Envia els canvis».']
+    'Toca un texto del lienzo para escribir el tuyo.': ['Tap a text on the canvas to type yours.', 'Toca un text del llenç per escriure el teu.'], 'Creadas {n} listas: toca un texto del lienzo para cambiarlo y, cuando esté, «✓ Publicar».': ['{n} lists created: tap a text on the canvas to change it and, when ready, “✓ Publish”.', 'Creades {n} llistes: toca un text del llenç per canviar-lo i, quan estigui, «✓ Publica».']
   });
   const lee = G.lee, guarda = G.guarda, el = (t, c) => { const e = document.createElement(t); if (c) e.className = c; return e; };
   const qrSvg = u => { try { const g = window.qrcode(0, 'M'); g.addData(u); g.make(); return g.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); } catch (e) { return ''; } };
@@ -144,7 +144,7 @@
       ${G.canal ? '' : `<div class="nota mal">${T('Sin directo: la emergencia solo se ve en el lienzo. Activa el directo para mandarla a las pantallas.')}</div>`}</div>`); }
 
   /* ================= ENVIAR CAMBIOS y A PANTALLAS ================= */
-  /* v1.23 · «✓ Enviar cambios» manda las listas, el calendario y los festivos a todas las pantallas: cada una sigue con su lista.
+  /* v1.23 · «✓ Publicar» manda las listas, el calendario y los festivos a todas las pantallas: cada una sigue con su lista.
      Las imágenes propias van cada una en su propio mensaje retenido (m/<clave>), solo las que han cambiado (o todas, si alguna pantalla dice que le faltan) */
   const huella = d => String(d).length.toString(36) + String(d).slice(-10);
   function datosVivo() { const B = G.B, usados = JSON.stringify(B.playlists), mk = {}; Object.keys(B.medios || {}).forEach(k => { if (usados.indexOf('"m:' + k + '"') >= 0) mk[k] = huella(B.medios[k]); }); return { t: Date.now(), playlists: B.playlists, agenda: B.agenda || [], festivos: B.festivos || [], mk }; }
@@ -227,7 +227,7 @@
         e.piezas = e.piezas.map(z => z.t === 'zona' ? { id: z.id, t: 'imagen', x: z.x, y: z.y, w: z.w, h: z.h, r: z.r || 0, o: z.o == null ? 1 : z.o, radio: z.radio || 0, src: '', aj: 'cubrir' } : z); return e; }).filter(Boolean); }
       B.playlists[id] = p; hechas.push(id); primera = primera || id; });
     G.guarda(G.KB, B); X.cierraModal ? X.cierraModal() : ACC.modalCierra(); ACC.sel(primera); if (innerWidth <= 900) ponVm('lienzo');
-    G.estado(T(hechas.length === 1 ? 'Lista creada: toca un texto del lienzo para cambiarlo y, cuando esté, «✓ Enviar cambios».' : 'Creadas {n} listas: toca un texto del lienzo para cambiarlo y, cuando esté, «✓ Enviar cambios».').replace('{n}', hechas.length)); }
+    G.estado(T(hechas.length === 1 ? 'Lista creada: toca un texto del lienzo para cambiarlo y, cuando esté, «✓ Publicar».' : 'Creadas {n} listas: toca un texto del lienzo para cambiarlo y, cuando esté, «✓ Publicar».').replace('{n}', hechas.length)); }
 
   /* ================= MANDO: turnos y pedidos ================= */
   /* v1.23 · el contador de turnos es uno por canal: cada gestor escucha el último turno del repetidor y sigue desde ahí (dos recepciones no repiten números) */
@@ -383,7 +383,7 @@
   const mq = matchMedia('(max-width: 900px)'), colocaEst = () => { const e = $('#estado'), z = $('.lienzo-zona'); if (!e || !z) return; if (mq.matches) { if (e.parentNode !== document.body) document.body.appendChild(e); } else if (e.parentNode !== z) z.appendChild(e); };
   try { mq.addEventListener('change', colocaEst); } catch (e) { mq.addListener(colocaEst); } colocaEst();
   /* ================= arranque y repintados ================= */
-  const pinta = () => { pintaSw(); pintaEm(); pintaNav(); bEnv.textContent = '✓ ' + T('Enviar cambios'); bEnv.title = T('Manda tus cambios a todas las pantallas; cada una sigue con su lista.'); bAp.textContent = '▶ ' + T('A pantallas'); bAp.title = T('Pon otra lista en algunas pantallas: ahora, un rato o desde una fecha.'); };
+  const pinta = () => { pintaSw(); pintaEm(); pintaNav(); bEnv.textContent = '✓ ' + T('Publicar'); bEnv.title = T('Manda tus cambios a todas las pantallas; cada una sigue con su lista.'); bAp.textContent = '▾'; bAp.title = T('Poner otra lista un rato o desde una fecha'); bAp.setAttribute('aria-label', bAp.title); };   /* v1.27 · un solo botón PUBLICAR y, al lado, ▾ para lo demás */
   if (window.AVCREDITO) window.AVCREDITO.alCambiar(pinta);
   const idV = ACC.idioma; ACC.idioma = () => { idV(); pinta(); };
   const vistaV = ACC.vista; ACC.vista = v => { vistaV(v); pinta(); };
