@@ -35,10 +35,11 @@
       i.onload = () => { let lado = 1920, q = .84, d = '';   /* v1.23 · hasta 1920 px de lado (un cartel 1080×1920 llega entero); si pesa, se reduce y se avisa */ for (let n = 0; n < 6; n++) { const k = Math.min(1, lado / Math.max(i.naturalWidth, i.naturalHeight)), c = document.createElement('canvas'); c.width = Math.max(1, Math.round(i.naturalWidth * k)); c.height = Math.max(1, Math.round(i.naturalHeight * k)); c.getContext('2d').drawImage(i, 0, 0, c.width, c.height); d = c.toDataURL('image/webp', q); if (d.indexOf('data:image/webp') !== 0) d = c.toDataURL('image/png'); if (d.length <= TOPE_UNA) break; lado = Math.round(lado * .86); q = Math.max(.6, q - .06); } if (Math.max(i.naturalWidth, i.naturalHeight) > lado) G.estado(T('Imagen reducida a {n} px para que viaje a las pantallas').replace('{n}', lado)); guarda(d); }; i.src = fr.result; };
     fr.readAsDataURL(file); }); }
   let alSubir = null;
-  function pide(cb) { alSubir = cb; const i = $('#sube-img'); i.value = ''; i.click(); }
+  function pide(cb, fin) { alSubir = cb; alFin = fin || null; const i = $('#sube-img'); i.value = ''; i.click(); }   /* v1.36 · fin(n): al acabar la tanda */
+  let alFin = null;
   /* v1.23 · varias imágenes a la vez, cada una con el nombre de su archivo */
   $('#sube-img').multiple = true;
-  $('#sube-img').addEventListener('change', async e => { const fs = [...(e.target.files || [])], cb = alSubir; alSubir = null; let n = 0; for (const f of fs) { const k = await sube(f); if (k) { n++; cb && cb(k); } } if (fs.length > 1) G.estado(T('{n} imágenes subidas').replace('{n}', n)); if (bib && !$('#modal').hidden) bibPinta(); });
+  $('#sube-img').addEventListener('change', async e => { const fs = [...(e.target.files || [])], cb = alSubir, fin = alFin; alSubir = null; alFin = null; let n = 0; for (const f of fs) { const k = await sube(f); if (k) { n++; cb && cb(k); } } if (fin) fin(n); else if (fs.length > 1) G.estado(T('{n} imágenes subidas').replace('{n}', n)); if (bib && !$('#modal').hidden) bibPinta(); });
 
   /* ================= BIBLIOTECA ================= */
   let bib = null;
@@ -197,7 +198,7 @@
       q.secuencia = (q.secuencia || []).map(x => x === de ? nu : x); if (q.archivos[de] && !q.archivos[de].off) { q.archivos[nu] = q.archivos[de]; delete q.archivos[de]; }
       (q.escenas || []).forEach(e => { (e.piezas || []).forEach(z => { if (z.src === de) { z.src = nu; hecho = true; } }); if (e.fondo && e.fondo.src === de) { e.fondo.src = nu; hecho = true; } }); });
     if (hecho) { G.estado(T('Copia editada puesta en lugar del original')); X.alLista && X.alLista(); } }
-  window.ADGEST = { elige: (tipo, cb) => biblio('elige', tipo, cb), pide, sube };
+  window.ADGEST = { elige: (tipo, cb) => biblio('elige', tipo, cb), pide, sube };   // pide(alSubir, alAcabar)
   /* v1.16 · FOTO (el editor de imagen, en otra pestaña) guarda aquí su copia editada como una imagen más de «Mis imágenes» */
   try { const bc = new BroadcastChannel('adposter-foto'); bc.onmessage = e => { const d = e.data || {}; if (d.t === 'guarda' && d.archivo) sube(d.archivo).then(k => { bc.postMessage({ t: 'ok', k }); if (k && d.de) sustituye(String(d.de), 'm:' + k); if (k && bib && !$('#modal').hidden) bibPinta(); }); }; } catch (e) {}
 })();

@@ -17,6 +17,7 @@
   'use strict';
   const G = window.ADG; if (!G || !G.ext.abreModal) return;
   const { T, TX, $, esc, tecla, campo, lim, copia } = G, X = G.ext, ACC = G.ACC, html = document.documentElement;
+  Object.assign(TX, { 'Sale en el rótulo de marca y bajo el QR.': ['It goes on the brand sign and under the QR.', 'Surt al rètol de marca i sota el QR.'] });
   Object.assign(TX, { 'Editar': ['Edit', 'Edita'], 'Avisos': ['Alerts', 'Avisos'] });
   Object.assign(TX, { 'Ámbar': ['Amber', 'Ambre'], 'Rojo': ['Red', 'Vermell'], 'Verde': ['Green', 'Verd'], 'Azul': ['Blue', 'Blau'], 'Aviso': ['Notice', 'Avís'], 'Mandar un aviso a las pantallas': ['Send a notice to the screens', 'Envia un avís a les pantalles'], 'Cuánto dura': ['How long', 'Quant dura'], 'Color': ['Colour', 'Color'], 'Enviar aviso': ['Send notice', 'Envia l’avís'], 'Aviso enviado': ['Notice sent', 'Avís enviat'],
     'Sale encima de lo que esté saliendo en todas las pantallas y luego desaparece solo.': ['It shows on top of whatever is playing on every screen and then goes away by itself.', 'Surt a sobre del que estigui sortint a totes les pantalles i després desapareix sol.'],
@@ -144,7 +145,7 @@
      («NO ENVIADA · reintentando») y se manda sola al volver; la banda cuenta en cuántas pantallas está saliendo. Si una pantalla enseña una emergencia
      que ya nadie tiene en curso (porque estaba apagada cuando se retiró), la banda lo dice y deja retirarla */
   let EM = lee('g-emer') || null, EMRET = lee('g-emret') || null;
-  function pintaEm() { bEm.innerHTML = `<i class="sir" aria-hidden="true"></i><span>${T('EMERGENCIA')}</span>`; bEm.setAttribute('aria-label', T('Emergencia')); bEm.title = T('Emergencia');
+  function pintaEm() { bEm.innerHTML = `<i class="sir" aria-hidden="true"></i><span>${T('EMERGENCIA')}</span><b class="sos">SOS</b>`; bEm.setAttribute('aria-label', T('Emergencia')); bEm.title = T('Emergencia');
     const D = G.DSP || {}, L = Object.keys(D), on = !!(EM && EM.on), vieja = !on && L.some(i => +D[i].e && Date.now() - D[i].visto < 50000); html.classList.toggle('alarma', on);
     banda.hidden = !on && !vieja; if (banda.hidden) { banda.innerHTML = ''; return; }
     if (!on) { banda.className = 'vieja'; banda.innerHTML = `<i class="sir" aria-hidden="true"></i><b>${T('Una pantalla muestra una emergencia antigua')}</b><span></span><button type="button" class="tecla" data-a="emRetira">${T('Retirar')}</button>`; return; }
@@ -246,9 +247,11 @@
   let as = null;
   function asPinta() { const m = $('#modal .m-caja'); if (!m || !as) return; let h;
     if (as.paso === 1) h = `<h2>1 · ${T('¿Qué negocio tienes?')}</h2><div class="rej dos neg">${Object.keys(NEG).map(k => tecla('asNeg', k, T(NEG[k].n), as.neg === k)).join('')}</div><div class="nota">${T('Tres pasos: el negocio, la pantalla y crear. Después se cambia todo tocando las piezas.')}</div>`;
-    else if (as.paso === 2) h = `<h2>2 · ${T('¿Cómo es la pantalla?')}</h2><div class="rej tres">${tecla('asFor', 'vertical', T('Vertical'), as.f === 'vertical')}${tecla('asFor', 'horizontal', T('Horizontal'), as.f === 'horizontal')}${tecla('asFor', 'led', T('LED a medida'), as.f === 'led')}</div>${campo('as-n', as.nom, T('Nombre del negocio'), ' maxlength="40" data-as="nom"')}`;
+    else if (as.paso === 2) h = `<h2>2 · ${T('¿Cómo es la pantalla?')}</h2><div class="rej tres">${tecla('asFor', 'vertical', T('Vertical'), as.f === 'vertical')}${tecla('asFor', 'horizontal', T('Horizontal'), as.f === 'horizontal')}${tecla('asFor', 'led', T('LED a medida'), as.f === 'led')}</div>${usaNombre() ? campo('as-n', as.nom, T('Nombre del negocio'), ' maxlength="40" data-as="nom"') + `<div class="nota">${T('Sale en el rótulo de marca y bajo el QR.')}</div>` : ''}`;
     else { const N = NEG[as.neg]; h = `<h2>3 · ${T('Se crearán')}</h2><div class="as-res">${N.l.map(l => `<div class="lcd res">${esc(l.n)} <small>${l.carteles ? T('Carteles') : (l.esc || []).length + ' ' + T('escenas')}</small></div>`).join('')}</div>`; }
     G.pon('#modal .m-caja', X.cabModal(T('Asistente')) + `<div class="as"><div class="as-pasos">${[1, 2, 3].map(i => `<i class="${i <= as.paso ? 'on' : ''}">${i}</i>`).join('')}</div>${h}<div class="fila">${as.paso > 1 ? `<button type="button" class="tecla" data-a="asPaso" data-v="-1">◀ ${T('Atrás')}</button>` : ''}<button type="button" class="tecla pri" data-a="${as.paso < 3 ? 'asPaso' : 'asCrea'}" data-v="1"${as.paso === 1 && !as.neg ? ' disabled' : ''}>${as.paso < 3 ? T('Siguiente') + ' ▶' : T('Crear')}</button></div></div>`); }
+  /* v1.36 · ¿alguna plantilla del negocio lleva un rótulo de marca o un QR con texto? Si no, el nombre no se pide */
+  function usaNombre() { const N = NEG[as && as.neg], PL = window.ADPLANT; if (!N || !PL) return true; return N.l.some(l => l.carteles || (l.esc || []).some(([pid]) => { const e = PL.haz(pid, as.f !== 'vertical', G.lang); return !!e && e.piezas.some(z => z.t === 'texto' && MARCA.test(String(z.tx || '').trim())); })); }
   function asCrea() { const N = NEG[as.neg], PL = window.ADPLANT, B = G.B, hechas = []; let primera = '';
     N.l.forEach(l => { let id = l.id, k = 2; while (B.playlists[id]) id = l.id.slice(0, 21) + '-' + k++; const medida = as.f === 'led' ? { w: 1500, h: 1000 } : l.medida || null, hor = medida ? medida.w >= medida.h : l.hor != null && as.f !== 'led' && N.l.length > 1 ? l.hor : as.f !== 'vertical';
       let nom = l.n, j = 2; while (Object.keys(B.playlists).some(x => (B.playlists[x].nombre || '') === nom)) nom = l.n + ' ' + j++;   // dos «PEDIDOS» no: el segundo es «PEDIDOS 2»

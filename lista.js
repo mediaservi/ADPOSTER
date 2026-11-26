@@ -117,7 +117,8 @@
     carMas() { anade(); },
     pkCarp(c) { if (!pk) return; pk.carp = c; pkPinta(); },
     pkTog(f) { if (!pk) return; pk.sel.has(f) ? pk.sel.delete(f) : pk.sel.add(f); pkPinta(); },
-    pkSube() { if (!window.ADGEST) return; window.ADGEST.pide(k => { if (k && pk) { pk.sel.add('m:' + k); pkPinta(); } }); },
+    pkSube() { if (!window.ADGEST) return; const ks = [];   /* v1.36 · lo que subes desde aquí entra ya en la lista, sin pulsar «Añadir» otra vez */
+      window.ADGEST.pide(k => { if (k) ks.push('m:' + k); }, n => { if (!ks.length) return; let m = 0; G.cambia(p => { const ya = new Set(todos(p)); p.sueltos = (p.sueltos || []).concat(ks.filter(f => !ya.has(f) && (m += 1))); }); if (pk) X.cierraModal(); G.estado(m + ' ' + T('carteles añadidos')); }); },
     pkAnade() { if (!pk || !pk.sel.size) return; const nuevos = [...pk.sel]; let n = 0; G.cambia(p => { const ya = new Set(todos(p)); p.sueltos = (p.sueltos || []).concat(nuevos.filter(f => !ya.has(f) && (n += 1))); }); X.cierraModal(); G.estado(n + ' ' + T('carteles añadidos')); },
     pkCarpeta() { if (!pk || pk.carp === '@mias') return; const c = pk.carp; G.cambia(p => { if (!p.contenido.includes(c)) p.contenido.push(c); p.sueltos = (p.sueltos || []).filter(f => f.indexOf(c + '/') !== 0); }); X.cierraModal(); G.estado(T('Carpeta añadida') + ' · ' + c); }
   });

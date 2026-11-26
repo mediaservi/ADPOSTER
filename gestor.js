@@ -10,7 +10,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.35', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS_C = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'], TABS_E = ['piezas', 'escena', 'tiempos', 'directo', 'publicar'];
+  const VERSION = '1.36', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS_C = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'], TABS_E = ['piezas', 'escena', 'tiempos', 'directo', 'publicar'];
   const DEF = { nombre: '', fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7], fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true,
     horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '', formato: 'vertical', qr: { activo: false, modo: 'url', url: '', texto: '', pos: 'bd' }, cinta: { activo: false, texto: '', rss: '' }, publico: false, modo: 'carteles', escenas: [], orden: 'azar', secuencia: [], archivos: {}, sueltos: [], adsS: [], tactil: { activo: false, vuelta: 30 } };
   const ESCM = p => !!p && p.modo === 'escenas', SIMPLE = () => document.documentElement.classList.contains('md-simple'), tabsDe = p => ESCM(p) ? TABS_E : SIMPLE() ? TABS_C.filter(t => t !== 'diseno') : TABS_C, X = () => window.ADG.ext || {};
@@ -124,7 +124,7 @@
   const firma = () => { const o = JSON.stringify([B.playlists, B.agenda, B.festivos || [], Object.keys(B.medios || {}).sort()]); let h = 5381; for (let i = 0; i < o.length; i++) h = (Math.imul(h, 33) ^ o.charCodeAt(i)) >>> 0; return h.toString(36) + '.' + o.length.toString(36); };
   const enviado = t => { ENV = { h: firma(), t }; guarda('g-env', ENV); estado(); };
   function cuentaEnv() { if (!ENV) return null; const L = Object.keys(DSP).filter(i => enLinea(DSP[i])), ok = L.filter(i => (+DSP[i].dv || 0) >= ENV.t && !(+DSP[i].mf)); return { tot: L.length, ok: ok.length, mf: L.filter(i => +DSP[i].mf).length }; }
-  function estado(msg) { const e = $('#estado'); if (msg) { clearTimeout(tFlash); e.className = 'estado flash'; e.lastElementChild.textContent = msg; tFlash = setTimeout(() => { tFlash = 0; estado(); }, 2600); return; } if (tFlash) return;
+  function estado(msg) { const e = $('#estado'); if (msg) { clearTimeout(tFlash); e.className = 'estado flash'; e.lastElementChild.textContent = msg; e.lastElementChild.title = msg; tFlash = setTimeout(() => { tFlash = 0; estado(); }, 2600); return; } if (tFlash) return;
     if (canal) { const pend = !ENV || ENV.h !== firma(), c = pend ? null : cuentaEnv(); let cl = ' sucio', tx = T('Cambios sin enviar');
       if (!pend) { if (!c || !c.tot) { cl = ' ok'; tx = '✓ ' + T('Enviado'); } else if (c.ok >= c.tot) { cl = ' ok'; tx = '✓ ' + T('En pantalla') + ' · ' + c.ok + '/' + c.tot; } else if (Date.now() - ENV.t < 30000) { cl = ' va'; tx = T('Llegando a las pantallas…') + ' ' + c.ok + '/' + c.tot; } else { cl = ' mal'; tx = '⚠ ' + (c.mf ? T('Faltan imágenes en {n} pantallas') : T('Sin confirmar en {n} pantallas')).replace('{n}', c.tot - c.ok); } }
       e.className = 'estado' + cl; e.lastElementChild.textContent = tx; return; }

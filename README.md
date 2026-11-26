@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.35**
+**Versión actual: v1.36**
 
 
 ## Icono
@@ -161,7 +161,15 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.35)
+## Cambios de la versión actual (v1.36)
+- **Subir fotos desde «Añadir carteles» las mete ya en la lista** (una o varias), sin pulsar «Añadir» otra vez; la ventana se cierra y el estado dice cuántas han entrado.
+- **El asistente solo pide el nombre del negocio cuando lo va a usar** (en el rótulo de marca o bajo el QR); en la cafetería, por ejemplo, ya no lo pide.
+- **El estado no se mete debajo de los botones:** un mensaje largo se corta con puntos suspensivos y se lee entero al pasar por encima.
+- **La tira de escenas enseña su horario:** «1 · ⏰ 07:00–12:00» en lugar de solo la duración, cuando la escena tiene horas.
+- **En el móvil, la tecla roja dice «SOS»** en lugar de ser un cuadrado sin texto.
+- Caché nueva de la app (`adposter-v31`).
+
+## Cambios de la v1.35
 - **Rótulos que dicen sobre qué actúan:** «Duplicar lista / Borrar lista» en LISTAS, «Duplicar escena / Borrar escena» en ESCENA y «Duplicar pieza / Borrar pieza» en PIEZAS (antes, «Duplicar» y «Borrar» a secas en los tres sitios). Las flechas de la escena dicen **«◀ Mover antes»** y **«Mover después ▶»** (parecían «anterior / siguiente»).
 - **Barra de abajo del móvil:** LISTAS · **EDITAR** · AJUSTES · **AVISOS** (antes LIENZO y MANDO).
 - En LISTAS, los botones pasan a dos líneas si no caben (en tablet o en catalán), siempre entre palabras.
@@ -536,7 +544,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.35 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.36 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

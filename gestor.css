@@ -745,3 +745,6 @@ h2 .h2-enl { float: right; min-height: 0; height: auto; padding: 3px 8px; font-s
 html:not(.md-simple) .bt-simple-f { display: none !important; }
 .tecla[data-a="duplica"], .tecla[data-a="borra"], .tecla[data-a="nueva"] { padding-left: 6px !important; padding-right: 6px !important; }
 .tecla[data-a="duplica"] > span, .tecla[data-a="borra"] > span { white-space: normal !important; line-height: 1.05; text-align: center; overflow-wrap: normal; word-break: normal; min-width: 0; }
+.tecla.emer-bt .sos { display: none; letter-spacing: .06em; }
+@media (max-width: 900px) { .tecla.emer-bt .sos { display: inline; } .tecla.emer-bt .sir { display: none; } }
+.estado > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
