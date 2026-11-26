@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.45**
+**Versión actual: v1.46**
 
 
 ## Icono
@@ -161,7 +161,11 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.45)
+## Cambios de la versión actual (v1.46)
+- **Arreglo:** de vez en cuando (más o menos 1 de cada 40 aperturas), el gestor en SIMPLE salía con algunos rótulos de PRO («Activar el directo», «Directo»…) hasta tocar algo. Ahora el modo SIMPLE se marca antes de pintar nada.
+- Caché nueva de la app (`adposter-v41`).
+
+## Cambios de la v1.45
 - **Lo que sale ahora, en grande:** en «Ver todas», tocar la miniatura de una pantalla la abre en grande, con la escena o la foto que está enseñando en ese momento, su nombre, su lista y su estado. Tocar el nombre sigue sirviendo para mandarle avisos.
 - Cada pantalla informa de la escena exacta que tiene puesta, así que la miniatura acierta aunque dos escenas se llamen igual (las pantallas con versiones anteriores siguen funcionando por el nombre).
 - La guía (AYUDA) lo explica en el apartado Pantallas.
@@ -593,7 +597,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.45 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.46 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 
