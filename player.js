@@ -16,7 +16,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.28';
+  const VERSION = '1.29';
   const SC = document.currentScript, Q = new URLSearchParams(location.search);
   const BASE = new URL(SC.dataset.base || '../', location.href).href;
   const ID = (SC.dataset.playlist || Q.get('l') || 'demo').toLowerCase().replace(/[^a-z0-9_-]/g, '');
