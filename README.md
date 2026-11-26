@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.27**
+**Versión actual: v1.28**
 
 
 ## Icono
@@ -161,7 +161,12 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.27)
+## Cambios de la versión actual (v1.28)
+- **«+ Nueva» pregunta qué va en la lista:** «Fotos que van pasando» (carteles) o «Textos, precios y fotos» (composición, que abre la galería de plantillas). Antes, los botones «Carteles | Composición» de LISTAS parecían elegir el tipo de la lista nueva, pero cambiaban la abierta.
+- En **SIMPLE**, «Carteles | Composición» ya no sale en LISTAS; en **PRO** sigue donde estaba, para cambiar el tipo de una lista ya hecha.
+- Caché nueva de la app (`adposter-v23`).
+
+## Cambios de la v1.27
 - **Un solo botón PUBLICAR** bajo el lienzo (antes «✓ ENVIAR CAMBIOS» y «▶ A PANTALLAS» juntos): **✓ PUBLICAR** manda tus cambios a todas las pantallas y cada una sigue con su lista; la flechita **▾** de al lado abre «Poner otra lista un rato o desde una fecha» (lo que antes era A PANTALLAS, igual que siempre). Los textos que nombraban «✓ Enviar cambios» (asistente, calendario y la pantalla en espera) dicen ahora «✓ Publicar». En las pestañas AVISOS/DIRECTO y PUBLICAR, A PANTALLAS sigue como estaba.
 - Caché nueva de la app (`adposter-v22`).
 
@@ -493,7 +498,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.27 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.28 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

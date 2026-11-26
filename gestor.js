@@ -10,7 +10,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.27', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS_C = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'], TABS_E = ['piezas', 'escena', 'tiempos', 'directo', 'publicar'];
+  const VERSION = '1.28', TIPOS = ['fundido', 'zoom', 'desliza', 'cortina', 'corte'], CON_CARPETA = ['cine', 'klub'], TABS_C = ['contenido', 'diseno', 'tiempos', 'directo', 'publicar'], TABS_E = ['piezas', 'escena', 'tiempos', 'directo', 'publicar'];
   const DEF = { nombre: '', fondo: '', cabecera: 18, pie: 4.5, lado: 5, alinea: 'abajo', contenido: [], anuncios: [], segundos: 8, segundosAnuncio: 8, anunciosCada: [4, 7], fundido: { tipo: 'fundido', segundos: 2.5 }, movimiento: true, llenar: false, brillo: true,
     horario: { activo: false, desde: '09:00', hasta: '23:00', dias: [1, 2, 3, 4, 5, 6, 7] }, redirige: '', formato: 'vertical', qr: { activo: false, modo: 'url', url: '', texto: '', pos: 'bd' }, cinta: { activo: false, texto: '', rss: '' }, publico: false, modo: 'carteles', escenas: [], orden: 'azar', secuencia: [], archivos: {}, sueltos: [], adsS: [], tactil: { activo: false, vuelta: 30 } };
   const ESCM = p => !!p && p.modo === 'escenas', SIMPLE = () => document.documentElement.classList.contains('md-simple'), tabsDe = p => ESCM(p) ? TABS_E : SIMPLE() ? TABS_C.filter(t => t !== 'diseno') : TABS_C, X = () => window.ADG.ext || {};
@@ -81,6 +81,8 @@
     'Sin directo: la emergencia solo se ve en el lienzo. Activa el directo para mandarla a las pantallas.': ['Sin pantallas conectadas: solo se ve aquí. Añade una pantalla para mandarla.', 'No screens connected: shown here only. Add a screen to send it.', 'Sense pantalles connectades: només es veu aquí. Afegeix una pantalla per enviar-la.'],
     'Encender': ['Quitar el negro', 'Remove black', 'Treu el negre'], 'Identificar': ['Hacer parpadear', 'Make it blink', 'Fes-la parpellejar'],
     'Unirme a mis pantallas': ['Ya tengo pantallas en otro aparato', 'I already have screens on another device', 'Ja tinc pantalles en un altre aparell'] });
+  Object.assign(TX, { '¿Qué va en «{n}»?': ['What goes in “{n}”?', 'Què hi va a «{n}»?'], 'Fotos que van pasando': ['Photos that go by', 'Fotos que van passant'], 'Tus fotos o carteles, uno detrás de otro, a toda pantalla.': ['Your photos or posters, one after another, full screen.', 'Les teves fotos o cartells, un darrere l’altre, a pantalla completa.'],
+    'Textos, precios y fotos': ['Texts, prices and photos', 'Textos, preus i fotos'], 'Partes de una plantilla (carta, ofertas, horario…) y cambias lo que quieras.': ['Start from a template (menu, offers, opening hours…) and change whatever you like.', 'Parteixes d’una plantilla (carta, ofertes, horari…) i canvies el que vulguis.'] });
   Object.assign(TX, { 'Usar horario': ['Use schedule', 'Fes servir l’horari'], 'Pantalla en negro': ['Black screen', 'Pantalla en negre'], 'o hasta las': ['or until', 'o fins a les'],
     'pieza': ['piece', 'peça'], '¿Seguro? Se pierde lo de esta pestaña': ['Sure? This tab’s changes are lost', 'Segur? Es perd el d’aquesta pestanya'] });
   const T = s => { const v = TS[s] && document.documentElement.classList.contains('md-simple') ? TS[s] : null; if (v) return v[lang === 'en' ? 1 : lang === 'ca' ? 2 : 0]; const t = TX[s]; return !t || lang === 'es' ? s : t[lang === 'en' ? 0 : 1]; };
@@ -88,6 +90,7 @@
   /* ---------- datos ---------- */
   let MAN = { carpetas: {} }, PUB = { recarga: 1, playlists: {} }, B = null, sel = '', listo = false, giro = 0;
   let tab = TABS_C.concat(TABS_E).includes(lee('g-tab')) ? lee('g-tab') : 'contenido', zoom = 1, guias = lee('g-guias') !== false;
+  let nPend = '';   // v1.28 · nombre de la lista que se está creando, mientras se elige su tipo
   let canal = '', enArchivo = false, dir = null, DSP = {}, dest = { k: 'todos', v: '' };
   const D = { aviso: '', seg: 30, hasta: '', color: 'ambar', cinta: '', hoy: true, n: '', g: '', s: '' };                 // lo que se está escribiendo en la pestaña DIRECTO
   const P = () => B.playlists[sel], carpetas = () => Object.keys(MAN.carpetas).filter(c => c !== 'fondos'), esAds = c => /^ads?[-_]/i.test(c) || /anuncio/i.test(c);
@@ -193,7 +196,7 @@
   const listasVis = () => { const ks = Object.keys(B.playlists); if (!SIMPLE() || lee('g-ej')) return ks; const propias = ks.filter(k => !esDemo(k)); return propias.length ? ks.filter(k => !esDemo(k) || k === sel) : ks; };
   function pintaL() { const cuenta = l => (l || []).reduce((n, c) => n + (MAN.carpetas[c] || []).length, 0), p = P(), cs = carpetas(), tot = cs.reduce((n, c) => n + MAN.carpetas[c].length, 0), vis = listasVis(), nDemo = Object.keys(B.playlists).filter(esDemo).length;
     pon('#zona-listas', `<h2>${T('Listas')}<b class="cuenta">${SIMPLE() ? vis.length : cs.length + ' ' + T('carpetas') + ' · ' + tot + ' ' + T('archivos')}</b></h2><div class="rej env">${vis.map(id => tecla('sel', id, esc(B.playlists[id].nombre || id.toUpperCase()), id === sel, B.playlists[id].publico ? '<small>QR</small>' : '', ' draggable="true" data-arr="lista:' + esc(id) + '"')).join('')}${SIMPLE() && nDemo && Object.keys(B.playlists).length > nDemo ? tecla('ejemplos', '', T('Ejemplos'), !!lee('g-ej'), `<small>${nDemo}</small>`) : ''}</div>${SIMPLE() && nDemo && nDemo === Object.keys(B.playlists).length ? `<div class="nota">${T('Son listas de ejemplo: crea la tuya con ASISTENTE o «+ Nueva».')}</div>` : ''}
-      <div class="fila">${tecla('modo', 'carteles', T('Carteles'), !ESCM(p))}${tecla('modo', 'escenas', T('Composición'), ESCM(p))}</div>
+      ${SIMPLE() ? '' : `<div class="fila">${tecla('modo', 'carteles', T('Carteles'), !ESCM(p))}${tecla('modo', 'escenas', T('Composición'), ESCM(p))}</div>`}
       ${campo('nueva', '', T('nueva lista'), ' maxlength="24"')}<div class="fila"><button type="button" class="tecla" data-a="nueva" title="${T('Crea una lista vacía con este nombre')}">+ ${T('Nueva')}</button><button type="button" class="tecla" data-a="duplica" title="${T('Copia la lista elegida')}">${T('Duplicar')}</button><button type="button" class="tecla reset" data-a="borra"${Object.keys(B.playlists).length < 2 ? ' disabled' : ''}>${T('Borrar')}</button></div>
       <div class="lcd res">${ESCM(p) ? p.escenas.length + ' <small>' + T(p.escenas.length === 1 ? 'escena' : 'escenas') + '</small> ' + (n => n + ' <small>' + T(n === 1 ? 'pieza' : 'piezas') + '</small>')(p.escenas.reduce((n, e) => n + e.piezas.length, 0)) : new Set((p.contenido || []).flatMap(c => (MAN.carpetas[c] || []).map(f => c + '/' + f)).concat(p.sueltos || [])).size + ' <small>' + T('carteles') + '</small> ' + cuenta(p.anuncios) + ' <small>' + T('anuncios') + '</small>'}</div>
       <div class="fila"><button type="button" class="tecla" data-a="biblio" data-pro="1">${T('Biblioteca')}</button><button type="button" class="tecla" data-a="agenda">${T('Calendario')}${B.agenda.length ? '<small>' + B.agenda.length + '</small>' : ''}</button><button type="button" class="tecla pri" data-a="asistente">${T('Asistente')}</button></div>${PUEDE() ? `<div class="fila"><button type="button" class="tecla pri" data-a="subir">${T('Subir carteles')}</button></div>` : ''}${canal ? `<div class="nota">${T('Arrastra una lista sobre un display para lanzarla.')}</div>` : ''}`); }
@@ -320,7 +323,17 @@
       d.showModal(); },
     sel(v) { if (!B.playlists[v]) return; sel = v; guarda('sel', sel); X().alSalir && X().alSalir(); pintaL(); pintaBarra(); pintaT(); ajusta(); previa(); X().alLista && X().alLista(true); },
     /* v1.23 · «+ Nueva» crea una lista VACÍA (con el formato de la que estaba elegida); «Duplicar» copia la elegida */
-    nueva() { const n = ($('#nueva').value || '').trim(); const id = idDe(n); if (!id) { $('#nueva').focus(); return; } if (!B.playlists[id]) { const p = P(); B.playlists[id] = completa(Object.assign({}, SIMPLE() ? PLANT.completa : {}, { formato: p ? p.formato : 'vertical' }, p && p.medida ? { medida: copia(p.medida) } : {})); B.playlists[id].nombre = n.toUpperCase(); } guarda(KB, B); $('#nueva').value = ''; ACC.sel(id); estado(); },
+    nueva() { const n = ($('#nueva').value || '').trim(); const id = idDe(n); if (!id) { $('#nueva').focus(); return; } if (B.playlists[id]) { $('#nueva').value = ''; ACC.sel(id); estado(); return; }
+      /* v1.28 · «+ Nueva» pregunta el tipo: fotos que van pasando o una composición */
+      nPend = n; const x = X(); if (!x.abreModal || !x.cabModal) { ACC.nuevaTipo('carteles'); return; }
+      const c = (v, t, d) => `<button type="button" class="tecla bv-t" data-a="nuevaTipo" data-v="${v}"><b>${T(t)}</b><small>${T(d)}</small></button>`;
+      x.abreModal('', 'm-bv m-tipo', () => { nPend = ''; });
+      pon('#modal .m-caja', x.cabModal(esc(T('¿Qué va en «{n}»?').replace('{n}', n.toUpperCase()))) + `<div class="bv"><div class="bv-rej dos">`
+        + c('carteles', 'Fotos que van pasando', 'Tus fotos o carteles, uno detrás de otro, a toda pantalla.')
+        + c('escenas', 'Textos, precios y fotos', 'Partes de una plantilla (carta, ofertas, horario…) y cambias lo que quieras.') + `</div></div>`); },
+    nuevaTipo(v) { const n = nPend; nPend = ''; const id = idDe(n); if (!id) return; const x = X(); if (document.querySelector('#modal.m-tipo')) { x.cierraModal ? x.cierraModal() : ACC.modalCierra && ACC.modalCierra(); }
+      if (!B.playlists[id]) { const p = P(); B.playlists[id] = completa(Object.assign({}, SIMPLE() ? PLANT.completa : {}, { formato: p ? p.formato : 'vertical' }, p && p.medida ? { medida: copia(p.medida) } : {})); B.playlists[id].nombre = n.toUpperCase(); }
+      guarda(KB, B); $('#nueva').value = ''; ACC.sel(id); estado(); if (v === 'escenas' && ACC.modo) ACC.modo('escenas'); },
     duplica() { const p = P(); if (!p) return; const n = ($('#nueva').value || '').trim() || (p.nombre || sel.toUpperCase()) + ' 2'; let id = idDe(n), k = 2; if (!id) return; while (B.playlists[id]) id = idDe(n).slice(0, 21) + '-' + k++; B.playlists[id] = completa(copia(p)); B.playlists[id].nombre = n.toUpperCase(); B.playlists[id].publico = false; guarda(KB, B); $('#nueva').value = ''; ACC.sel(id); estado(); },
     borra() { if (Object.keys(B.playlists).length < 2) return; const bt = document.querySelector('[data-a="borra"]'); if (bt && !bt.dataset.seguro) { bt.dataset.seguro = '1'; bt.textContent = T('¿Seguro?'); setTimeout(() => { if (bt.isConnected) { delete bt.dataset.seguro; bt.textContent = T('Borrar'); } }, 3000); return; }   /* v1.20 · borrar una lista pide un segundo toque */
       delete B.playlists[sel]; guarda(KB, B); ACC.sel(Object.keys(B.playlists)[0]); estado(); },

@@ -719,3 +719,5 @@ html.md-simple.alarma .tecla.emer-bt { background: linear-gradient(180deg, #d837
 @media (max-width: 900px) { .modal.m-bv .m-caja { height: auto; } }
 .modal.m-bv .m-cab h2 { min-width: 0; flex: 1 1 auto; overflow-wrap: anywhere; line-height: 1.5; }
 .estado .bots-env .bt-ap { min-width: calc(var(--alto) * .85); padding: 0 10px; font-size: 1.1em; letter-spacing: 0; }
+.bv-rej.dos { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 700px) { .bv-rej.dos { grid-template-columns: 1fr; } }
