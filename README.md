@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.48**
+**Versión actual: v1.49**
 
 
 ## Icono
@@ -161,7 +161,11 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.48)
+## Cambios de la versión actual (v1.49)
+- **Accesos directos** al final de la información: la guía (AYUDA) acaba con un apartado «Accesos directos» y la ventana «Acerca de» también. Cada línea lleva el nombre (se abre al tocarlo), la dirección entera y un botón **Copiar**: el gestor (`adposter.mediaservi.com`), la alta de una pantalla en la tele (`/tv`) y las listas de ejemplo CINE (`/cine`) y KLUB (`/klub`). En español, inglés y catalán.
+- Caché nueva de la app (`adposter-v44`).
+
+## Cambios de la v1.48
 - **Pantallas sincronizadas** (TIEMPOS, en PRO, listas de composición): con «Sincronizar las pantallas», todas las pantallas que tienen esa lista enseñan la misma escena a la vez, porque cada una la calcula con su reloj, y los vídeos de las escenas van al mismo fotograma, corrigiéndose solos si se desvían. Pensado para murales de varias pantallas. Mientras está activa no hay anuncios entre escenas, y no se puede combinar con el modo táctil. Necesita la hora de cada aparato bien puesta (lo normal en teles y ordenadores conectados).
 - La guía (AYUDA) lo explica en Trucos.
 - Caché nueva de la app (`adposter-v43`).
@@ -607,7 +611,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.48 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.49 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

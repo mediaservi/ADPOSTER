@@ -83,8 +83,19 @@
   };
   Object.assign(TX, { 'Ayuda': ['Help', 'Ajuda'], 'Guía de uso': ['User guide', 'Guia d’ús'], 'Anterior': ['Previous', 'Anterior'], 'Siguiente': ['Next', 'Següent'], 'Acerca de': ['About', 'Quant a'] });
 
+
+  /* v1.49 · NORMA (Josep, 27-11): al final de la información, los ACCESOS DIRECTOS (general y subapartados públicos) con COPIAR */
+  const BASE = 'https://adposter.mediaservi.com/';
+  const ACCESOS = [['', ['ADPOSTER · gestor', 'ADPOSTER · manager', 'ADPOSTER · gestor']], ['tv/', ['Dar de alta una pantalla (en la tele)', 'Add a screen (on the TV)', 'Donar d’alta una pantalla (a la tele)']],
+    ['cine/', ['Lista de ejemplo · CINE', 'Sample list · CINE', 'Llista d’exemple · CINE']], ['klub/', ['Lista de ejemplo · KLUB', 'Sample list · KLUB', 'Llista d’exemple · KLUB']]];
+  const li = () => ({ es: 0, en: 1, ca: 2 })[G.lang] || 0;
+  function accesos() { const k = li();
+    return `<div class="acc"><h3>${esc(['Accesos directos', 'Direct links', 'Accessos directes'][k])}</h3>${ACCESOS.map(([r, n], i) => { const u = BASE + r;
+      return `<div class="acc-f${i ? '' : ' on'}"><a href="${u}" target="_blank" rel="noopener">${esc(n[k])}</a><code>${esc(u.replace('https://', ''))}</code><button type="button" class="tecla" data-a="ayCopia" data-v="${u}">${esc(['Copiar', 'Copy', 'Copia'][k])}</button></div>`; }).join('')}</div>`; }
+
   let ay = 0;
-  const lista = () => GUIA[G.lang] || GUIA.es;
+  const ENL = { es: ['enlaces', 'Accesos directos', '<p>Direcciones para abrir ADPOSTER o una de sus partes directamente, o para compartirlas.</p>'], en: ['enlaces', 'Direct links', '<p>Addresses to open ADPOSTER or one of its parts directly, or to share them.</p>'], ca: ['enlaces', 'Accessos directes', '<p>Adreces per obrir ADPOSTER o una de les seves parts directament, o per compartir-les.</p>'] };
+  const lista = () => { const g = GUIA[G.lang] || GUIA.es, e = ENL[G.lang] || ENL.es; return g.concat([[e[0], e[1], e[2] + accesos()]]); };
   function pinta() { const L = lista(), s = L[ay], m = document.querySelector('#modal .m-caja'); if (!m) return;
     G.pon('#modal .m-caja', X.cabModal(T('Guía de uso')) + `<div class="ay"><div class="ay-i" role="tablist">${L.map((x, i) => `<button type="button" class="tecla${i === ay ? ' on' : ''}" data-a="ayVe" data-v="${i}" role="tab" aria-selected="${i === ay}"><b>${i + 1}</b><span>${esc(x[1])}</span></button>`).join('')}</div>
       <div class="ay-c" role="tabpanel"><h2>${i18n(ay + 1)} · ${esc(s[1])}</h2>${s[2]}${s[3] ? `<div class="fila"><button type="button" class="tecla pri" data-a="ayIr" data-v="${s[3][1]}">${esc(s[3][0])} ▶</button></div>` : ''}</div>
@@ -96,7 +107,10 @@
     ayuda() { X.abreModal('', 'm-ay', () => {}); pinta(); },
     ayVe(v) { const n = +v; if (!(n >= 0 && n < lista().length)) return; ay = n; pinta(); },
     ayIr(v) { if (!['asistente', 'altaPantalla', 'avisoRapido', 'agenda'].includes(v) || typeof ACC[v] !== 'function') return; cierra(); setTimeout(() => ACC[v](), 60); },
-    ayInfo() { cierra(); setTimeout(() => ACC.info && ACC.info(), 60); }
+    ayInfo() { cierra(); setTimeout(() => ACC.info && ACC.info(), 60); },
+    ayCopia(v, b) { if (!/^https:\/\/adposter\.mediaservi\.com\//.test(v)) return; b = b || document.querySelector(`[data-a="ayCopia"][data-v="${v}"]`); const t0 = b ? b.textContent : '';
+      const ok = () => { if (!b) return; b.textContent = ['Copiada', 'Copied', 'Copiada'][li()]; setTimeout(() => { b.textContent = t0; }, 1500); };
+      (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(ok, () => { const r = document.createElement('textarea'); r.value = v; document.body.appendChild(r); r.select(); try { document.execCommand('copy'); ok(); } catch (e) {} r.remove(); }); }
   });
 
   /* botón «?» en la cabecera, junto al idioma */
@@ -104,5 +118,7 @@
   const id = document.getElementById('btn-idioma'); if (id && id.parentNode) id.parentNode.insertBefore(b, id);
   const rotula = () => { b.title = T('Ayuda'); b.setAttribute('aria-label', T('Ayuda')); }; rotula();
   new MutationObserver(rotula).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
-  window.ADAYUDA = { GUIA };
+  /* la ventana «Acerca de» (información) también acaba con los accesos directos */
+  const info0 = ACC.info; if (typeof info0 === 'function') ACC.info = function () { info0.apply(this, arguments); const f = document.querySelector('#info-m .adm-c'), fi = f && f.querySelector(':scope > .fila'); if (f && !f.querySelector('.acc')) { const d = document.createElement('div'); d.innerHTML = accesos(); fi ? f.insertBefore(d.firstChild, fi) : f.appendChild(d.firstChild); } };
+  window.ADAYUDA = { GUIA, accesos };
 })();

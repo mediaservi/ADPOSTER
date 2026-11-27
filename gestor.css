@@ -791,3 +791,13 @@ html.md-op body { padding-bottom: 0; }
 .vg.hor .vg-m { height: auto; width: min(100%, 980px, calc(60vh * 16 / 9)); aspect-ratio: 16 / 9; }
 .vg-m > span { position: absolute; inset: 0; } .vg-m img { width: 100%; height: 100%; object-fit: contain; }
 .m-caja:has(> .vg), .m-caja:has(.vg) { height: auto; max-height: 100%; }
+/* v1.49 · ACCESOS DIRECTOS al final de la información (guía y «Acerca de») */
+.acc { margin-top: 12px; border-top: 1px solid #2a2c31; padding-top: 10px; display: grid; gap: 6px; }
+.acc h3 { margin: 0 0 2px; font: 800 12px/1.2 Inter, system-ui, sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--ambar, #ffb000); }
+.acc-f { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) auto; align-items: center; gap: 10px; background: #111216; border: 1px solid #000; border-radius: 8px; padding: 6px 6px 6px 10px; }
+.acc-f.on { border-color: var(--ambar, #ffb000); }
+.acc-f a { color: #fff; font-weight: 700; text-decoration: none; min-width: 0; overflow-wrap: anywhere; line-height: 1.25; }
+.acc-f a:hover, .acc-f a:focus-visible { text-decoration: underline; }
+.acc-f code { font: 13px/1.25 'Share Tech Mono', monospace; color: #c5ccd4; min-width: 0; overflow-wrap: anywhere; }
+.acc-f .tecla { min-height: 34px; padding: 4px 12px; font-size: 13px; }
+@media (max-width: 600px) { .acc-f { grid-template-columns: minmax(0, 1fr) auto; } .acc-f code { grid-column: 1; grid-row: 2; } .acc-f .tecla { grid-column: 2; grid-row: 1 / span 2; } }
