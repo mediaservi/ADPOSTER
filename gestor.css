@@ -830,3 +830,4 @@ dialog.adm.sim-tv { width: min(760px, calc(100vw - 24px)); }
 .sim-tele.g90 { transform: rotate(-90deg); } .sim-tele.g180 { transform: rotate(180deg); } .sim-tele.g270 { transform: rotate(90deg); }
 .sim-tele iframe { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; border: 0; transform-origin: 0 0; pointer-events: none; }
 .sim-tv .fila.giro { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.ay-c a { color: #ffb000; }   /* v1.53 · enlaces de la ayuda en ámbar */

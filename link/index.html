@@ -106,7 +106,7 @@
         '<h2>' + t.h5 + '</h2><div class="caja">' + t.p5 + '</div>' +
         '<h2>' + t.h6 + '</h2><div class="caja">' + t.p6 + '</div>' +
         '<div class="nota">' + t.nota + '</div>';
-      document.getElementById('pie').innerHTML = 'ADPOSTER v1.52 ' + new Date().getFullYear() + ' · <a href="https://mediaservi.com">mediaservi.com</a> · GPL-3.0';
+      document.getElementById('pie').innerHTML = 'ADPOSTER v1.53 ' + new Date().getFullYear() + ' · <a href="https://mediaservi.com">mediaservi.com</a> · GPL-3.0';
       [].forEach.call(document.querySelectorAll('.idi button'), function (b) { b.classList.toggle('on', b.dataset.l === L); });
     }
     [].forEach.call(document.querySelectorAll('.idi button'), function (b) { b.addEventListener('click', function () { L = b.dataset.l; try { localStorage.setItem('adposter:lang', JSON.stringify(L)); } catch (e) {} pinta(); }); });

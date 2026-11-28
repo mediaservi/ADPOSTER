@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.52**
+**Versión actual: v1.53**
 
 
 ## Icono
@@ -182,7 +182,11 @@ Para un stick o TV box con **Android TV o Google TV** (Xiaomi Mi TV Stick, Chrom
 - **Menú de la app:** tecla MENÚ, mantener ATRÁS o ATRÁS tres veces: recargar, volver a dar de alta, arrancar sola al encender, permiso, **modo kiosco total** (la app como pantalla de inicio del aparato) y ajustes. ATRÁS solo nunca la cierra.
 - **Código:** `link/android/` (Java, sin dependencias, Android 5 o posterior). GitHub la compila sola al subir cambios a `beta` (`.github/workflows/link-apk.yml`) y deja el APK en la publicación `link` del repositorio. La firma de serie es pública (`adposter-link-publica.jks`): si se guardan los secretos `LINK_KEYSTORE` (en base64) y `LINK_KS_PASS`, firma con esa otra clave.
 
-## Cambios de la versión actual (v1.52)
+## Cambios de la versión actual (v1.53)
+- **Ayuda › ADPOSTER LINK** (nuevo apartado, es/en/ca): qué es, los cinco pasos para instalarla en un stick con Android TV o Google TV (Downloader, fuentes desconocidas, `adposter.mediaservi.com/link/apk`, el permiso «Mostrar sobre otras apps» y el código de alta), cómo probarlo antes y cómo se abre el menú de la app, con enlace a la página `/link`.
+- Caché nueva de la app (`adposter-v48`).
+
+## Cambios de la v1.52
 - **ADPOSTER LINK** (nueva): la app de Android TV que arranca sola al volver la luz, con su página de instrucciones y descarga en `/link/` (es/en/ca) y la dirección corta `/link/apk` para la app Downloader.
 - **Probar cómo se verá:** en **+ Añadir pantalla**, el botón **▶ Probar cómo se verá** reproduce la lista elegida, con todas sus reglas, en una tele dibujada; con los botones de giro se ve montada en horizontal, en vertical o boca abajo, y «Usar este giro» lo deja elegido para el alta.
 - **Giro de la pantalla desde la tele:** en el panel del display (OK del mando o tocar la pantalla) hay ahora **Giro de la pantalla** (0°, 90°, 180°, 270°), también en las composiciones.
