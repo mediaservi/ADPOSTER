@@ -15,7 +15,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: '17' }
-      - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
         with: { gradle-version: '8.9' }
       - name: Compilar
@@ -25,6 +24,7 @@ jobs:
         run: |
           if [ -n "$LINK_KS_B64" ]; then echo "$LINK_KS_B64" | base64 -d > "$RUNNER_TEMP/link.jks"; export LINK_KS="$RUNNER_TEMP/link.jks" LINK_KS_PASS="$LINK_KS_PASS_S"; fi
           set -o pipefail
+          echo "sdk.dir=$ANDROID_HOME" > link/android/local.properties
           gradle -p link/android assembleRelease --no-daemon 2>&1 | tee compilacion.log
           cp link/android/app/build/outputs/apk/release/app-release.apk adposter-link.apk
       - uses: actions/upload-artifact@v4
