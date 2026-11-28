@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.53**
+**Versión actual: v1.54**
 
 
 ## Icono
@@ -176,13 +176,18 @@ El navegador normal de una tele doméstica (Google TV, Android TV, webOS, Tizen�
 
 Para un stick o TV box con **Android TV o Google TV** (Xiaomi Mi TV Stick, Chromecast con Google TV…), ADPOSTER tiene su propia app: **ADPOSTER LINK**. Abre el reproductor a pantalla completa, sin menús, y **arranca sola cada vez que vuelve la luz**. Reproduce con todas las reglas del gestor (tiempos, anuncios cada X carteles, horarios, calendario, avisos y emergencia), porque lo que abre es el mismo reproductor.
 
-- **Instrucciones y descarga:** [adposter.mediaservi.com/link](https://adposter.mediaservi.com/link/). En la tele, con la app Downloader: `adposter.mediaservi.com/link/apk`.
+- **Instrucciones y descarga:** [adposter.mediaservi.com/link](https://adposter.mediaservi.com/link/). En la tele, con la app Downloader: `adposter.mediaservi.com/link/apk` (página con el botón de descarga; el APK está en `link/adposter-link.apk`).
 - **Primera vez:** pide el permiso «Mostrar sobre otras apps» (lo que la deja arrancar sola en Android 10 o posterior) y enseña el código de 6 caracteres para darla de alta desde el gestor.
 - **Recuerda su lista:** al volver la luz sigue donde estaba, con su giro, idioma y canal. Sin conexión reintenta cada 15 s; si se cae el motor del navegador, se rehace sola.
 - **Menú de la app:** tecla MENÚ, mantener ATRÁS o ATRÁS tres veces: recargar, volver a dar de alta, arrancar sola al encender, permiso, **modo kiosco total** (la app como pantalla de inicio del aparato) y ajustes. ATRÁS solo nunca la cierra.
 - **Código:** `link/android/` (Java, sin dependencias, Android 5 o posterior). GitHub la compila sola al subir cambios a `beta` (`.github/workflows/link-apk.yml`) y deja el APK en la publicación `link` del repositorio. La firma de serie es pública (`adposter-link-publica.jks`): si se guardan los secretos `LINK_KEYSTORE` (en base64) y `LINK_KS_PASS`, firma con esa otra clave.
 
-## Cambios de la versión actual (v1.53)
+## Cambios de la versión actual (v1.54)
+- **Descarga de ADPOSTER LINK sin redirección automática:** `/link/apk` ya no salta sola a la descarga (es el patrón que usan las webs peligrosas y la protección de Chrome lo marcaba); ahora es una página con el botón **Descargar ADPOSTER LINK**, y el APK está en la propia web (`/link/adposter-link.apk`). La ayuda y la página `/link` cuentan el paso nuevo.
+- Al cambiar la app (`link/android/`), además de la publicación `link` que compila GitHub, hay que copiar el APK nuevo a `link/adposter-link.apk`.
+- Caché nueva de la app (`adposter-v49`).
+
+## Cambios de la v1.53
 - **Ayuda › ADPOSTER LINK** (nuevo apartado, es/en/ca): qué es, los cinco pasos para instalarla en un stick con Android TV o Google TV (Downloader, fuentes desconocidas, `adposter.mediaservi.com/link/apk`, el permiso «Mostrar sobre otras apps» y el código de alta), cómo probarlo antes y cómo se abre el menú de la app, con enlace a la página `/link`.
 - Caché nueva de la app (`adposter-v48`).
 
