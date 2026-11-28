@@ -1,4 +1,4 @@
-/* ADPOSTER · GUÍAS PASO A PASO (v1.50)
+/* ADPOSTER · GUÍAS PASO A PASO (v1.51)
    Dos recorridos que iluminan cada botón y explican qué hacer: 1) crear una lista y dejarla funcionando en una pantalla;
    2) manejar a distancia una lista que ya está publicada. Al abrir el gestor sale una tarjeta para elegir (se apaga con «Mostrar al abrir»);
    también se lanzan desde la AYUDA («?»). No cambian nada de la app: solo señalan y, en el móvil, cambian a la vista donde está cada botón. */
@@ -28,7 +28,7 @@
       { sel: '[data-a="probar"]', pre: vm('lienzo'), tit: ['5 · Pruébala', '5 · Try it', '5 · Prova-la'],
         txt: ['<b>▶ Probar</b> la reproduce aquí mismo, como saldrá en la pantalla. Vuelve a pulsar para parar.', '<b>▶ Play</b> runs it right here, as the screen will show it. Press again to stop.', '<b>▶ Prova</b> la reprodueix aquí mateix, com sortirà a la pantalla. Torna a prémer per parar.'] },
       { sel: null, tit: ['6 · En la tele', '6 · On the TV', '6 · A la tele'],
-        txt: ['En la pantalla, abre el navegador (o la app de kiosco del stick) y entra en <b>adposter.mediaservi.com/tv</b>. Saldrá un <b>código de 6 caracteres</b>: déjala así y sigue en este aparato.', 'On the screen, open the browser (or the stick’s kiosk app) and go to <b>adposter.mediaservi.com/tv</b>. A <b>6-character code</b> appears: leave it there and carry on on this device.', 'A la pantalla, obre el navegador (o l’app de quiosc de l’stick) i entra a <b>adposter.mediaservi.com/tv</b>. Sortirà un <b>codi de 6 caràcters</b>: deixa-la així i continua en aquest aparell.'] },
+        txt: ['En la pantalla, abre la app de kiosco del stick (o el reproductor del display profesional) y entra en <b>adposter.mediaservi.com/tv</b>. Saldrá un <b>código de 6 caracteres</b>: déjala así y sigue en este aparato.', 'On the screen, open the stick’s kiosk app (or the professional display’s player) and go to <b>adposter.mediaservi.com/tv</b>. A <b>6-character code</b> appears: leave it there and carry on on this device.', 'A la pantalla, obre l’app de quiosc de l’stick (o el reproductor del display professional) i entra a <b>adposter.mediaservi.com/tv</b>. Sortirà un <b>codi de 6 caràcters</b>: deixa-la així i continua en aquest aparell.'] },
       { sel: '[data-a="altaPantalla"]', pre: vm('listas'), tit: ['7 · Añade la pantalla', '7 · Add the screen', '7 · Afegeix la pantalla'],
         txt: ['Pulsa <b>+ Añadir pantalla</b>, ponle un nombre, elige <b>esta lista</b> y escribe el código que sale en la tele. La pantalla se configura sola.', 'Press <b>+ Add screen</b>, give it a name, choose <b>this list</b> and type the code shown on the TV. The screen sets itself up.', 'Prem <b>+ Afegeix una pantalla</b>, posa-li un nom, tria <b>aquesta llista</b> i escriu el codi que surt a la tele. La pantalla es configura sola.'] },
       { sel: '.bt-env', pre: vm('lienzo'), tit: ['8 · Publica', '8 · Publish', '8 · Publica'],

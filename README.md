@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.50**
+**Versión actual: v1.51**
 
 
 ## Icono
@@ -161,7 +161,21 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.50)
+## Requisitos de la pantalla
+
+La pantalla tiene que arrancar sola en la dirección de su lista cada vez que vuelve la corriente, sin menús. Vale cualquiera de estas dos:
+
+- **Display profesional con reproductor integrado** (SoC) que se configura para arrancar desde una dirección web como página de inicio.
+- **Tele o monitor con un accesorio en el HDMI** (stick de TV o miniPC) y una **app de kiosco** que abra la dirección al encenderse. La tele debe encenderse sola al volver la luz (modo hotel o encendido automático) y el accesorio, tomar corriente con ella.
+
+El navegador normal de una tele doméstica (Google TV, Android TV, webOS, Tizen…) no sirve como reproductor: no arranca solo tras un corte de luz. El gestor se usa desde un ordenador, una tableta o un móvil con el navegador al día.
+
+## Cambios de la versión actual (v1.51)
+- **Requisitos de la pantalla** en este README y en la ayuda (Pantallas), en español, inglés y catalán: display profesional con reproductor que arranca desde una dirección, o tele con stick o miniPC y app de kiosco. Fuera la idea de abrirlo en el navegador de una tele doméstica.
+- La guía paso a paso (paso 6) dice ahora «abre la app de kiosco del stick (o el reproductor del display profesional)».
+- Caché nueva de la app (`adposter-v46`).
+
+## Cambios de la v1.50
 - **Guías paso a paso.** Al abrir el gestor sale una tarjeta para elegir entre dos recorridos guiados. En cada paso se oscurece la pantalla, se ilumina el botón que toca y una tarjeta explica qué hacer (Anterior, Siguiente, Salir; también con las flechas del teclado y Esc):
   1. **Crear una lista y ponerla en una pantalla** (9 pasos): las listas, el ASISTENTE o «+ Nueva», retocar en el lienzo, tus fotos, probar, abrir `/tv` en la tele, añadir la pantalla con su código, publicar y comprobar que funciona.
   2. **Gestionar a distancia una lista publicada** (10 pasos): conectar este aparato, ver las pantallas en directo, cambiar y publicar, poner otra lista un rato, AVISO, EMERGENCIA, la pestaña de avisos, el calendario y el mando en el móvil.
@@ -618,7 +632,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.50 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.51 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 
