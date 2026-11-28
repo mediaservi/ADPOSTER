@@ -820,3 +820,13 @@ html.md-op body { padding-bottom: 0; }
 .ay-gu .tecla { white-space: normal; line-height: 1.2; text-align: left; justify-content: flex-start; min-height: 44px; }
 @media (max-width: 600px) { .tr-card { font-size: 14px; padding: 12px 14px; } .tr-card h3 { font-size: 16px; } .ay-gu { grid-template-columns: minmax(0, 1fr); } }
 @media (max-height: 520px) { .tr-card { font-size: 13px; line-height: 1.35; padding: 9px 12px; width: min(440px, calc(100vw - 24px)); } .tr-card h3 { font-size: 15px; margin-bottom: 3px; } .tr-card p { margin-bottom: 8px; } .tr-cab { margin-bottom: 3px; } .tr-bt .tecla { min-height: 32px; padding: 4px 10px; } .tr-op .tecla { min-height: 38px; } }
+.rej.giro { grid-template-columns: repeat(4, 1fr); }   /* v1.52 · giro del display: 0°, 90°, 180°, 270° */
+
+/* v1.52 · probar cómo se verá: una tele dibujada (señal 16:9) montada con el giro elegido */
+dialog.adm.sim-tv { width: min(760px, calc(100vw - 24px)); }
+.sim-caja { position: relative; width: 100%; aspect-ratio: 16 / 10; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 40%, #2a2a2e, #121214); border-radius: 8px; overflow: hidden; }
+.sim-tele { --w: 88%; position: relative; width: var(--w); aspect-ratio: 16 / 9; border: 10px solid #050505; border-radius: 6px; box-shadow: 0 0 0 1px #3a3a40, 0 12px 30px #000c; background: #000; transition: transform .35s ease; }
+.sim-tele.g90, .sim-tele.g270 { --w: 54%; }
+.sim-tele.g90 { transform: rotate(-90deg); } .sim-tele.g180 { transform: rotate(180deg); } .sim-tele.g270 { transform: rotate(90deg); }
+.sim-tele iframe { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; border: 0; transform-origin: 0 0; pointer-events: none; }
+.sim-tv .fila.giro { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }

@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.51**
+**Versión actual: v1.52**
 
 
 ## Icono
@@ -14,7 +14,7 @@ Icono de pestaña y de app (noviembre 2026) en el estilo de placa de la familia 
 ## Cómo funciona
 
 1. Cada **lista** tiene su dirección: `adposter.mediaservi.com/cine`, `adposter.mediaservi.com/klub` o `adposter.mediaservi.com/p/?l=nombre`.
-2. Esa dirección se pone como **página de inicio del kiosco** (por ejemplo, la app Kiosk en un stick de TV conectado al HDMI del display).
+2. Esa dirección se pone como **página de inicio del kiosco**: en un stick con Android TV, la app **ADPOSTER LINK** lo hace sola con el código de alta; en un display profesional, en su reproductor.
 3. Al dar corriente al display, **arranca solo** en unos segundos y no hay que tocar nada más.
 
 Si el display está girado, se añade el giro a la dirección: `…/cine/?rot=90` (derecha), `?rot=180` (boca abajo) o `?rot=270` (izquierda). También valen las direcciones cortas de siempre: `…/cine/v`, `…/cine/i` y `…/cine/V`. Y cualquier lista nueva tiene la suya: `adposter.mediaservi.com/mi-bar`.
@@ -136,6 +136,8 @@ No hay servidor propio. El gestor, los displays y la página del público se hab
 
 | Ruta | Qué es |
 |---|---|
+| `link/` | Página de **ADPOSTER LINK** (instrucciones y descarga) y `link/apk`, la dirección corta de descarga |
+| `link/android/` | Código de la app ADPOSTER LINK (Android TV) |
 | `index.html`, `gestor.js`, `gestor.css` | El gestor |
 | `editor.js` | El editor de composiciones en el lienzo, las pestañas PIEZAS y ESCENA y la galería de plantillas |
 | `gestion.js` | La biblioteca de archivos y el calendario |
@@ -170,7 +172,26 @@ La pantalla tiene que arrancar sola en la dirección de su lista cada vez que vu
 
 El navegador normal de una tele doméstica (Google TV, Android TV, webOS, Tizen…) no sirve como reproductor: no arranca solo tras un corte de luz. El gestor se usa desde un ordenador, una tableta o un móvil con el navegador al día.
 
-## Cambios de la versión actual (v1.51)
+## ADPOSTER LINK · la app para la tele
+
+Para un stick o TV box con **Android TV o Google TV** (Xiaomi Mi TV Stick, Chromecast con Google TV…), ADPOSTER tiene su propia app: **ADPOSTER LINK**. Abre el reproductor a pantalla completa, sin menús, y **arranca sola cada vez que vuelve la luz**. Reproduce con todas las reglas del gestor (tiempos, anuncios cada X carteles, horarios, calendario, avisos y emergencia), porque lo que abre es el mismo reproductor.
+
+- **Instrucciones y descarga:** [adposter.mediaservi.com/link](https://adposter.mediaservi.com/link/). En la tele, con la app Downloader: `adposter.mediaservi.com/link/apk`.
+- **Primera vez:** pide el permiso «Mostrar sobre otras apps» (lo que la deja arrancar sola en Android 10 o posterior) y enseña el código de 6 caracteres para darla de alta desde el gestor.
+- **Recuerda su lista:** al volver la luz sigue donde estaba, con su giro, idioma y canal. Sin conexión reintenta cada 15 s; si se cae el motor del navegador, se rehace sola.
+- **Menú de la app:** tecla MENÚ, mantener ATRÁS o ATRÁS tres veces: recargar, volver a dar de alta, arrancar sola al encender, permiso, **modo kiosco total** (la app como pantalla de inicio del aparato) y ajustes. ATRÁS solo nunca la cierra.
+- **Código:** `link/android/` (Java, sin dependencias, Android 5 o posterior). GitHub la compila sola al subir cambios a `beta` (`.github/workflows/link-apk.yml`) y deja el APK en la publicación `link` del repositorio. La firma de serie es pública (`adposter-link-publica.jks`): si se guardan los secretos `LINK_KEYSTORE` (en base64) y `LINK_KS_PASS`, firma con esa otra clave.
+
+## Cambios de la versión actual (v1.52)
+- **ADPOSTER LINK** (nueva): la app de Android TV que arranca sola al volver la luz, con su página de instrucciones y descarga en `/link/` (es/en/ca) y la dirección corta `/link/apk` para la app Downloader.
+- **Probar cómo se verá:** en **+ Añadir pantalla**, el botón **▶ Probar cómo se verá** reproduce la lista elegida, con todas sus reglas, en una tele dibujada; con los botones de giro se ve montada en horizontal, en vertical o boca abajo, y «Usar este giro» lo deja elegido para el alta.
+- **Giro de la pantalla desde la tele:** en el panel del display (OK del mando o tocar la pantalla) hay ahora **Giro de la pantalla** (0°, 90°, 180°, 270°), también en las composiciones.
+- **Giro de la pantalla desde el gestor:** **DIRECTO** › una pantalla › **Giro de la pantalla**. La pantalla vuelve a arrancar ya girada y lo recuerda aunque su página de inicio diga otro giro. Cada display cuenta al gestor qué giro tiene.
+- En el alta de pantalla, la ayuda y la guía paso a paso, ADPOSTER LINK aparece como la forma recomendada para un stick con Android TV, con enlace a su página; también en Accesos directos.
+- Caché nueva de la app (`adposter-v47`).
+
+## Cambios de la v1.51
+
 - **Requisitos de la pantalla** en este README y en la ayuda (Pantallas), en español, inglés y catalán: display profesional con reproductor que arranca desde una dirección, o tele con stick o miniPC y app de kiosco. Fuera la idea de abrirlo en el navegador de una tele doméstica.
 - La guía paso a paso (paso 6) dice ahora «abre la app de kiosco del stick (o el reproductor del display profesional)».
 - Caché nueva de la app (`adposter-v46`).

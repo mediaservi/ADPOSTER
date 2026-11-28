@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sin_red">Sense connexió: es torna a provar cada 15 segons…</string>
+    <string name="recargar">Torna a carregar</string>
+    <string name="nueva_alta">Dona d’alta un altre cop (codi nou)</string>
+    <string name="nueva_alta_txt">La pantalla oblidarà la seva llista i ensenyarà un codi nou per donar-la d’alta des del gestor. Segur?</string>
+    <string name="arranque">Arrencar sola en engegar</string>
+    <string name="permiso">Permís per arrencar sola</string>
+    <string name="permiso_txt">Perquè ADPOSTER LINK s’obri sola cada cop que torna la llum, Android necessita el permís «Mostra sobre altres aplicacions». Es dona un sol cop: a la pantalla que s’obre, busca ADPOSTER LINK i activa’l.</string>
+    <string name="permiso_adb">Aquest aparell no deixa obrir aquest ajust des de l’app. Busca’l a Configuració › Aplicacions › Accés especial › Mostra sobre altres aplicacions, o activa’l un cop des d’un ordinador amb: adb shell appops set com.mediaservi.adposterlink SYSTEM_ALERT_WINDOW allow</string>
+    <string name="dar_permiso">Dona permís</string>
+    <string name="ahora_no">Ara no</string>
+    <string name="kiosco">Mode quiosc total (pantalla d’inici)</string>
+    <string name="kiosco_on">Fet. Ara prem OK: Android preguntarà quina pantalla d’inici fer servir. Tria ADPOSTER LINK i «Sempre». Per desfer-ho, torna a aquest menú.</string>
+    <string name="kiosco_off">Mode quiosc total desactivat: l’aparell torna a la seva pantalla d’inici de sempre.</string>
+    <string name="ajustes_aparato">Configuració de l’aparell</string>
+    <string name="salir">Surt</string>
+    <string name="si">Sí</string>
+    <string name="no">No</string>
+</resources>

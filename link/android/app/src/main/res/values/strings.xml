@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ADPOSTER LINK</string>
+    <string name="sin_red">Sin conexión: reintentando cada 15 segundos…</string>
+    <string name="recargar">Recargar</string>
+    <string name="nueva_alta">Dar de alta otra vez (código nuevo)</string>
+    <string name="nueva_alta_txt">La pantalla olvidará su lista y enseñará un código nuevo para darla de alta desde el gestor. ¿Seguro?</string>
+    <string name="arranque">Arrancar sola al encender</string>
+    <string name="permiso">Permiso para arrancar sola</string>
+    <string name="permiso_txt">Para que ADPOSTER LINK se abra sola cada vez que vuelve la luz, Android necesita el permiso «Mostrar sobre otras apps». Se da una sola vez: en la pantalla que se abre, busca ADPOSTER LINK y actívalo.</string>
+    <string name="permiso_adb">Este aparato no deja abrir ese ajuste desde la app. Búscalo en Ajustes › Apps › Acceso especial › Mostrar sobre otras apps, o actívalo una vez desde un ordenador con: adb shell appops set com.mediaservi.adposterlink SYSTEM_ALERT_WINDOW allow</string>
+    <string name="dar_permiso">Dar permiso</string>
+    <string name="ahora_no">Ahora no</string>
+    <string name="kiosco">Modo kiosco total (pantalla de inicio)</string>
+    <string name="kiosco_on">Hecho. Ahora pulsa OK: Android preguntará qué pantalla de inicio usar. Elige ADPOSTER LINK y «Siempre». Para deshacerlo, vuelve a este menú.</string>
+    <string name="kiosco_off">Modo kiosco total desactivado: el aparato vuelve a su pantalla de inicio de siempre.</string>
+    <string name="ajustes_aparato">Ajustes del aparato</string>
+    <string name="salir">Salir</string>
+    <string name="si">Sí</string>
+    <string name="no">No</string>
+</resources>

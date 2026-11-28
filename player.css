@@ -177,3 +177,8 @@ body.ap.px1 #escena { contain: strict; }
 .desenf .marco { overflow: hidden; }
 .desenf .capa.entera .hoja { z-index: 1; }
 .llena.desenf .capa.entera .hoja.anim { animation: none; transform: none; }
+
+/* v1.52 · giro del display en el panel: cuatro botones, el elegido encendido */
+.panel .fila.giro { flex-wrap: wrap; }
+.panel .fila.giro button.rd { width: auto; min-width: calc(var(--u) * 9); padding-left: calc(var(--u) * 1.4); padding-right: calc(var(--u) * 1.4); }
+.panel .fila.giro button.rd.on { background: #ffb000; color: #000; border-color: #ffb000; }

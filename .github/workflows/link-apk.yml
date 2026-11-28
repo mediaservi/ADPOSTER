@@ -1,0 +1,43 @@
+# ADPOSTER LINK · compila la app de Android TV y la deja en la publicación «link» del repositorio:
+# https://github.com/mediaservi/ADPOSTER/releases/download/link/adposter-link.apk
+name: ADPOSTER LINK (APK)
+on:
+  push:
+    branches: [beta]
+    paths: ['link/android/**', '.github/workflows/link-apk.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.9' }
+      - name: Compilar
+        env:
+          LINK_KS_B64: ${{ secrets.LINK_KEYSTORE }}
+          LINK_KS_PASS_S: ${{ secrets.LINK_KS_PASS }}
+        run: |
+          if [ -n "$LINK_KS_B64" ]; then echo "$LINK_KS_B64" | base64 -d > "$RUNNER_TEMP/link.jks"; export LINK_KS="$RUNNER_TEMP/link.jks" LINK_KS_PASS="$LINK_KS_PASS_S"; fi
+          set -o pipefail
+          gradle -p link/android assembleRelease --no-daemon 2>&1 | tee compilacion.log
+          cp link/android/app/build/outputs/apk/release/app-release.apk adposter-link.apk
+      - uses: actions/upload-artifact@v4
+        with: { name: adposter-link, path: adposter-link.apk }
+      - name: Publicar en «link»
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: |
+          gh release view link >/dev/null 2>&1 || gh release create link --title "ADPOSTER LINK" --notes "App de Android TV de ADPOSTER: abre el reproductor a pantalla completa y arranca sola al encender. Instrucciones: https://adposter.mediaservi.com/link/" --latest=false
+          gh release upload link adposter-link.apk --clobber
+      - name: Si falla, deja el registro en «link» (compilacion.log)
+        if: failure()
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: |
+          gh release view link >/dev/null 2>&1 || gh release create link --title "ADPOSTER LINK" --notes "App de Android TV de ADPOSTER." --latest=false
+          tail -c 200000 compilacion.log > compilacion-error.log || echo "sin registro" > compilacion-error.log
+          gh release upload link compilacion-error.log --clobber

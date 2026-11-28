@@ -16,7 +16,7 @@
    Licencia GPL-3.0 · mediaservi.com */
 (() => {
   'use strict';
-  const VERSION = '1.51';
+  const VERSION = '1.52';
   const SC = document.currentScript, Q = new URLSearchParams(location.search);
   const BASE = new URL(SC.dataset.base || '../', location.href).href;
   const ID = (SC.dataset.playlist || Q.get('l') || 'demo').toLowerCase().replace(/[^a-z0-9_-]/g, '');
@@ -42,7 +42,7 @@
 
   /* ---------- idioma (es · en · ca) ---------- */
   const LANG = (Q.get('lang') || (PREV ? '' : leeG('lang')) || navigator.language || 'es').slice(0, 2).toLowerCase();   // v1.23 · el idioma de la URL del kiosco se queda guardado en el display
-  const TX = { 'Duración de cada póster': ['Time per poster', 'Durada de cada pòster'], 'Transición': ['Transition', 'Transició'], 'Carpetas de contenido': ['Content folders', 'Carpetes de contingut'], 'Carpetas de anuncios': ['Ad folders', "Carpetes d'anuncis"],
+  const TX = { 'Giro de la pantalla': ['Screen rotation', 'Gir de la pantalla'], 'Duración de cada póster': ['Time per poster', 'Durada de cada pòster'], 'Transición': ['Transition', 'Transició'], 'Carpetas de contenido': ['Content folders', 'Carpetes de contingut'], 'Carpetas de anuncios': ['Ad folders', "Carpetes d'anuncis"],
     'Aceptar y reproducir': ['Apply and play', 'Accepta i reprodueix'], 'Restablecer': ['Reset', 'Restableix'], 'Cerrar': ['Close', 'Tanca'], 'fundido': ['fade', 'fosa'], 'zoom': ['zoom', 'zoom'], 'desliza': ['slide', 'llisca'], 'cortina': ['wipe', 'cortina'], 'corte': ['cut', 'tall'],
     'Sin conexión: reintentando…': ['Offline: retrying…', 'Sense connexió: reintentant…'], 'Esta lista aún no tiene carteles: añádelos desde el gestor.': ['This list has no posters yet: add them from the manager.', 'Aquesta llista encara no té cartells: afegeix-los des del gestor.'], 'No existe la playlist': ['Playlist not found', 'No existeix la playlist'],
     'es un proyecto hecho con': ['is a project made with', 'és un projecte fet amb'], 'imágenes': ['images', 'imatges'], 'Contenido privado de este display': ['Private content of this display', 'Contingut privat d’aquest display'], 'Estos ajustes se guardan solo en este display.': ['These settings are saved on this display only.', 'Aquests ajustos es desen només en aquest display.'],
@@ -62,7 +62,7 @@
     if (!window.ADDIRECTO) return; let ok = false; const est = t => { d.querySelector('.est').textContent = t; };
     /* v1.23 · «hola» retenido: el gestor sabe al momento si el código existe (un código mal tecleado se avisa en segundos, no a los 90 s) */
     const c = window.ADDIRECTO.conecta('alta' + DISP, { temas: ['cfg'], alCambiar: v => { if (v && !ok) c.pub('hola', { d: DISP, t: Date.now() }, true); if (!ok) est(T(v ? 'Esperando…' : 'Sin conexión con el repetidor: reintentando…')); }, alMensaje: (t, x) => { if (t !== 'cfg' || ok || !x || !window.ADDIRECTO.canalOk(x.canal)) return; ok = true;
-      guardaG('canal', x.canal); [['n', 'nombre'], ['g', 'grupo'], ['s', 'sede']].forEach(([a, k]) => guardaG(k, String(x[a] || '').trim().slice(0, 32))); guardaG('etiq', String(x.et || '').trim().slice(0, 120)); if (/^(es|en|ca)$/.test(x.lang || '')) guardaG('lang', x.lang); if (x.origen && URL_OK.test(x.origen)) guardaG('origen', x.origen.replace(/\/*$/, '/'));
+      guardaG('canal', x.canal); guardaG('giro', ''); [['n', 'nombre'], ['g', 'grupo'], ['s', 'sede']].forEach(([a, k]) => guardaG(k, String(x[a] || '').trim().slice(0, 32))); guardaG('etiq', String(x.et || '').trim().slice(0, 120)); if (/^(es|en|ca)$/.test(x.lang || '')) guardaG('lang', x.lang); if (x.origen && URL_OK.test(x.origen)) guardaG('origen', x.origen.replace(/\/*$/, '/'));
       /* v1.23 · las listas llegan con el emparejado: la pantalla enseña su lista al momento, sin esperar a que nadie pulse nada */
       if (x.datos && typeof x.datos === 'object' && x.datos.playlists) try { localStorage.setItem(G + 'vivo', JSON.stringify(x.datos)); } catch (e) {}
       c.borra('hola'); c.pub('ok', { d: DISP, t: Date.now() }); est('✓ ' + T('¡Emparejada!')); const p = new URLSearchParams(); p.set('l', String(x.l || 'demo').toLowerCase().replace(/[^a-z0-9_-]/g, '')); if (+x.rot) p.set('rot', +x.rot); if (x.lang) p.set('lang', String(x.lang).slice(0, 2)); p.set('canal', x.canal);   // el canal va también en la dirección: sirve de página de inicio del kiosco aunque se borre la memoria del aparato
@@ -80,7 +80,7 @@
   const url = f => DATOS + 'assets/' + f.split('/').map(encodeURIComponent).join('/') + (MAN && MAN.huellas && MAN.huellas[f] ? '?v=' + encodeURIComponent(MAN.huellas[f]) : '');   // con huella, la copia guardada vale para siempre
 
   /* ---------- escenario ---------- */
-  document.body.classList.add('ap'); const rot = +Q.get('rot') || 0; if (rot === 90 || rot === 270) document.body.classList.add('rot', 'rot-' + rot); else if (rot === 180) document.body.classList.add('rot-180');   // giro del display: ?rot=90 (derecha), 180 (boca abajo) o 270 (izquierda)
+  document.body.classList.add('ap'); const rot = (g => g ? +g : +Q.get('rot') || 0)(PREV ? '' : leeG('giro'));   /* v1.52 · el giro cambiado desde la tele o el gestor manda sobre la dirección (que puede ser la página de inicio fija del kiosco) */ if (rot === 90 || rot === 270) document.body.classList.add('rot', 'rot-' + rot); else if (rot === 180) document.body.classList.add('rot-180');   // giro del display: ?rot=90 (derecha), 180 (boca abajo) o 270 (izquierda)
   const escena = el('div'); escena.id = 'escena';
   escena.innerHTML = '<div class="fondo"></div><div class="marco"><div class="capa"><div class="hoja"><img alt=""></div></div><div class="capa"><div class="hoja"><img alt=""></div></div></div><div class="anuncio"><img alt=""></div><div class="anuncio"><img alt=""></div><div class="esc-capa"></div><div class="esc-capa"></div><div class="qr"><div class="q-img"></div><div class="q-txt"></div></div><div class="cinta"><div class="c-in"><span></span></div></div><div class="apagado"></div><div class="alerta"><div class="a-in"></div></div><div class="aviso"></div><div class="emer"><div class="em-t"></div><div class="em-x"></div></div><div class="panel"></div>';
   document.body.appendChild(escena);
@@ -296,11 +296,13 @@
   let dir = null, dirP = null, dirK = null, canalP = '', uPide = 0;
   const yo = () => ({ n: leeG('nombre') || 'DISPLAY ' + DISP.toUpperCase(), g: slug(leeG('grupo')), s: slug(leeG('sede')), et: [...new Set(String(leeG('etiq') || '').split(',').map(slug).filter(Boolean))].slice(0, 8) });
   const canalAct = () => leeG('canal') || (LISTAS && typeof LISTAS.canal === 'string' ? LISTAS.canal : '');
-  const estadoDe = () => { const y = yo(); return { n: y.n, g: y.g, s: y.s, et: y.et, l: ID, ln: cfg.nombre, f: cfg.formato, md: cfg.medida ? cfg.medida.w + '×' + cfg.medida.h : '', w: innerWidth, h: innerHeight, v: VERSION, off: offR ? 2 : enHorario() && !offA ? 0 : 1, i: actual.ads || actual.feed || '', es: !actual.ads && escAct && ESC() ? String(escAct.id || '').slice(0, 40) : '', p: ORIGEN ? 1 : 0, c: CASA, e: EMR ? (EMR.sc ? 2 : 1) : 0, ei: EMR ? emId(EMR) : '', dv: VIVOL ? +VIVOL.t || 0 : 0, mf: faltan(), t: Date.now() }; };   // v1.23 · dv: qué envío de listas tiene; mf: imágenes que aún no le han llegado
+  const estadoDe = () => { const y = yo(); return { n: y.n, g: y.g, s: y.s, et: y.et, l: ID, ln: cfg.nombre, f: cfg.formato, md: cfg.medida ? cfg.medida.w + '×' + cfg.medida.h : '', w: innerWidth, h: innerHeight, r: rot, v: VERSION, off: offR ? 2 : enHorario() && !offA ? 0 : 1, i: actual.ads || actual.feed || '', es: !actual.ads && escAct && ESC() ? String(escAct.id || '').slice(0, 40) : '', p: ORIGEN ? 1 : 0, c: CASA, e: EMR ? (EMR.sc ? 2 : 1) : 0, ei: EMR ? emId(EMR) : '', dv: VIVOL ? +VIVOL.t || 0 : 0, mf: faltan(), t: Date.now() }; };   // v1.23 · dv: qué envío de listas tiene; mf: imágenes que aún no le han llegado
   function estado() { if (!dir || !cfg) return; dir.pub('estado/' + DISP, estadoDe(), true); }
   function menu() { if (!dirP || !LISTAS) return; const pl = LISTAS.playlists || {}; dirP.pub('menu/' + DISP, { n: leeG('nombre') || cfg.nombre, l: ID, listas: Object.keys(pl).filter(k => pl[k] && pl[k].publico).slice(0, 24).map(k => ({ id: k, n: String(pl[k].nombre || k.toUpperCase()).slice(0, 40) })), t: Date.now() }, true); }
   function ir(id, porAgenda, hasta) { id = String(id || '').toLowerCase().replace(/[^a-z0-9_-]/g, ''); if (PREV || !id || !LISTAS || !LISTAS.playlists || !LISTAS.playlists[id]) return false; if (hasta) guardaG('tk', JSON.stringify({ id, h: hasta })); if (id === ID) { if (hasta) TK = hasta; return false; }
     const q = new URLSearchParams(); q.set('l', id); if (porAgenda || hasta) q.set('ag', '1'); if (hasta) q.set('tk', hasta); if (rot) q.set('rot', rot); if (Q.get('lang')) q.set('lang', Q.get('lang')); location.replace(BASE + 'p/?' + q); return true; }
+  /* v1.52 · GIRO del display (0, 90, 180 o 270): desde el panel de la tele o por orden del gestor. Se guarda en el aparato y en la dirección, y la pantalla vuelve a arrancar ya girada */
+  function gira(v) { v = [0, 90, 180, 270].includes(+v) ? +v : 0; if (PREV || v === rot) return; guardaG('giro', String(v)); const u = new URL(location.href); if (v) u.searchParams.set('rot', v); else u.searchParams.delete('rot'); location.replace(u.href); }
   function orden(o, ret) { if (!o || typeof o !== 'object') return;
     if (o.t === 'lista') { if (o.ot && !PREV) { if (+o.ot <= (+leeG('ordt') || 0)) return; guardaG('ordt', String(o.ot)); } else if (ret) return;   // v1.23 · la orden de A PANTALLAS queda retenida: la recibe también la pantalla que estaba apagada
       const h = +o.hasta || 0; if (h && h <= Date.now()) return; if (o.casa) { guardaG('punt', ''); guardaG('tk', ''); TK = 0; if (o.id === ID) { CASA = ID; guardaG('casa', ID); } else ir(o.id, false); } else if (h) ir(o.id, true, h); else puntual(o.id); }
@@ -310,6 +312,7 @@
     else if (o.t === 'cinta') { cintaR = String(o.x || '').slice(0, 600); cintaH = cintaR && +o.hasta > Date.now() ? +o.hasta : 0; if (!PREV) { guardaG('cinta', cintaR); guardaG('cinta-h', cintaH ? String(cintaH) : ''); } cinta(); margenes(); }
     else if (o.t === 'apaga') { offR = !!o.v; if (!PREV) guardaG('off', offR ? '1' : ''); gen++; estado(); }
     else if (o.t === 'recarga') { if (!PREV) location.reload(); }
+    else if (o.t === 'giro') gira(o.v);
     else if (o.t === 'ident') { const y = yo(); alerta(y.n + '\n' + DISP.toUpperCase() + (y.g ? ' · ' + y.g : '') + (y.s ? ' · ' + y.s : ''), 8, 'azul'); }
     else if (o.t === 'pon' && !PREV) { [['n', 'nombre'], ['g', 'grupo'], ['s', 'sede'], ['et', 'etiq']].forEach(([a, k]) => { if (typeof o[a] === 'string') guardaG(k, o[a].trim().slice(0, k === 'etiq' ? 120 : 32)); }); enlaza(); estado(); menu(); } }
   function enlaza() { if (PREV || !window.ADDIRECTO) return; const c = canalAct(), y = yo(), k = c + '|' + y.g + '|' + y.s + '|' + (y.et || []).join(','); if (k === dirK) return; dirK = k;
@@ -363,17 +366,19 @@
     p.innerHTML = `<div class="p-cab"><img src="${BASE}assets/logos/adposter-logo.svg" alt="ADPOSTER"><b>${cfg.nombre}</b></div>
       <h3>${T('Duración de cada póster')}</h3><div class="fila"><button class="rd" data-a="menos">−</button><div class="lcd">${borr.segundos} s</div><button class="rd" data-a="mas">+</button></div>
       <h3>${T('Transición')}</h3><div class="fila"><button class="rd" data-a="tant">◀</button><div class="lcd">${T(borr.fundido.tipo)}</div><button class="rd" data-a="tsig">▶</button></div>
+      <h3>${T('Giro de la pantalla')}</h3><div class="fila giro">${[0, 90, 180, 270].map(g => `<button class="rd${g === rot ? ' on' : ''}" data-a="giro" data-v="${g}" aria-pressed="${g === rot}">${g}°</button>`).join('')}</div>
       <h3>${T('Carpetas de contenido')}</h3><div class="lista">${con.map(c => chk(c, 'contenido')).join('')}</div>
       <h3>${T('Carpetas de anuncios')}</h3><div class="lista">${ads.map(c => chk(c, 'anuncios')).join('')}</div>
       <div class="acc"><button class="pri" data-a="ok">${T('Aceptar y reproducir')}</button><button data-a="reset">${T('Restablecer')}</button><button data-a="cerrar">${T('Cerrar')}</button></div>
       <div class="firma">${T('Estos ajustes se guardan solo en este display.')}${ORIGEN ? '<br>🔒 ' + T('Contenido privado de este display') : ''}${PRE.total ? '<br>💾 ' + PRE.ok + ' / ' + PRE.total + ' ' + T('imágenes guardadas en este display') + (PRE.fin ? '' : ' (' + T('descargando') + '…)') : ''}<br>${leeG('nombre') ? leeG('nombre').replace(/[<>&"]/g, '') + ' · ' : 'DISPLAY '}${DISP.toUpperCase()}${dir ? ' · ' + T('Directo') + ': ' + T(dir.up ? 'conectado' : 'sin conexión') : ''}<br>${window.AVCREDITO ? window.AVCREDITO.html('ADPOSTER', 'v' + VERSION, LANG, { sinEnlaces: true }) : 'ADPOSTER v' + VERSION + ' ' + new Date().getFullYear() + ' ' + T('es un proyecto hecho con') + ' by mediaservi.com'}</div>`; }
-  function abre() { if (PREV || !cfg) return; if (ESC()) { const p = $('.panel'); p.innerHTML = `<div class="p-cab"><img src="${BASE}assets/logos/adposter-logo.svg" alt="ADPOSTER"><b></b></div><div class="acc"><button class="pri" data-a="cerrar">${T('Cerrar')}</button></div><div class="firma">${leeG('nombre') ? leeG('nombre').replace(/[<>&"]/g, '') + ' · ' : 'DISPLAY '}${DISP.toUpperCase()}${dir ? ' · ' + T('Directo') + ': ' + T(dir.up ? 'conectado' : 'sin conexión') : ''}<br>${window.AVCREDITO ? window.AVCREDITO.html('ADPOSTER', 'v' + VERSION, LANG, { sinEnlaces: true }) : 'ADPOSTER v' + VERSION}</div>`; p.querySelector('.p-cab b').textContent = cfg.nombre; document.body.classList.add('con-panel'); tPanel = Date.now(); p.querySelector('.pri').focus(); return; }
+  function abre() { if (PREV || !cfg) return; if (ESC()) { const p = $('.panel'); p.innerHTML = `<div class="p-cab"><img src="${BASE}assets/logos/adposter-logo.svg" alt="ADPOSTER"><b></b></div><h3>${T('Giro de la pantalla')}</h3><div class="fila giro">${[0, 90, 180, 270].map(g => `<button class="rd${g === rot ? ' on' : ''}" data-a="giro" data-v="${g}" aria-pressed="${g === rot}">${g}°</button>`).join('')}</div><div class="acc"><button class="pri" data-a="cerrar">${T('Cerrar')}</button></div><div class="firma">${leeG('nombre') ? leeG('nombre').replace(/[<>&"]/g, '') + ' · ' : 'DISPLAY '}${DISP.toUpperCase()}${dir ? ' · ' + T('Directo') + ': ' + T(dir.up ? 'conectado' : 'sin conexión') : ''}<br>${window.AVCREDITO ? window.AVCREDITO.html('ADPOSTER', 'v' + VERSION, LANG, { sinEnlaces: true }) : 'ADPOSTER v' + VERSION}</div>`; p.querySelector('.p-cab b').textContent = cfg.nombre; document.body.classList.add('con-panel'); tPanel = Date.now(); p.querySelector('.pri').focus(); return; }
     borr = { segundos: cfg.segundos, fundido: { tipo: cfg.fundido.tipo, segundos: cfg.fundido.segundos }, contenido: cfg.contenido.slice(), anuncios: cfg.anuncios.slice() }; pinta(); document.body.classList.add('con-panel'); tPanel = Date.now(); const b = $('.panel .pri'); b && b.focus(); }
   function cierra() { document.body.classList.remove('con-panel'); }
   function accion(t) { const a = t.dataset.a, foco = sel => { pinta(); const e = $(sel); e && e.focus(); }; tPanel = Date.now();
     if (t.dataset.c) { const l = borr[t.dataset.g], i = l.indexOf(t.dataset.c); i < 0 ? l.push(t.dataset.c) : l.splice(i, 1); foco(`.panel label[data-g="${t.dataset.g}"][data-c="${t.dataset.c}"]`); return; }
     if (a === 'menos' || a === 'mas') { borr.segundos = Math.min(120, Math.max(2, borr.segundos + (a === 'mas' ? 1 : -1))); foco(`.panel [data-a="${a}"]`); }
     else if (a === 'tant' || a === 'tsig') { const i = TIPOS.indexOf(borr.fundido.tipo); borr.fundido.tipo = TIPOS[(i + (a === 'tsig' ? 1 : TIPOS.length - 1)) % TIPOS.length]; foco(`.panel [data-a="${a}"]`); }
+    else if (a === 'giro') { cierra(); gira(t.dataset.v); }
     else if (a === 'ok') { guarda('local', borr); cierra(); aplica(); }
     else if (a === 'reset') { guarda('local', null); cierra(); aplica(); }
     else if (a === 'cerrar') cierra(); }

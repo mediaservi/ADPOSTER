@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sin_red">No connection: retrying every 15 seconds…</string>
+    <string name="recargar">Reload</string>
+    <string name="nueva_alta">Add this screen again (new code)</string>
+    <string name="nueva_alta_txt">The screen will forget its list and show a new code to add it from the manager. Are you sure?</string>
+    <string name="arranque">Start by itself at power-on</string>
+    <string name="permiso">Permission to start by itself</string>
+    <string name="permiso_txt">For ADPOSTER LINK to open by itself every time the power comes back, Android needs the “Display over other apps” permission. It is given once: on the screen that opens, find ADPOSTER LINK and turn it on.</string>
+    <string name="permiso_adb">This device does not let the app open that setting. Find it in Settings › Apps › Special app access › Display over other apps, or turn it on once from a computer with: adb shell appops set com.mediaservi.adposterlink SYSTEM_ALERT_WINDOW allow</string>
+    <string name="dar_permiso">Give permission</string>
+    <string name="ahora_no">Not now</string>
+    <string name="kiosco">Full kiosk mode (home screen)</string>
+    <string name="kiosco_on">Done. Now press OK: Android will ask which home screen to use. Choose ADPOSTER LINK and “Always”. To undo it, come back to this menu.</string>
+    <string name="kiosco_off">Full kiosk mode turned off: the device goes back to its usual home screen.</string>
+    <string name="ajustes_aparato">Device settings</string>
+    <string name="salir">Exit</string>
+    <string name="si">Yes</string>
+    <string name="no">No</string>
+</resources>

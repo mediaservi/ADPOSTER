@@ -1,0 +1,26 @@
+// ADPOSTER LINK · app de Android TV que abre el reproductor de ADPOSTER a pantalla completa y arranca sola al encender · GPL-3.0 · mediaservi.com
+plugins { id 'com.android.application' }
+android {
+    namespace 'com.mediaservi.adposterlink'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'com.mediaservi.adposterlink'
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+    }
+    signingConfigs {
+        firma {
+            storeFile file(System.getenv('LINK_KS') ?: '../adposter-link-publica.jks')
+            storePassword System.getenv('LINK_KS_PASS') ?: 'adposterlink'
+            keyAlias System.getenv('LINK_KS_ALIAS') ?: 'adposterlink'
+            keyPassword System.getenv('LINK_KS_PASS') ?: 'adposterlink'
+        }
+    }
+    buildTypes {
+        release { minifyEnabled false; signingConfig signingConfigs.firma }
+    }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_1_8; targetCompatibility JavaVersion.VERSION_1_8 }
+    lint { abortOnError false; checkReleaseBuilds false }
+}
