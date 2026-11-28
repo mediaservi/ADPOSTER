@@ -4,7 +4,7 @@
 
 Es software gratuito hecho por afición: sin cuentas, sin servidor propio, sin publicidad y sin cuotas.
 
-**Versión actual: v1.49**
+**Versión actual: v1.50**
 
 
 ## Icono
@@ -161,7 +161,14 @@ Para publicar los ajustes de las listas: **Guardar playlists.json** y subir ese 
 
 En tu propio dominio: copia el repositorio, publícalo (GitHub Pages, Netlify o cualquier alojamiento estático) y pon tus carpetas en `assets/`.
 
-## Cambios de la versión actual (v1.49)
+## Cambios de la versión actual (v1.50)
+- **Guías paso a paso.** Al abrir el gestor sale una tarjeta para elegir entre dos recorridos guiados. En cada paso se oscurece la pantalla, se ilumina el botón que toca y una tarjeta explica qué hacer (Anterior, Siguiente, Salir; también con las flechas del teclado y Esc):
+  1. **Crear una lista y ponerla en una pantalla** (9 pasos): las listas, el ASISTENTE o «+ Nueva», retocar en el lienzo, tus fotos, probar, abrir `/tv` en la tele, añadir la pantalla con su código, publicar y comprobar que funciona.
+  2. **Gestionar a distancia una lista publicada** (10 pasos): conectar este aparato, ver las pantallas en directo, cambiar y publicar, poner otra lista un rato, AVISO, EMERGENCIA, la pestaña de avisos, el calendario y el mando en el móvil.
+- La tarjeta del inicio se apaga con **«Mostrar al abrir»**. Las dos guías se pueden lanzar siempre desde la AYUDA («?»). En el móvil, cada paso cambia sola a la vista donde está el botón.
+- Caché nueva de la app (`adposter-v45`).
+
+## Cambios de la v1.49
 - **Accesos directos** al final de la información: la guía (AYUDA) acaba con un apartado «Accesos directos» y la ventana «Acerca de» también. Cada línea lleva el nombre (se abre al tocarlo), la dirección entera y un botón **Copiar**: el gestor (`adposter.mediaservi.com`), la alta de una pantalla en la tele (`/tv`) y las listas de ejemplo CINE (`/cine`) y KLUB (`/klub`). En español, inglés y catalán.
 - Caché nueva de la app (`adposter-v44`).
 
@@ -611,7 +618,7 @@ Sigue de la v0.1:
 
 ---
 
-*ADPOSTER v1.49 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
+*ADPOSTER v1.50 2026 es un proyecto hecho con ⚙ by [mediaservi.com](https://mediaservi.com)*
 
 ## Aviso
 

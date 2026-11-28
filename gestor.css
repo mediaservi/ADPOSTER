@@ -801,3 +801,22 @@ html.md-op body { padding-bottom: 0; }
 .acc-f code { font: 13px/1.25 'Share Tech Mono', monospace; color: #c5ccd4; min-width: 0; overflow-wrap: anywhere; }
 .acc-f .tecla { min-height: 34px; padding: 4px 12px; font-size: 13px; }
 @media (max-width: 600px) { .acc-f { grid-template-columns: minmax(0, 1fr) auto; } .acc-f code { grid-column: 1; grid-row: 2; } .acc-f .tecla { grid-column: 2; grid-row: 1 / span 2; } }
+
+/* v1.50 · GUÍAS PASO A PASO: la luz rodea el botón del paso (el resto se oscurece) y la tarjeta explica qué hacer */
+.tr-luz { position: fixed; z-index: 2147483000; pointer-events: none; border: 2px solid var(--ambar, #ffb000); border-radius: 10px; box-shadow: 0 0 0 200vmax rgba(0, 0, 0, .62), 0 0 18px rgba(255, 176, 0, .55); transition: left .25s ease, top .25s ease, width .25s ease, height .25s ease; }
+.tr-luz.tod { left: 0 !important; top: 0 !important; width: 100vw !important; height: 100vh !important; border: 0; border-radius: 0; box-shadow: none; background: rgba(0, 0, 0, .62); }
+.tr-card { position: fixed; z-index: 2147483001; width: min(400px, calc(100vw - 24px)); max-height: calc(100vh - 24px); overflow: auto; background: linear-gradient(180deg, #23262b, #17191d); border: 1px solid #000; outline: 1px solid var(--ambar, #ffb000); border-radius: 12px; padding: 14px 16px; color: #e6e9ed; box-shadow: 0 18px 50px rgba(0, 0, 0, .6); font: 400 15px/1.45 Inter, system-ui, sans-serif; transition: left .25s ease, top .25s ease; }
+.tr-cab { display: flex; justify-content: space-between; gap: 10px; font: 700 11px/1.2 'Share Tech Mono', monospace; letter-spacing: .14em; text-transform: uppercase; color: var(--ambar, #ffb000); margin-bottom: 6px; }
+.tr-cab span { min-width: 0; overflow-wrap: anywhere; }
+.tr-card h3 { margin: 0 0 6px; font: 800 18px/1.2 Inter, system-ui, sans-serif; color: #fff; }
+.tr-card p { margin: 0 0 12px; } .tr-card p b { color: #fff; }
+.tr-bt { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; } .tr-bt > span { flex: 1; }
+.tr-bt .tecla { min-height: 38px; padding: 6px 12px; flex: none; }
+.tr-op { display: grid; gap: 8px; margin-bottom: 12px; }
+.tr-op .tecla { justify-content: flex-start; gap: 10px; text-align: left; min-height: 48px; padding: 8px 12px; white-space: normal; }
+.tr-op .tecla b { flex: none; width: 1.7em; height: 1.7em; border-radius: 50%; display: inline-grid; place-items: center; background: #111; color: var(--ambar, #ffb000); font: 800 .85em/1 'Share Tech Mono', monospace; }
+.tr-op .tecla span { min-width: 0; line-height: 1.2; }
+.ay-gu { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.ay-gu .tecla { white-space: normal; line-height: 1.2; text-align: left; justify-content: flex-start; min-height: 44px; }
+@media (max-width: 600px) { .tr-card { font-size: 14px; padding: 12px 14px; } .tr-card h3 { font-size: 16px; } .ay-gu { grid-template-columns: minmax(0, 1fr); } }
+@media (max-height: 520px) { .tr-card { font-size: 13px; line-height: 1.35; padding: 9px 12px; width: min(440px, calc(100vw - 24px)); } .tr-card h3 { font-size: 15px; margin-bottom: 3px; } .tr-card p { margin-bottom: 8px; } .tr-cab { margin-bottom: 3px; } .tr-bt .tecla { min-height: 32px; padding: 4px 10px; } .tr-op .tecla { min-height: 38px; } }
